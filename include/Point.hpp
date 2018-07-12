@@ -14,7 +14,7 @@ public:
   Point(const Vec & coord): _coords(coords){}; // Controllare come si passano elementi eigen
   unsigned get_dimension() const;
   const Vec & get_coords() const;
-  const double & operator[](std::size_t i);
+  const double & operator()(std::size_t i);
   double l2norm() const;
 };
 

@@ -6,7 +6,7 @@ unsigned Point::get_dimension() const {
 const Vec & Point::get_coords() const {
   return (_coords);
 }
-const double & Point::operator[](std::size_t i) const {
+const double & Point::operator()(std::size_t i) const {
   return (_coords(i));
 }
 
