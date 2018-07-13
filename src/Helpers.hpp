@@ -8,9 +8,6 @@ typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::VectorXd Vec;
 typedef Triplet<double> TripType;
 
-enum checkDistance {
-  EUCLIDEAN,
-  GEODIST
-};
+
 
 #endif
