@@ -8,7 +8,7 @@
 
 RcppExport SEXP get_model () {
   // DISTANCE
-  // default EUCLIDEAN
+  // default EUCLIDEAN static data
   // errore se GEODIST e più di 2 _coords
 
   // COORDINATES
