@@ -11,9 +11,9 @@
 class Coordinates {
   std::vector<Point> _coords;
   SpMat _distance_matrix;
-  checkDistance _distance_type;
+  static checkDistance _distance_type;
 public:
-  Coordinates(const std::string, std::vector<Point>);
+  Coordinates(const checkDistance, std::vector<Point>&);
 
 
 };
