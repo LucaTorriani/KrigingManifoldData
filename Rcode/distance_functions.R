@@ -5,7 +5,7 @@
 Geodist=function(c1,c2){
   R=6371
   r=(pi/2)/90
-  tmp = sin(c1[1]*r)*sin(c2[1]*r)+cos(c1[1]*r)*cos(c2[1]*r)*cos(-c2[2]*r+c1[2]*r)
+  tmp = sin(c1[1]*r)*sin(c2[1]*r)+cos(c1[1]*r)*cos(c2[1]*r)*cos(abs(-c2[2]*r+c1[2]*r))
   if( abs(tmp-1) < 2*.Machine$double.eps){
     return(0)
   }
