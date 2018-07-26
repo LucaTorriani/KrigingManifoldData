@@ -3,10 +3,13 @@
 
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include <Eigen/Cholesky>
+#include <Eigen/SparseCholesky>
 
 typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::VectorXd Vec;
-typedef Triplet<double> TripType;
+typedef Eigen::Triplet<double> TripType;
 
 
 
