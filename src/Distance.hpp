@@ -16,8 +16,8 @@ public:
   };
 
 class GeoDist{
-  double constexpr Earth_R = 6371.0; //constrollare
-  double constexpr eps_dbl = std::numeric_limits<double>::epsilon; //constrollare
+  double constexpr Earth_R = 6371.0;
+  double constexpr eps_dbl = std::numeric_limits<double>::epsilon; 
 
 public:
       double operator()(const Point&, const Point&);
