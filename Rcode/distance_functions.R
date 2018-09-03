@@ -2,21 +2,38 @@
 # - c1: (Latitude, Longitude) of point 1
 # - c2: (Latitude, Longitude) of point 2
 ### Value: Geodetic distance between point 1 and point 2
+# Geodist=function(c1,c2){
+#   R=6371
+#   r=(pi/2)/90
+#   tmp = sin(c1[1]*r)*sin(c2[1]*r)+cos(c1[1]*r)*cos(c2[1]*r)*cos(abs(-c2[2]*r+c1[2]*r))
+#   if( abs(tmp-1) < 2*.Machine$double.eps){
+#     return(0)
+#   }
+#   else if(abs(tmp+1) < 2*.Machine$double.eps){
+#     return(pi*R)
+#   }
+#   else{
+#     d=as.double(R*acos(tmp))
+#     return (d)
+#   }
+# }
+# 
+
+
+# Haversine formula
 Geodist=function(c1,c2){
   R=6371
   r=(pi/2)/90
-  tmp = sin(c1[1]*r)*sin(c2[1]*r)+cos(c1[1]*r)*cos(c2[1]*r)*cos(abs(-c2[2]*r+c1[2]*r))
-  if( abs(tmp-1) < 2*.Machine$double.eps){
-    return(0)
+  tmp = sqrt( sin( (c2[1]-c1[1])*r/2 )^2 + cos(c1[1]*r) * cos(c2[1]*r) * sin( (c2[2] - c1[2])*r/2) ^2 )
+  if( tmp > 1){
+    tmp = 1
   }
-  else if(abs(tmp+1) < 2*.Machine$double.eps){
-    return(pi*R)
-  }
-  else{
-    d=as.double(R*acos(tmp))
-    return (d)   
-  }
+  d=as.double(2*R*asin(tmp))
+  return (d)   
+
 }
+
+
 
 ### Arguments
 # - coords: nx2 matrix. The i-th row indicates (Latitute, Longitude) of point i
