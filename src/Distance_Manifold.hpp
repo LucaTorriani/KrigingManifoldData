@@ -12,17 +12,17 @@ namespace distances_manifold{
 
 class Frobenius{
 public:
-  double operator()(const SpMat&, const SpMat& );
+  static double operator()(const SpMat&, const SpMat& ) const;
   };
 
 class LogEuclidean{
 public:
-  double operator()(const SpMat&, const SpMat& );
+  static double operator()(const SpMat&, const SpMat& ) const;
 };
 
 class SqRoot{
 public:
-  double operator()(const SpMat&, const SpMat& );
+  static double operator()(const SpMat&, const SpMat& ) const;
 };
 
 
