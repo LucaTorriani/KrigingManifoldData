@@ -12,15 +12,15 @@ namespace distances{
 
 class EuclDist{
 public:
-      double operator()(const Point&, const Point& );
+      static double operator()(const Point&, const Point& );
   };
 
 class GeoDist{
   double constexpr Earth_R = 6371.0;
-  double constexpr eps_dbl = std::numeric_limits<double>::epsilon; 
+  double constexpr eps_dbl = std::numeric_limits<double>::epsilon;
 
 public:
-      double operator()(const Point&, const Point&);
+  static double operator()(const Point&, const Point&);
 };
 
 class Distance{

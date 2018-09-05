@@ -5,7 +5,7 @@
 
 using namespace distances;
 
-double EuclDist::operator()(const Point& P1, const Point& P2){
+static double EuclDist::operator()(const Point& P1, const Point& P2){
   return ((P1-P2).l2norm());
 }
 
@@ -29,7 +29,7 @@ double EuclDist::operator()(const Point& P1, const Point& P2){
 // }
 
 // Haversine formula (To be tested)
-double Geodist::operator()(const Point& P1, const Point& P2){
+static double Geodist::operator()(const Point& P1, const Point& P2){
   double coeff = M_PI_2/90;
   double lat1 =  P1(1);
   double long1 =  P1(2);
