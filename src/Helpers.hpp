@@ -11,6 +11,13 @@ typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::VectorXd Vec;
 typedef Eigen::Triplet<double> TripType;
 
+namespace matrix_manipulation {
+
+  SpMat expMat(const SpMat&);
+  SpMat logMat(const SpMat&);
+  SpMat sqrtMat(const SpMat&)
+
+}
 
 
 #endif
