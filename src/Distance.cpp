@@ -5,7 +5,7 @@
 
 using namespace distances;
 
-static double EuclDist::operator()(const Point& P1, const Point& P2){
+double EuclDist::operator()(const Point& P1, const Point& P2){
   return ((P1-P2).l2norm());
 }
 
@@ -29,7 +29,7 @@ static double EuclDist::operator()(const Point& P1, const Point& P2){
 // }
 
 // Haversine formula (To be tested)
-static double Geodist::operator()(const Point& P1, const Point& P2){
+double Geodist::operator()(const Point& P1, const Point& P2){
   double coeff = M_PI_2/90;
   double lat1 =  P1(1);
   double long1 =  P1(2);
@@ -44,24 +44,24 @@ static double Geodist::operator()(const Point& P1, const Point& P2){
 
 }
 
-Distance::Distance(){
+Distance::Distance(const std::string& distance_type):_distance_type(distance_type){
   distances.insert(std::pair<std::string, std::function<double(std::vector<double>, std::vector<double>)>>("Euclidean", EuclDist()));
   distances.insert(std::pair<std::string, std::function<double(std::vector<double>, std::vector<double>)>>("Geodist", Geodist()));
 
 }
-double Distance::compute_distance(const Point& P1, const Point& P2, const std::string & distance_type){
-  double result = dist[distance_type](P1, P2);
+double Distance::compute_distance(const Point& P1, const Point& P2){
+  double result = dist[_distance_type](P1, P2);
   return result;
 }
 
-SpMat Distance::create_distance_matrix(const std::vector<Point> & coords,const std::string & distance_type){
+SpMat Distance::create_distance_matrix(const std::vector<Point> & coords){
   size_t num_points = coords.size();
 
   std::vector<TripType> tripletList;
   tripletList.reserve(num_points*(num_points-1)/2);
   for (size_t i=0; i<(num_points-1); i++ ) {
     for (size_t j=(i+1); j<num_points; j++ ) {
-      tripletList.push_back(TripType(i,j,compute_distance(coords[i], coords[j], distance_type)));
+      tripletList.push_back(TripType(i,j,compute_distance(coords[i], coords[j], _distance_type)));
     }
   }
 
