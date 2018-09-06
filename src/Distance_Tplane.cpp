@@ -12,20 +12,19 @@ double Frobenius::norm(const SpMat& M1){
   return (tmp.norm());
 }
 
-double Frobenius::tplane_dist(const SpMat& M1, const SpMat& M2) {
-  return ((M1-M2).norm());
-}
-
-double Frobenius::operator()(const SpMat& M1, const SpMat& M2, const SpMat & Sigma = SpMat(1,1)) {
-  return (Frobenius::tplane_dist(M1,M2));
+double Frobenius::operator()(const SpMat& M1, const SpMat& M2) {
+  unsigned int n = M1.cols();
+  SpMat tmp(n,n);
+  tmp = (M1-M2).selfadjointView<Lower>();
+  return (tmp.norm());
 }
 
 // FROBENIUS SCALED
-double FrobeniusScaled::norm(const SpMat& M, const SpMat& Sigma){
+double FrobeniusScaled::norm(const SpMat& M){
 
   auto MM = M.selfadjointView<Eigen::Lower>();
-  Eigen::SimplicialLDLT<SpMat,Lower> solver(Sigma);
-  unsigned int n(Sigma.rows());
+  Eigen::SimplicialLDLT<SpMat,Lower> solver(_Sigma);
+  unsigned int n(_Sigma.rows());
   SpMat Id(n,n);
   Id.setIdentity();
   MatrixXd SigmaInv(n,n);
@@ -35,23 +34,18 @@ double FrobeniusScaled::norm(const SpMat& M, const SpMat& Sigma){
   return (sqrt(tmp.trace()));
 }
 
-
-double FrobeniusScaled::tplane_dist(const SpMat& M1, const SpMat& M2, const SpMat& Sigma){
-  return (FrobeniusScaled::norm((M1-M2), Sigma));
-}
-
-double FrobeniusScaled::operator()(const SpMat& M1, const SpMat& M2, const SpMat& Sigma){
-  return (FrobeniusScaled::tplane_dist(M1,M2, Sigma));
+double FrobeniusScaled::operator()(const SpMat& M1, const SpMat& M2){
+  return (FrobeniusScaled::norm((M1-M2)));
 }
 
 
-DistanceTplane::DistanceTplane(){
-  distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&,const SpMat&)>>("Frobenius", Frobenius()));
-  distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&, const SpMat&)>>("FrobeniusScaled", FrobeniusScaled()));
+DistanceTplane::DistanceTplane(const std::string & distanceTplane, const SpMat& Sigma):_distanceTplane(distanceTplane){
+  distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("Frobenius", Frobenius()));
+  distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("FrobeniusScaled", FrobeniusScaled(Sigma)));
 
 }
 
-double DistanceTplane::compute_distance( const std::string & distance_type, const SpMat& M1, const SpMat& M2, const SpMat& Sigma = SpMat(1,1)) {
-  double result = distances[distance_type](M1, M2, Sigma);
+double DistanceTplane::compute_distance(const SpMat& M1, const SpMat& M2) {
+  double result = distances[_distanceTplane](M1, M2);
   return result;
 }
