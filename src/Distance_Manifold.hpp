@@ -1,36 +1,40 @@
 #ifndef _DISTANCE_MANIFOLD_HPP_
 #define _DISTANCE_MANIFOLD_HPP_
 
-#include "Point.hpp"
 #include "Helpers.hpp"
 #include <vector>
 #include <utility>
 #include <map>
 #include <functional>
 
+using namespace Eigen;
 namespace distances_manifold{
 
 class Frobenius{
 public:
-  static double operator()(const SpMat&, const SpMat& ) const;
+  static double manifold_distance(const SpMat&, const SpMat& );
+
+  double operator()(const SpMat&, const SpMat& );
   };
 
 class LogEuclidean{
 public:
-  static double operator()(const SpMat&, const SpMat& ) const;
+  static double manifold_distance(const SpMat&, const SpMat& );
+  double operator()(const SpMat&, const SpMat& );
 };
 
 class SqRoot{
 public:
-  static double operator()(const SpMat&, const SpMat& ) const;
+  static double manifold_distance(const SpMat&, const SpMat& );
+  double operator()(const SpMat&, const SpMat& );
 };
 
 
 class DistanceManifold{
-  std::map<std::string,std::function<double(std::vector<double>, std::vector<double>)>> dist;
+  std::map<std::string,std::function<double(const SpMat&, const SpMat&)>> distances;
 public:
   DistanceManifold();
-  double compute_distance(const SpMat&, const SpMat&, const std::string &);
+  double compute_distance(const std::string& , const SpMat&, const SpMat&);
 
 };
 

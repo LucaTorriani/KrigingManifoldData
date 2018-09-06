@@ -2,43 +2,62 @@
 
 #include <cmath>
 
+#include <iostream>
 
 using namespace distances_manifold;
 
 // FROBENIUS
-static double Frobenius::operator()(const SpMat& M1, const SpMat& M2) const{
 
-  Eigen::SimplicialLDLT<SpMat,Lower> solver(M1);
-  SpMat tmp = M2.selfadjointView<Lower>();
-  Eigen::MatrixXd matrix_result(solver.solve(tmp));
+double Frobenius::manifold_distance(const SpMat& M1, const SpMat& M2 ){
 
-  SelfAdjointEigenSolver<SpMat> eigensolver (A,EigenvaluesOnly);
-  VectorXd eigenvalues =  eigensolver1.eigenvalues();
+    Eigen::SimplicialLDLT<SpMat,Lower> solver(M1);
+    SpMat tmp = M2.selfadjointView<Lower>();
+    Eigen::MatrixXd matrix_result(solver.solve(tmp));
 
-  double ssq = 0.0;
-    for(auto i = 0;i < eigenvalues.size(); i++)  ssq += (std::log(std::abs(eigenvalues(i)))*std::log(std::abs(eigenvalues(i))));
-  }
-  return (std::sqrt(ssq));
+    VectorXcd eigenvalues =  matrix_result.eigenvalues();
+
+    double ssq = 0.0;
+      for(auto i = 0;i < eigenvalues.size(); i++)  ssq += (std::log(std::abs(eigenvalues(i)))*std::log(std::abs(eigenvalues(i))));
+
+    return (std::sqrt(ssq));
+}
+
+double Frobenius::operator()(const SpMat& M1, const SpMat& M2) {
+  return (Frobenius::manifold_distance(M1,M2));
 }
 
 // LOGEUCLIDEAN
-static double LogEuclidean::operator()(const SpMat& M1, const SpMat& M2) const {
-  return ( (matrix_manipulation::logMat(M1)-matrix_manipulation::logMat(M2)).norm())
+double LogEuclidean::manifold_distance(const SpMat& M1, const SpMat& M2){
+  unsigned int n = M1.cols();
+  SpMat tmp(n,n);
+  tmp =  (matrix_manipulation::logMat(M1)-matrix_manipulation::logMat(M2)).selfadjointView<Lower>();
+  return ( tmp.norm());
+}
+
+double LogEuclidean::operator()(const SpMat& M1, const SpMat& M2)  {
+  return(LogEuclidean::manifold_distance(M1,M2));
 }
 
 // SQROOT
-static double SqRoot::operator()(const SpMat& M1, const SpMat& M2) const{
-  return ( (matrix_manipulation::sqrtMat(M1)-matrix_manipulation::sqrtMat(M2)).norm())
+double SqRoot::manifold_distance(const SpMat& M1, const SpMat& M2){
+  unsigned int n = M1.cols();
+  SpMat tmp(n,n);
+  tmp = (matrix_manipulation::sqrtMat(M1)-matrix_manipulation::sqrtMat(M2)).selfadjointView<Lower>();
+  return ( tmp.norm());
+}
+
+double SqRoot::operator()(const SpMat& M1, const SpMat& M2) {
+  return(SqRoot::manifold_distance(M1,M2));
 
 }
 
 DistanceManifold::DistanceManifold(){
-  distances.insert(std::pair<std::string, std::function<double(std::vector<double>, std::vector<double>)>>("Frobenius", Frobenius()));
-  distances.insert(std::pair<std::string, std::function<double(std::vector<double>, std::vector<double>)>>("Log_euclidean", LogEuclidean()));
-  distances.insert(std::pair<std::string, std::function<double(std::vector<double>, std::vector<double>)>>("Square_root", SqRoot()));
+  distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>> ("Frobenius", Frobenius()));
+  distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("LogEuclidean", LogEuclidean()));
+  distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("SquareRoot", SqRoot()));
 
 }
-double DistanceManifold::compute_distance const (SpMat& M1, const SpMat& M2, const std::string & distance_type){
-  double result = dist[distance_type](M1, M2);
+double DistanceManifold::compute_distance ( const std::string & distance_type, const SpMat& M1, const SpMat& M2) {
+  double result = distances[distance_type](M1, M2);
   return result;
 }
