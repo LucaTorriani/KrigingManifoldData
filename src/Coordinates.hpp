@@ -10,11 +10,11 @@
 
 class Coordinates {
   std::vector<Point> _coords;
-  SpMat _distance_matrix;
-  static checkDistance _distance_type;
+  SpMat _distanceMatrix;
 public:
-  Coordinates(const checkDistance, std::vector<Point>&);
-
+  Coordinates(std::vector<Point>&, const Distance &);
+  std::vector<Point> get_coords const;
+  SpMat get_distance_matrix const;
 
 };
 
