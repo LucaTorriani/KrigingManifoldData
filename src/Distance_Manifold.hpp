@@ -31,9 +31,10 @@ public:
 
 
 class DistanceManifold{
+  std::string _distanceManifold;
   std::map<std::string,std::function<double(const SpMat&, const SpMat&)>> distances;
 public:
-  DistanceManifold();
+  DistanceManifold(const std::string&);
   double compute_distance(const std::string& , const SpMat&, const SpMat&);
 
 };

@@ -51,7 +51,9 @@ double SqRoot::operator()(const SpMat& M1, const SpMat& M2) {
 
 }
 
-DistanceManifold::DistanceManifold(){
+DistanceManifold::DistanceManifold(const std::string& distanceManifold, const SpMat& Sigma):_distanceManifold(distanceManifold)
+
+{
   distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>> ("Frobenius", Frobenius()));
   distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("LogEuclidean", LogEuclidean()));
   distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("SquareRoot", SqRoot()));
