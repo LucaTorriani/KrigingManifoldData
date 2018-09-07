@@ -22,7 +22,7 @@ double Frobenius::operator()(const SpMat& M1, const SpMat& M2) {
 // FROBENIUS SCALED
 double FrobeniusScaled::norm(const SpMat& M){
 
-  auto MM = M.selfadjointView<Eigen::Lower>();
+  SpMat MM = M.selfadjointView<Eigen::Lower>();
   Eigen::SimplicialLDLT<SpMat,Lower> solver(_Sigma);
   unsigned int n(_Sigma.rows());
   SpMat Id(n,n);
@@ -30,7 +30,7 @@ double FrobeniusScaled::norm(const SpMat& M){
   MatrixXd SigmaInv(n,n);
   SigmaInv = solver.solve(Id);
   MatrixXd tmp(n, MM.cols());
-  tmp = MM*(MM*SigmaInv).transpose()*SigmaInv;
+  tmp = SigmaInv*MM*SigmaInv*MM;
   return (sqrt(tmp.trace()));
 }
 
