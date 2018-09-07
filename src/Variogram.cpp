@@ -29,10 +29,6 @@ EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const Distanc
     _d.setLinSpaced(n_h+1, 0, _hmax);
     _N = local_coords.size();
 
-    // _emp_vario_values.resize(n_h);
-    // _hvec.resize(n_h);
-    // _N_hvec.resize(n_h);
-
     _weights.resize(_N);
     _weights.setOnes(_N);
 }
@@ -66,6 +62,33 @@ void EmpiricalVariogram::update_emp_vario(std::vector<SpMat> res) {
       _hvec.pushback((_d(l)+_d(l-1))/2);
     }
   }
+}
+
+void EmpiricalVariogram::compute_hmax (const Coordinates& coords, const Distance& distance) {
+  unsigned int n_coords = coords.get_n_coords();
+  Vec coords_min_point(n_coords);
+  Vec coords_max_point(n_coords);
+  std::vector<Point> vec_coords (coords.get_coords());
+  coords_min_point = vec_coords[0];
+  coords_max_point = vec_coords[0];
+
+  for (auto i= 1; i<vec_coords.size(); i++) {
+    Vec point_coords(n_coords);
+    Vec point_coords = vec_coords[i].get_coords();
+    for (auto j=0; j< n_coords; j++) {
+
+      if (point_coords(j) < coords_min_point(j))
+        coords_min_point(j) = point_coords(j);
+
+      if (point_coords(j) > coords_max_point(j))
+        coords_max_point(j) = point_coords(j);
+    }
+  }
+
+  Point min_point(coords_min_point);
+  Point max_point(coords_max_point);
+
+  return (1/3*distance.compute_distance(min_point, max_point))
 }
 
 // FittedVariogram

@@ -18,7 +18,7 @@ class EmpiricalVariogram {
   const SpMat _distanceMatrix;
   Vec _weights;
 
-  void compute_hmax();
+  void compute_hmax(const Coordinates&, const Distance&);
 
 public:
   Vec get_emp_vario_values () const;
@@ -36,6 +36,7 @@ protected:
   virtual MatrixXd compute_jacobian(const Vec &) const = 0;
 
 public:
+  FittedVariogram();
   double get_tau2() const;
   double get_sigma2() const;
   double get_a() const;
