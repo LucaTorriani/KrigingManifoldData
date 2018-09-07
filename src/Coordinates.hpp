@@ -13,9 +13,9 @@ class Coordinates {
   SpMat _distanceMatrix;
 public:
   Coordinates(std::vector<Point>&, const Distance &);
-  std::vector<Point> get_coords const;
-  SpMat get_distance_matrix const;
-
+  std::vector<Point> get_coords() const;
+  SpMat get_distance_matrix() const;
+  unsigned int get_n_coords() const;
 };
 
 #endif
