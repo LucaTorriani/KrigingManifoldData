@@ -7,7 +7,6 @@
 using namespace distances_manifold;
 
 // FROBENIUS
-
 double Frobenius::manifold_distance(const SpMat& M1, const SpMat& M2 ){
 
     Eigen::SimplicialLDLT<SpMat,Lower> solver(M1);
@@ -51,15 +50,22 @@ double SqRoot::operator()(const SpMat& M1, const SpMat& M2) {
 
 }
 
-DistanceManifold::DistanceManifold(const std::string& distanceManifold, const SpMat& Sigma):_distanceManifold(distanceManifold)
+// CLASS DISTANCE MANIFOLD
+
+DistanceManifold::DistanceManifold(const std::string& distanceManifold, const SpMat& Sigma):_distanceManifold(distanceManifold),
+  _Sigma(Sigma)
 
 {
   distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>> ("Frobenius", Frobenius()));
   distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("LogEuclidean", LogEuclidean()));
   distances.insert(std::pair<std::string, std::function<double(const SpMat&, const SpMat&)>>("SquareRoot", SqRoot()));
-
 }
-double DistanceManifold::compute_distance ( const std::string & distance_type, const SpMat& M1, const SpMat& M2) {
-  double result = distances[distance_type](M1, M2);
+
+double DistanceManifold::compute_distance (const SpMat& M1, const SpMat& M2) {
+  double result = distances[_distance_type](M1, M2);
   return result;
+}
+
+SpMat DistanceManifold::get_Sigma() const {
+  return _Sigma;
 }

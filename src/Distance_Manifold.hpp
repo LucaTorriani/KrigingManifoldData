@@ -13,7 +13,6 @@ namespace distances_manifold{
 class Frobenius{
 public:
   static double manifold_distance(const SpMat&, const SpMat& );
-
   double operator()(const SpMat&, const SpMat& );
   };
 
@@ -31,11 +30,13 @@ public:
 
 
 class DistanceManifold{
-  std::string _distanceManifold;
+  const std::string _distanceManifold;
+  const SpMat _Sigma;
   std::map<std::string,std::function<double(const SpMat&, const SpMat&)>> distances;
 public:
-  DistanceManifold(const std::string&);
-  double compute_distance(const std::string& , const SpMat&, const SpMat&);
+  DistanceManifold(const std::string&, const SpMat&);
+  double compute_distance(const SpMat&, const SpMat&);
+  SpMat get_Sigma() const;
 
 };
 
