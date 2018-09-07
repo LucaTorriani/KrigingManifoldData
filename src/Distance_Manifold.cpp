@@ -62,10 +62,14 @@ DistanceManifold::DistanceManifold(const std::string& distanceManifold, const Sp
 }
 
 double DistanceManifold::compute_distance (const SpMat& M1, const SpMat& M2) {
-  double result = distances[_distance_type](M1, M2);
+  double result = distances[_distanceManifold](M1, M2);
   return result;
 }
 
 SpMat DistanceManifold::get_Sigma() const {
   return _Sigma;
+}
+
+std::string DistanceManifold::get_distanceType() const{
+  return _distanceManifold;
 }

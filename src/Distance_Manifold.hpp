@@ -37,7 +37,7 @@ public:
   DistanceManifold(const std::string&, const SpMat&);
   double compute_distance(const SpMat&, const SpMat&);
   SpMat get_Sigma() const;
-
+  std::string get_distanceType() const;
 };
 
 
