@@ -45,8 +45,8 @@ double Geodist::operator()(const Point& P1, const Point& P2){
 }
 
 Distance::Distance(const std::string& distance_type):_distance_type(distance_type){
-  distances.insert(std::pair<std::string, std::function<double(std::vector<double>, std::vector<double>)>>("Euclidean", EuclDist()));
-  distances.insert(std::pair<std::string, std::function<double(std::vector<double>, std::vector<double>)>>("Geodist", Geodist()));
+  distances.insert(std::pair<std::string, std::function<double(const Point&, const Point&)>>("Euclidean", EuclDist()));
+  distances.insert(std::pair<std::string, std::function<double(const Point&, const Point&)>>("Geodist", Geodist()));
 
 }
 double Distance::compute_distance(const Point& P1, const Point& P2){

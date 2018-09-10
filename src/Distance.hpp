@@ -25,7 +25,7 @@ public:
 
 class Distance{
   std::string _distance_type;
-  std::map<std::string,std::function<double(std::vector<double>, std::vector<double>)>> dist;
+  std::map<std::string,std::function<double(const Point&, const Point&)>> dist;
 public:
   Distance(const std::string &);
   double compute_distance(const Point&, const Point&);
