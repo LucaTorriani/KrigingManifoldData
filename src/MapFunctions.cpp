@@ -1,8 +1,6 @@
 #include "MapFunctions.hpp"
 #include<iostream>
 using namespace map_functions;
-using namespace distances_manifold;
-
 
 //LOGMAPFROB
 logMapFrob::logMapFrob(const MatrixXd& sqrtSigma, const MatrixXd& sqrtSigmaInv):_sqrtSigma(sqrtSigma),_sqrtSigmaInv(sqrtSigmaInv){};
@@ -51,7 +49,7 @@ SpMat logMapSqRoot::operator()(const SpMat& M){
 
 //LOGARITHMICMAP
 
-logarithmicMap::logarithmicMap(const DistanceManifold& distanceManifoldObj): _distanceManifold(distanceManifoldObj.get_distanceType()) {
+logarithmicMap::logarithmicMap(const distances_manifold::DistanceManifold& distanceManifoldObj): _distanceManifold(distanceManifoldObj.get_distanceType()) {
 
   SpMat Sigma(distanceManifoldObj.get_Sigma());
 
