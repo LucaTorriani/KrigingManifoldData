@@ -13,10 +13,10 @@ double Frobenius::manifold_distance(const SpMat& M1, const SpMat& M2 ){
     SpMat tmp = M2.selfadjointView<Lower>();
     Eigen::MatrixXd matrix_result(solver.solve(tmp));
 
-    VectorXcd eigenvalues =  matrix_result.eigenvalues();
+    VectorXcd eigenvalues =  matrix_result.eigenvalues().real();
 
     double ssq = 0.0;
-      for(auto i = 0;i < eigenvalues.size(); i++)  ssq += (std::log(std::abs(eigenvalues(i)))*std::log(std::abs(eigenvalues(i))));
+      for(auto i = 0;i < eigenvalues.size(); i++)  ssq += (std::log(eigenvalues(i).real())*std::log(eigenvalues(i).real()));
 
     return (std::sqrt(ssq));
 }
