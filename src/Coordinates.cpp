@@ -1,9 +1,9 @@
 #include "Coordinates.hpp"
 
 
-Coordinates::Coordinates(std::vector<Point> &coords, const Distance& distance):
+Coordinates::Coordinates(std::vector<Point> &coords, const distances::Distance& distance):
    _coords(coords){
-    _distance_matrix = distance.compute_distance(_coords);
+    _distanceMatrix = distance.create_distance_matrix(_coords);
 }
 
 SpMat Coordinates::get_distance_matrix () const {
