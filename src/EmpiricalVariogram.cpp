@@ -96,7 +96,6 @@ unsigned int EmpiricalVariogram::get_card_h() const {
   return _card_h;
 }
 
-
 std::vector<double> EmpiricalVariogram::get_emp_vario_values () const {
   return _emp_vario_values;
 };

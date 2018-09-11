@@ -19,7 +19,7 @@ class EmpiricalVariogram {
   Vec _d; // Vettore h+-deltah
   double _hmax;
   const distances_tplane::DistanceTplane _distanceTplane;
-  const SpMat _distanceMatrix;
+  const SpMat & _distanceMatrix;
   Vec _weights;
   const unsigned int _n_h;
 
