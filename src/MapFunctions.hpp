@@ -6,6 +6,7 @@
 
 namespace map_functions {
 
+// LOGARITHMIC MAP
   class logMapFrob{
     const MatrixXd _sqrtSigma;
     const MatrixXd _sqrtSigmaInv;
@@ -31,14 +32,43 @@ namespace map_functions {
   class logarithmicMap{
     const std::string _distanceManifold;
     std::map<std::string, std::function<SpMat(const SpMat&)>> maps;
-
   public:
     logarithmicMap(const distances_manifold::DistanceManifold&);
     SpMat map2tplane(const SpMat&);
   };
 
 
-}
+  // EXPONENTIAL MAP MAP
+  class expMapFrob{
+    const MatrixXd _sqrtSigma;
+    const MatrixXd _sqrtSigmaInv;
+  public:
+    expMapFrob(const MatrixXd&, const MatrixXd&);
+    SpMat operator()(const SpMat&);
+  };
+
+  class expMapLogEucl{
+    SpMat _Sigma;
+  public:
+    expMapLogEucl(const SpMat&);
+    SpMat operator()(const SpMat&);
+  };
+
+  class expMapSqRoot{
+    SpMat _Sigma;
+  public:
+    expMapSqRoot(const SpMat&);
+    SpMat operator()(const SpMat&);
+  };
+
+  class exponentialMap{
+    const std::string _distanceManifold;
+    std::map<std::string, std::function<SpMat(const SpMat&)>> maps;
+  public:
+    exponentialMap(const distances_manifold::DistanceManifold&);
+    SpMat map2manifold(const SpMat&);
+  };
+};
 
 
 #endif
