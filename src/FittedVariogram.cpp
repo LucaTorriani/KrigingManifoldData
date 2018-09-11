@@ -173,3 +173,17 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   }
   _parameters(2) = 1/3*hvec[i];
 }
+
+
+MatrixXd GaussVariogram::compute_gamma_matrix(const SpMat & distance_matrix) const{
+  MatrixXd gamma_matrix(_N,_N);
+
+  for (size_t i=0; i<(_N-1); i++ ) {
+    for (size_t j=(i+1); j<_N; j++ ) {
+      gamma_matrix(i,j) = get_covario_univ(distance_matrix.coeff(i,j));
+    }
+  }
+  double c0 = get_covario_univ(0);
+  gamma_matrix += gamma_matrix.transpose() + c0*MatrixXd::Identity(_N,_N);
+  return (gamma_matrix);
+}
