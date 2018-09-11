@@ -1,7 +1,5 @@
 #include "Distance_Manifold.hpp"
-
 #include <cmath>
-
 #include <iostream>
 
 using namespace distances_manifold;
