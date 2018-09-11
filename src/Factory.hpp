@@ -6,7 +6,7 @@
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
-namespace GenericFactory{
+namespace generic_factory{
 
   /*! @brief A generic factory.
 
