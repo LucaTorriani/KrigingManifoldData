@@ -4,7 +4,7 @@
 #include <memory>
 #include <iostream>
 #include <type_traits>
-namespace GenericFactory {
+namespace generic_factory {
   /*! A simple proxy for registering into a factory.
 
     It provides the builder as static method
