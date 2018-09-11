@@ -3,14 +3,15 @@
 unsigned Point::get_dimension() const {
   return (_coords.size()); // Esiste??
 }
-const Vec & Point::get_coords() const {
+
+Vec Point::get_coords() const {
   return (_coords);
 }
-const double & Point::operator()(std::size_t i) const {
+double Point::operator()(std::size_t i) const {
   return (_coords(i));
 }
 
-double l2norm() const {
+double Point::l2norm() const {
   return(_coords.norm());
 }
 
@@ -25,5 +26,5 @@ Point operator-(const Point & P1, const Point & P2){
 }
 
 bool check_dim(const Point & P1, const Point & P2){
-  return P1.get_dimensions() == P2.get_dimensions();
+  return P1.get_dimension() == P2.get_dimension();
 }

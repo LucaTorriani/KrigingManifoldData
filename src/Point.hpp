@@ -9,16 +9,16 @@ class Point {
 
 public:
   friend Point operator-(const Point &, const Point &);
-  friend Point check_dim(const Point &, const Point &);
+  friend bool check_dim(const Point &, const Point &);
 
-  Point(const Vec & coord): _coords(coords){}; // Controllare come si passano elementi eigen
+  Point(const Vec & coords): _coords(coords){}; // Controllare come si passano elementi eigen
   unsigned get_dimension() const;
-  const Vec & get_coords() const;
-  const double & operator()(std::size_t i);
+  Vec get_coords() const;
+  double operator()(std::size_t i) const;
   double l2norm() const;
 };
 
-friend Point operator-(const Point &, const Point &);
-friend Point check_dim(const Point &, const Point &);
+Point operator-(const Point &, const Point &);
+bool check_dim(const Point &, const Point &);
 
 #endif
