@@ -1,10 +1,4 @@
 #include "Helpers.hpp"
-#include <Eigen/Sparse>
-#include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
-#include <Eigen/Cholesky>
-#include <Eigen/SparseCholesky>
-using namespace Eigen;
 
 // EXPMAT
 SpMat matrix_manipulation::expMat(const SpMat &A) {
