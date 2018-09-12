@@ -21,6 +21,8 @@ namespace matrix_manipulation {
   MatrixXd logMat(const MatrixXd&);
 
   MatrixXd sqrtMat(const Eigen::MatrixXd&);
+
+  std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd&);
 };
 
 
