@@ -27,8 +27,8 @@ class EmpiricalVariogram {
 
 public:
   EmpiricalVariogram()= default;
-  EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &, const Vec &);
-  EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &);
+  EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &, const SpMat&, const Vec &);
+  EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &, const SpMat&);
   std::vector<double> get_emp_vario_values () const;
   std::vector<unsigned int> get_N_hvec() const;
   std::vector<double> get_hvec() const;

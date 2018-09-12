@@ -60,9 +60,11 @@ double Distance::compute_distance(const Point& P1, const Point& P2) const{
   return _dist.at(_distance_type)(P1, P2);
 }
 
-SpMat Distance::create_distance_matrix(const std::vector<Point> & coords) const{
-  size_t num_points = coords.size();
-
+SpMat Distance::create_distance_matrix(const Coordinates & coordinates) const{
+  size_t num_points = coordinates.get_N_station();
+  std::vector<Point> coords(num_points);
+  coords = coordinates.get_coords();
+  
   std::vector<TripType> tripletList;
   tripletList.reserve(num_points*(num_points-1)/2);
   for (size_t i=0; i<(num_points-1); i++ ) {

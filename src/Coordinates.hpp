@@ -10,12 +10,13 @@
 
 class Coordinates {
   std::vector<Point> _coords;
-  SpMat _distanceMatrix;
 public:
   Coordinates(std::vector<Point>&, const distances::Distance &);
+  unsigned int get_N_station() const;
   std::vector<Point> get_coords() const;
-  SpMat get_distance_matrix() const;
   unsigned int get_n_coords() const;
 };
 
 #endif
+
+SpMat Sigma

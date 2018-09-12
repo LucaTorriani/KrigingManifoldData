@@ -4,16 +4,16 @@
 using namespace variogram_evaluation;
 
 // EmpiricalVariogram
-EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const Vec & weights):
-  _distanceTplane(distanceTplane), _distanceMatrix(coords.get_distance_matrix()), _weights(weights), _n_h(n_h) {
+EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const SpMat& distanceMatrix, const Vec & weights):
+  _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _weights(weights), _n_h(n_h) {
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
     _N = (coords.get_coords()).size();
 }
 
-EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane):
-  _distanceTplane(distanceTplane), _distanceMatrix(coords.get_distance_matrix()), _n_h(n_h) {
+EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const SpMat& distanceMatrix):
+  _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _n_h(n_h) {
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);

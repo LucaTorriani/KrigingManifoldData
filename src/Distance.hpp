@@ -28,7 +28,7 @@ class Distance{
 public:
   Distance(const std::string &);
   double compute_distance(const Point&, const Point&) const;
-  SpMat create_distance_matrix(const std::vector<Point> &) const;
+  SpMat create_distance_matrix(const Coordinates &) const;
 
 };
 
