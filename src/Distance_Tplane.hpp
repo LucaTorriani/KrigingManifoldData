@@ -11,25 +11,25 @@ namespace distances_tplane{
 
 class Frobenius{
 public:
-  double norm(const SpMat&) const; // Attenzione al nome
-  double operator()(const SpMat &, const SpMat &) const;
+  double norm(const MatrixXd&) const; // Attenzione al nome
+  double operator()(const MatrixXd &, const MatrixXd &) const;
 };
 
 class FrobeniusScaled{
-  const SpMat _Sigma;
+  const MatrixXd& _Sigma;
 public:
-  FrobeniusScaled(const SpMat &Sigma):_Sigma(Sigma){};
-  double norm (const SpMat &) const; // Attenzione al nome
-  double operator()(const SpMat &, const SpMat&) const;
+  FrobeniusScaled(const MatrixXd &Sigma):_Sigma(Sigma){};
+  double norm (const MatrixXd &) const; // Attenzione al nome
+  double operator()(const MatrixXd &, const MatrixXd&) const;
 };
 
 
 class DistanceTplane{
-  std::map<std::string, std::function<double(const SpMat&, const SpMat&)>> _distances;
+  std::map<std::string, std::function<double(const MatrixXd&, const MatrixXd&)>> _distances;
   const std::string _distanceTplane;
 public:
-  DistanceTplane(const std::string &, const SpMat &);
-  double compute_distance(const SpMat&, const SpMat&) const;
+  DistanceTplane(const std::string &, const MatrixXd &);
+  double compute_distance(const MatrixXd&, const MatrixXd&) const;
 };
 
 

@@ -16,14 +16,11 @@ using namespace Eigen;
 
 namespace matrix_manipulation {
 
-  SpMat expMat(const SpMat&);
-  SpMat expMat(const Eigen::MatrixXd&);
+  MatrixXd expMat(const MatrixXd&);
 
-  SpMat logMat(const SpMat&);
-  SpMat logMat(const Eigen::MatrixXd&);
+  MatrixXd logMat(const MatrixXd&);
 
-  SpMat sqrtMat(const SpMat&);
-  SpMat sqrtMat(const Eigen::MatrixXd&);
+  MatrixXd sqrtMat(const Eigen::MatrixXd&);
 };
 
 

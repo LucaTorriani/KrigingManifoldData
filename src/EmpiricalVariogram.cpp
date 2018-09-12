@@ -27,7 +27,7 @@ unsigned int EmpiricalVariogram::get_N() const {
   return _N;
 }
 
-void EmpiricalVariogram::update_emp_vario(std::vector<SpMat>& res) {
+void EmpiricalVariogram::update_emp_vario(std::vector<MatrixXd>& res) {
   _emp_vario_values.clear();
   _hvec.clear();
   _N_hvec.clear();

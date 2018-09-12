@@ -8,65 +8,65 @@ namespace map_functions {
 
 // LOGARITHMIC MAP
   class logMapFrob{
-    const MatrixXd _sqrtSigma;
-    const MatrixXd _sqrtSigmaInv;
+    MatrixXd  _sqrtSigma;
+    MatrixXd  _sqrtSigmaInv;
   public:
     logMapFrob(const MatrixXd&, const MatrixXd&);
-    SpMat operator()(const SpMat&);
+    MatrixXd operator()(const MatrixXd&) const;
   };
 
   class logMapLogEucl{
-    SpMat _Sigma;
+    MatrixXd _Sigma;
   public:
-    logMapLogEucl(const SpMat&);
-    SpMat operator()(const SpMat&);
+    logMapLogEucl(const MatrixXd&);
+    MatrixXd operator()(const MatrixXd&) const;
   };
 
   class logMapSqRoot{
-    SpMat _Sigma;
+    MatrixXd _Sigma;
   public:
-    logMapSqRoot(const SpMat&);
-    SpMat operator()(const SpMat&);
+    logMapSqRoot(const MatrixXd&);
+    MatrixXd operator()(const MatrixXd&) const;
   };
 
   class logarithmicMap{
-    const std::string _distanceManifold;
-    std::map<std::string, std::function<SpMat(const SpMat&)>> maps;
+    const std::string& _distanceManifold;
+    std::map<std::string, std::function<MatrixXd(const MatrixXd&)>> maps;
   public:
     logarithmicMap(const distances_manifold::DistanceManifold&);
-    SpMat map2tplane(const SpMat&);
+    MatrixXd map2tplane(const MatrixXd&) const;
   };
 
 
   // EXPONENTIAL MAP MAP
   class expMapFrob{
-    const MatrixXd _sqrtSigma;
-    const MatrixXd _sqrtSigmaInv;
+    MatrixXd _sqrtSigma;
+    MatrixXd _sqrtSigmaInv;
   public:
     expMapFrob(const MatrixXd&, const MatrixXd&);
-    SpMat operator()(const SpMat&);
+    MatrixXd operator()(const MatrixXd&) const;
   };
 
   class expMapLogEucl{
-    SpMat _Sigma;
+    MatrixXd _Sigma;
   public:
-    expMapLogEucl(const SpMat&);
-    SpMat operator()(const SpMat&);
+    expMapLogEucl(const MatrixXd&);
+    MatrixXd operator()(const MatrixXd&) const;
   };
 
   class expMapSqRoot{
-    SpMat _Sigma;
+    MatrixXd _Sigma;
   public:
-    expMapSqRoot(const SpMat&);
-    SpMat operator()(const SpMat&);
+    expMapSqRoot(const MatrixXd&);
+    MatrixXd operator()(const MatrixXd&) const;
   };
 
   class exponentialMap{
-    const std::string _distanceManifold;
-    std::map<std::string, std::function<SpMat(const SpMat&)>> maps;
+    const std::string& _distanceManifold;
+    std::map<std::string, std::function<MatrixXd(const MatrixXd&)>> maps;
   public:
     exponentialMap(const distances_manifold::DistanceManifold&);
-    SpMat map2manifold(const SpMat&);
+    MatrixXd map2manifold(const MatrixXd&) const;
   };
 };
 
