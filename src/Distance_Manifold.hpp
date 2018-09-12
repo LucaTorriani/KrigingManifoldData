@@ -12,32 +12,29 @@ namespace distances_manifold{
 
 class Frobenius{
 public:
-  static double manifold_distance(const SpMat&, const SpMat& );
-  double operator()(const SpMat&, const SpMat& );
+  double operator()(const MatrixXd&, const MatrixXd& ) const;
   };
 
 class LogEuclidean{
 public:
-  static double manifold_distance(const SpMat&, const SpMat& );
-  double operator()(const SpMat&, const SpMat& );
+  double operator()(const MatrixXd&, const MatrixXd& ) const;
 };
 
 class SqRoot{
 public:
-  static double manifold_distance(const SpMat&, const SpMat& );
-  double operator()(const SpMat&, const SpMat& );
+  double operator()(const MatrixXd&, const MatrixXd& ) const;
 };
 
 
 class DistanceManifold{
   const std::string _distanceManifold;
-  const SpMat _Sigma;
-  std::map<std::string,std::function<double(const SpMat&, const SpMat&)>> distances;
+  const MatrixXd& _Sigma;
+  std::map<std::string,std::function<double(const MatrixXd&, const MatrixXd&)>> distances;
 public:
-  DistanceManifold(const std::string&, const SpMat&);
-  double compute_distance(const SpMat&, const SpMat&);
-  SpMat get_Sigma() const;
-  std::string get_distanceType() const;
+  DistanceManifold(const std::string&, const MatrixXd&);
+  double compute_distance(const MatrixXd&, const MatrixXd&) const; // Se vogliamo const togliamo static
+  const MatrixXd&  get_Sigma() const;
+  const std::string& get_distanceType() const;
 };
 
 
