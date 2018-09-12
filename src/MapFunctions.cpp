@@ -11,10 +11,12 @@ MatrixXd logMapFrob::operator()(const MatrixXd& M) const {
   unsigned int n(_sqrtSigmaInv.cols());
 
   MatrixXd prod(n,n);
-  prod = matrix_manipulation::logMat(_sqrtSigmaInv*M*_sqrtSigmaInv);
+  MatrixXd tmp(n,n);
+  tmp.triangularView<Lower>() = _sqrtSigmaInv*M*_sqrtSigmaInv;
+  prod = matrix_manipulation::logMat(tmp);
 
   MatrixXd result(n,n);
-  result = _sqrtSigma*prod*_sqrtSigma;
+  result.triangularView<Lower>() = _sqrtSigma*prod*_sqrtSigma;
 
   return result;
 }
@@ -69,10 +71,12 @@ expMapFrob::expMapFrob(const MatrixXd& sqrtSigma, const MatrixXd& sqrtSigmaInv):
 MatrixXd expMapFrob::operator()(const MatrixXd& M) const{
   unsigned int n(_sqrtSigmaInv.cols());
   MatrixXd prod(n,n);
-  prod = matrix_manipulation::expMat(_sqrtSigmaInv*M*_sqrtSigmaInv);
+  MatrixXd tmp(n,n);
+  tmp.triangularView<Lower>() = _sqrtSigmaInv*M*_sqrtSigmaInv;
+  prod = matrix_manipulation::expMat(tmp);
 
   MatrixXd result(n,n);
-  result = _sqrtSigma*prod*_sqrtSigma;
+  result.triangularView<Lower() = _sqrtSigma*prod*_sqrtSigma;
 
   return result;
 }
@@ -86,7 +90,7 @@ MatrixXd expMapLogEucl::operator()(const MatrixXd& M) const{
   MatrixXd tmp(n,n);
   tmp = matrix_manipulation::logMat(_Sigma) + M;
   MatrixXd result(n,n);
-  result = MatrixXd(tmp).transpose()*MatrixXd(tmp);
+  result.triangularView<Lower>() = MatrixXd(tmp).transpose()*MatrixXd(tmp);
 
   return (result);
 }
@@ -101,7 +105,7 @@ MatrixXd expMapSqRoot::operator()(const MatrixXd& M) const{
   MatrixXd tmp(n,n);
   tmp = matrix_manipulation::sqrtMat(_Sigma) + M;
   MatrixXd result(n,n);
-  result = tmp.transpose()*tmp;
+  result.triangularView<Lower>() = tmp.transpose()*tmp;
 
   return (result);
 }
