@@ -25,7 +25,7 @@ public:
   virtual double get_vario_univ(const double &) const = 0;
   virtual double get_covario_univ(const double &) const = 0;
   virtual Vec get_vario_vec(const std::vector<double> &, unsigned int) const = 0;
-  virtual MatrixXd compute_gamma_matrix() const = 0;
+  virtual MatrixXd compute_gamma_matrix(const SpMat &) const = 0;
 };
 
 
@@ -37,7 +37,7 @@ public:
   double get_vario_univ(const double &) const override;
   double get_covario_univ(const double &) const override;
   Vec get_vario_vec(const std::vector<double> &, unsigned int) const override;
-  MatrixXd compute_gamma_matrix() const override;
+  MatrixXd compute_gamma_matrix(const SpMat &) const override;
 };
 }
 
