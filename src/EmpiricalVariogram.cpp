@@ -27,7 +27,9 @@ unsigned int EmpiricalVariogram::get_N() const {
   return _N;
 }
 
-void EmpiricalVariogram::update_emp_vario(std::vector<MatrixXd>& res) {
+void EmpiricalVariogram::update_emp_vario(const MatrixXd& resMatrix) {
+  std::vector<MatrixXd> res(_N);
+  res = matrix_manipulation::bigMatrix2VecMatrices(resMatrix);
   _emp_vario_values.clear();
   _hvec.clear();
   _N_hvec.clear();
@@ -42,6 +44,7 @@ void EmpiricalVariogram::update_emp_vario(std::vector<MatrixXd>& res) {
     w_ij.clear();
     tplanedist2_ij.clear();
     for (size_t j =0; j<(_N-1); j++) {
+
       for (size_t i=(j+1); i<_N; i++) {
         if (_distanceMatrix.coeff(i,j) >= _d(l-1) && _distanceMatrix.coeff(i,j) <= _d(l)) {
           tplanedist2_ij.push_back( (_distanceTplane.compute_distance(res[i], res[j]))*(_distanceTplane.compute_distance(res[i], res[j])) );

@@ -33,7 +33,7 @@ public:
   std::vector<unsigned int> get_N_hvec() const;
   std::vector<double> get_hvec() const;
   unsigned int get_card_h() const;
-  void update_emp_vario(std::vector<MatrixXd>&);
+  void update_emp_vario(const MatrixXd&);
   unsigned int get_N() const;
 };
 
