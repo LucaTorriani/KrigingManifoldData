@@ -85,10 +85,6 @@ MatrixXd AdditiveDM::compute_design_matrix(const Coordinates& coords, const Matr
   return(Z);
 }
 
-
-
-
-
 // *** DesignMatrixFactory ***
 DesignMatrixFactory& DesignMatrixFactory::Instance(){
   static DesignMatrixFactory theDesignMatrixFactory;

@@ -13,7 +13,7 @@ MatrixXd matrix_manipulation::expMat(const MatrixXd& A) {
   for (size_t i = 0; i < n; i++) expvalues(i) = exp(eigenvalues(i).real());
 
   MatrixXd result(n, n);
-  result.triangularView<Lower>() =  eigenvectors.real()*expvalues.asDiagonal()*eigenvectors.real().transpose(); // not tested
+  result =  eigenvectors.real()*expvalues.asDiagonal()*eigenvectors.real().transpose(); // not tested
 
   return result;
 };
@@ -33,7 +33,7 @@ MatrixXd matrix_manipulation::logMat(const MatrixXd& A) {
   for (size_t i = 0; i < n; i++) logvalues(i) = log(eigenvalues(i).real());
 
   MatrixXd result(n, n);
-  result.triangularView<Lower>() =  eigenvectors.real()*logvalues.asDiagonal()*eigenvectors.real().transpose();
+  result =  eigenvectors.real()*logvalues.asDiagonal()*eigenvectors.real().transpose();
 
   return result;
 };
@@ -51,7 +51,7 @@ MatrixXd matrix_manipulation::sqrtMat(const MatrixXd& A) {
   for (size_t i = 0; i < n; i++) sqrtvalues(i) = sqrt(eigenvalues(i).real());
 
   MatrixXd result(n, n);
-  result.triangularView<Lower>() =  eigenvectors.real()*sqrtvalues.asDiagonal()*eigenvectors.real().transpose();
+  result =  eigenvectors.real()*sqrtvalues.asDiagonal()*eigenvectors.real().transpose();
 
   return result;
 };
