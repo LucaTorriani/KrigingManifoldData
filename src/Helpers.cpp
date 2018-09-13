@@ -59,9 +59,10 @@ MatrixXd matrix_manipulation::sqrtMat(const MatrixXd& A) {
 std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int n){
   unsigned int N(bigMatrix.rows());
   std::vector<MatrixXd> result(N);
+  unsigned int k;
   for(size_t l=0; l<N; l++){
     result[l].resize(n,n);
-    unsigned int k = 0;
+    k = 0;
     for(size_t i=0; i<n; i++){
       result[l](i,i) = bigMatrix(l,k);
       k++;
@@ -73,4 +74,21 @@ std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned 
     }
   }
   return(result);
+};
+
+MatrixXd VecMatrices2bigMatrix(const std::vector<MatrixXd>& vecMatrices) {
+  unsigned int N (vecMatrices.size());
+  unsigned int n((vecMatrices[0]).rows());
+  MatrixXd bigMatrix(N, ((n+1)*n)/2);
+  unsigned int k;
+  for (size_t l=0; l<N;l++) {
+    k=0;
+    for (size_t i=0; i<n; i++) {
+      for(size_t j=i; j<n; j++) {
+        bigMatrix(l,k) = (vecMatrices[l])(i,j);
+        k++;
+      }
+    }
+  }
+  return bigMatrix;
 };
