@@ -26,7 +26,7 @@ namespace generic_factory {
     typedef typename  Factory::Identifier_type Identifier_type;
     typedef typename  Factory::Builder_type Builder_type;
     // The type returned by the builder
-    typedef typename  std::result_of<Builder_type()>::type Result_type;
+    // typedef typename  std::result_of<Builder_type()>::type Result_type;
     typedef           Factory Factory_type;
 
     //! The constructor does the registration.
@@ -41,13 +41,13 @@ namespace generic_factory {
       \todo add a static assert with type trait is_same to test if the builder defined in the
       factory complies with this.
      */
-    static Result_type Build()
-    {
-      return Result_type(new ConcreteProduct());
+    // static Result_type Build()
+    // {
+    //   return Result_type(new ConcreteProduct());
+    // }
+    static std::unique_ptr<AbstractProduct_type> Build(){
+      return std::unique_ptr<AbstractProduct_type>(new ConcreteProduct());
     }
-    //    static std::unique_ptr<AbstractProduct_type> Build(){
-    //return std::unique_ptr<AbstractProduct_type>(new ConcreteProduct());
-    //}
 
   private:
     Proxy(Proxy const &)=delete; // only C++11
