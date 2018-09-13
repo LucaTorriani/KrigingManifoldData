@@ -11,7 +11,7 @@ namespace distances{
 
 class EuclDist{
 public:
-      double operator()(const Point&, const Point& ) const;
+      double operator()(const Vec&, const Vec& ) const;
   };
 
 class GeoDist{
@@ -19,15 +19,15 @@ class GeoDist{
   static double constexpr eps_dbl = std::numeric_limits<double>::epsilon();
 
 public:
-  double operator()(const Point&, const Point&) const;
+  double operator()(const Vec&, const Vec&) const;
 };
 
 class Distance{
   std::string _distance_type;
-  std::map<std::string,std::function<double(const Point&, const Point&)>> _dist;
+  std::map<std::string,std::function<double(const Vec&, const Vec&)>> _dist;
 public:
   Distance(const std::string &);
-  double compute_distance(const Point&, const Point&) const;
+  double compute_distance(const Vec&, const Vec&) const;
   SpMat create_distance_matrix(const Coordinates &) const;
 
 };

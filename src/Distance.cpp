@@ -5,8 +5,8 @@
 
 using namespace distances;
 
-double EuclDist::operator()(const Point& P1, const Point& P2) const{
-  return ((P1-P2).l2norm());
+double EuclDist::operator()(const Vec& P1, const Vec& P2) const{
+  return ((P1-P2).norm());
 }
 
 // OLD FORMULA: great circle distance (commented 3/9/18)
@@ -29,17 +29,12 @@ double EuclDist::operator()(const Point& P1, const Point& P2) const{
 // }
 
 // Haversine formula (To be tested)
-double GeoDist::operator()(const Point& P1, const Point& P2) const{
+double GeoDist::operator()(const Vec& P1, const Vec& P2) const{
   double coeff = M_PI_2/90;
-  unsigned int n(P1.get_dimension());
-  Vec P1_coords(n);
-  Vec P2_coords(n);
-  P1_coords = P1.get_coords();
-  P2_coords = P2.get_coords();
-  double lat1 =  P1_coords(1);
-  double long1 =  P1_coords(2);
-  double lat2 =  P2_coords(1);
-  double long2 =  P2_coords(2);
+  double lat1 =  P1(1);
+  double long1 =  P1(2);
+  double lat2 =  P2(1);
+  double long2 =  P2(2);
   double sin_1(sin( (lat2-lat1)/2*coeff ));
   double sin_2((sin( (long2-long1)/2*coeff )));
   double sqrth(sqrt( sin_1*sin_1 + cos(lat1*coeff)*cos(lat2*coeff)* sin_2*sin_2 ));
@@ -52,28 +47,30 @@ double GeoDist::operator()(const Point& P1, const Point& P2) const{
 }
 
 Distance::Distance(const std::string& distance_type):_distance_type(distance_type){
-  _dist.insert(std::pair<std::string, std::function<double(const Point&, const Point&)>>("Euclidean", EuclDist()));
-  _dist.insert(std::pair<std::string, std::function<double(const Point&, const Point&)>>("Geodist", GeoDist()));
-
+  _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Euclidean", EuclDist()));
+  _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Geodist", GeoDist()));
 }
-double Distance::compute_distance(const Point& P1, const Point& P2) const{
+
+double Distance::compute_distance(const Vec& P1, const Vec& P2) const{
   return _dist.at(_distance_type)(P1, P2);
 }
 
 SpMat Distance::create_distance_matrix(const Coordinates & coordinates) const{
-  size_t num_points = coordinates.get_N_station();
-  std::vector<Point> coords(num_points);
+  unsigned int N(coordinates.get_N_station());
+  unsigned int n(coordinates.get_n_coords());
+
+  MatrixXd coords(N, n);
   coords = coordinates.get_coords();
-  
+
   std::vector<TripType> tripletList;
-  tripletList.reserve(num_points*(num_points-1)/2);
-  for (size_t i=0; i<(num_points-1); i++ ) {
-    for (size_t j=(i+1); j<num_points; j++ ) {
-      tripletList.push_back(TripType(i,j,compute_distance(coords[i], coords[j])));
+  tripletList.reserve((N*(N-1))/2);
+  for (size_t i=0; i<(N-1); i++ ) {
+    for (size_t j=(i+1); j<N; j++ ) {
+      tripletList.push_back(TripType(i,j,compute_distance(coords.row(i), coords.row(j)));
     }
   }
 
-  SpMat distance_matrix(num_points, num_points);
+  SpMat distance_matrix(N, N);
   distance_matrix.setFromTriplets(tripletList.begin(), tripletList.end());
 
   return (distance_matrix);

@@ -9,7 +9,7 @@ EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distanc
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
-    _N = (coords.get_coords()).size();
+    _N = coords.get_N_station();
 }
 
 EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const SpMat& distanceMatrix):
@@ -17,7 +17,7 @@ EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distanc
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
-    _N = (coords.get_coords()).size();
+    _N = coords.get_N_station();
 
     _weights.resize(_N);
     _weights.setOnes(_N);
@@ -70,27 +70,12 @@ void EmpiricalVariogram::update_emp_vario(const MatrixXd& resMatrix) {
 
 void EmpiricalVariogram::compute_hmax(const Coordinates& coords, const distances::Distance& distance) {
   unsigned int n_coords = coords.get_n_coords();
-  Vec coords_min_point(n_coords);
-  Vec coords_max_point(n_coords);
-  std::vector<Point> vec_coords (coords.get_coords());
-  coords_min_point = (vec_coords[0]).get_coords();
-  coords_max_point = coords_min_point;
+  Vec min_point(n_coords);
+  Vec max_point(n_coords);
+  MatrixXd mat_coords (coords.get_coords());
 
-  for (size_t i= 1; i<vec_coords.size(); i++) {
-    Vec point_coords(n_coords);
-    point_coords = (vec_coords[i]).get_coords();
-    for (size_t j=0; j< n_coords; j++) {
-
-      if (point_coords(j) < coords_min_point(j))
-        coords_min_point(j) = point_coords(j);
-
-      if (point_coords(j) > coords_max_point(j))
-        coords_max_point(j) = point_coords(j);
-    }
-  }
-
-  Point min_point(coords_min_point);
-  Point max_point(coords_max_point);
+  Vec min_point = mat_coords.colwise().minCoeff();
+  Vec max_point = mat_coords.colwise().maxCoeff();
 
   _hmax = (1/3*distance.compute_distance(min_point, max_point));
 }
