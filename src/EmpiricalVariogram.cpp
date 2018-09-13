@@ -35,7 +35,7 @@ void EmpiricalVariogram::update_emp_vario(const MatrixXd& resMatrix) {
   _N_hvec.clear();
   std::vector<double> w_ij;
   std::vector<double> tplanedist2_ij;
-  unsigned int card_esitmate = (_N-1)*_N/_n_h;  // Numero diversi valori di distanze tra _N punti è (_N-1)*_N/2
+  unsigned int card_esitmate = ((_N-1)*_N)/_n_h;  // Numero diversi valori di distanze tra _N punti è (_N-1)*_N/2
   w_ij.reserve(card_esitmate);
   tplanedist2_ij.reserve(card_esitmate);
   _card_h = 0;
