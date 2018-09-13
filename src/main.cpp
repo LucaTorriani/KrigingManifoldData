@@ -10,14 +10,13 @@
 using namespace Eigen;
 
 int main(){
-  unsigned int N; // Number of stations
-  unsigned int n; // Dimensione delle matrici sulla manifold
+  unsigned int N(7); // Number of stations
+  unsigned int n(2); // Dimensione delle matrici sulla manifold
 
+  // Tangent point
   MatrixXd tangent_point(n,n); // Matrice simmmetrica e definita positiva
-  // tangent_point(0, 0) = 1;
-  // tangent_point(0, 1) = 2;
-  // tangent_point(1, 0) = 3;
-  // tangent_point(1, 1) = 3;
+  tangent_point = MatrixXd::Random(n,n);
+  tangent_point = tangent_point.transpose()*tangent_point;
 
   std::string distance_name("Euclidean"); //(Geodist, Euclidean)
   Distance distance(distance_name);
@@ -25,18 +24,28 @@ int main(){
   std::string distance_Tplane_name("Frobenius"); //(Frobenius, FrobeniusScaled)
   DistanceTplane distanceTplane (distance_Tplane_name, tangent_point);
 
-  std::string distance_Manifold_name("Frobenius"); //(Frobenius, SquareRoot, LogEuclidean)
-  DistanceManifold distanceManifold (distance_Manifold_name, tangent_point);
+  std::string log_map_and_Manifold_name("Frobenius"); //(Frobenius, SquareRoot, LogEuclidean)
+  DistanceManifold distanceManifold (log_map_and_Manifold_name, tangent_point);
 
-  std::string log_map_name("Frobenius");  //(Frobenius, SquareRoot, LogEuclidean) //STESSO DI SOPRA?
-  logarithmicMap logMap(distanceManifold);
+  logarithmicMap logMap(log_map_and_Manifold_name);
 
 
   // FIXED DATA (Opzione1) passare e salvare come const reference nelle classi a cui servono
   //            (Opzione2) mettere tutte insieme in una classe e passare questa allo stesso modo
-  std::vector<Point> point_coords(N);
-  Coordinates coords(point_coords, distance);
+  // coords
+  MatrixXd coords_mat(N, 2);
+  coords_mat = MatrixXd::Random(N,2);
+  Coordinates coords(coords_mat);
+
+  // Data manifold
   std::vector<MatrixXd> data_manifold(N);
+  MatrixXd manifold_mat(n,n);    // Matrice simmmetrica e definita positiva
+  for (size_t i=0; i<N;i++) {
+    manifold_mat = MatrixXd::Random(n,n);
+    manifold_mat = manifold_mat.transpose()*manifold_mat;
+    data_manifold.push_back(manifold_mat);
+  }
+
   std::vector<MatrixXd> data_tspace(N);
   for (size_t i=0; i<N; i++) {
     data_tspace[i]=logMap.map2tplane(data_manifold[i]);
@@ -44,22 +53,28 @@ int main(){
   MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
   big_matrix_data_tspace = VecMatrices2bigMatrix(data_tspace, n);
 
-  //
-
   // Emp vario
   unsigned int n_h;
   EmpiricalVariogram emp_vario(coords, distance, n_h, distanceTplane);
 
   // Fitted vario
   VariogramFactory & vf(VariogramFactory::Instance());
-  std::string variogram_type;
+  std::string variogram_type("Gaussian"); // (Gaussian, Exponential, Spherical) //IMPLEMENTAREEE
   unique_ptr<FittedVariogram> the_variogram = vf.create(variogram_type);
 
   // Gamma matrix
   MatrixXd gamma_matrix(MatrixXd::Identity(N,N));
 
+  // Design matrix
+  registerDesignMatrices();
+  DesignMatrixFactory& design_matrix = DesignMatrixFactory::Instance();
+  std::string model_name("Coord1"); //(Intercept, Coord1, Coord2, Additive)
+  std::unique_ptr<DesignMatrix> theDesign_matrix = design_matrices.create(model_name);
+
+  MatrixXd result = theDesign_matrix->compute_design_matrix(coords);
+
+
   // Model
-  // Create design_matrix
   unsigned int n_covariates(design_matrix.cols());
   Model model(data_tspace, design_matrix);
   model.update_model(gamma_matrix);
