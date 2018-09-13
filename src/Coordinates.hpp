@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 
-#include "Point.hpp"
 #include "Helpers.hpp"
 
 class Coordinates {

@@ -9,6 +9,6 @@ unsigned int Coordinates::get_n_coords() const {
   return _coords.cols();
 }
 
-unsigned int get_N_station() const{
+unsigned int Coordinates::get_N_station() const{
   return _coords.rows();
 }
