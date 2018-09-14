@@ -101,6 +101,31 @@ double FittedVariogram::weighted_median (const std::vector<double> & values, con
   return values[index];
 }
 
+Vec FittedVariogram::get_vario_vec(const std::vector<double> & h_vec, unsigned int card_h) const {
+  Vec vario_values(card_h);
+  for (size_t i=0; i<card_h; i++) {
+    vario_values(i) = get_vario_univ(h_vec[i]);
+  }
+  return vario_values;
+}
+
+double FittedVariogram::get_covario_univ(const double & h) const {
+  return _parameters(0) + _parameters(1) - get_vario_univ(h);
+}
+
+MatrixXd FittedVariogram::compute_gamma_matrix(const SpMat & distanceMatrix, unsigned int N) const{
+  MatrixXd gamma_matrix(N,N);
+
+  for (size_t i=0; i<(N-1); i++ ) {
+    for (size_t j=(i+1); j<N; j++ ) {
+      gamma_matrix(i,j) = get_covario_univ(distanceMatrix.coeff(i,j));
+    }
+  }
+  double c0 = get_covario_univ(0);
+  gamma_matrix = gamma_matrix + gamma_matrix.transpose() + c0*MatrixXd::Identity(N,N);
+  return (gamma_matrix);
+}
+
 // GaussianVariogram
 double GaussVariogram::get_vario_univ(const double & h) const {
   double vario_value;
@@ -111,18 +136,6 @@ double GaussVariogram::get_vario_univ(const double & h) const {
     vario_value = _parameters(0) + _parameters(1)*(1-exp(-(h*h)/(_parameters(2)*_parameters(2))));
   };
   return vario_value;
-}
-
-double GaussVariogram::get_covario_univ(const double & h) const {
-  return _parameters(0) + _parameters(1) - get_vario_univ(h);
-}
-
-Vec GaussVariogram::get_vario_vec(const std::vector<double> & h_vec, unsigned int card_h) const {
-  Vec vario_values(card_h);
-  for (size_t i=0; i<card_h; i++) {
-    vario_values(i) = get_vario_univ(h_vec[i]);
-  }
-  return vario_values;
 }
 
 MatrixXd GaussVariogram::compute_jacobian(const std::vector<double> & h_vec, unsigned int card_h) const {
@@ -174,16 +187,135 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   _parameters(2) = 1/3*hvec[i];
 }
 
+// ExponentialVariogram
+double ExpVariogram::get_vario_univ(const double & h) const {
+  double vario_value;
+  if (h==0) {
+    vario_value = 0;
+  }
+  else {
+    vario_value = _parameters(0) + _parameters(1)*(1-exp(-h/_parameters(2)));
+  };
+  return vario_value;
+}
 
-MatrixXd GaussVariogram::compute_gamma_matrix() const{
-  MatrixXd gamma_matrix(_N,_N);
+MatrixXd ExpVariogram::compute_jacobian(const std::vector<double> & h_vec, unsigned int card_h) const {
+  MatrixXd jacobian (card_h,3);
 
-  for (size_t i=0; i<(_N-1); i++ ) {
-    for (size_t j=(i+1); j<_N; j++ ) {
-      gamma_matrix(i,j) = get_covario_univ(_distanceMatrix.coeff(i,j));
+  for (size_t i=0; i<card_h; i++) {
+    double tmp = exp(-h_vec[i]/_parameters(2));
+    jacobian(i,1) = 1;
+    jacobian(i,2) = 1-tmp;
+    jacobian(i,3) = _parameters(1)*tmp/(_parameters(2)*_parameters(2));
+  }
+  return jacobian;
+}
+
+void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
+  std::vector<double> emp_vario_values(emp_vario.get_emp_vario_values());
+  std::vector<unsigned int> N_hvec(emp_vario.get_N_hvec());
+  std::vector<double> hvec(emp_vario.get_hvec());
+
+  std::vector<double> first_two(2);
+  first_two[0] = emp_vario_values[0];
+  first_two[1] = emp_vario_values[1];
+
+  unsigned int card_h(emp_vario.get_card_h());
+  std::vector<double> last_four(4);
+  last_four[0] = emp_vario_values[card_h-4];
+  last_four[1] = emp_vario_values[card_h-3];
+  last_four[2] = emp_vario_values[card_h-2];
+  last_four[3] = emp_vario_values[card_h-1];
+
+  std::vector<unsigned int> N_h_first_two(2);
+  N_h_first_two[0] = N_hvec[0];
+  N_h_first_two[1] = N_hvec[1];
+  std::vector<unsigned int> N_h_last_four(4);
+  N_h_last_four[0] = N_hvec[card_h-4];
+  N_h_last_four[1] = N_hvec[card_h-3];
+  N_h_last_four[2] = N_hvec[card_h-2];
+  N_h_last_four[3] = N_hvec[card_h-1];
+
+  double sill = weighted_median(last_four, N_h_last_four);
+  _parameters(0) = weighted_median(first_two, N_h_first_two);
+  _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
+
+  double tol = 0.0505*sill;
+  size_t i = 0;
+  while (abs(emp_vario_values[i]-0.95*sill) > tol) {
+    i++;
+  }
+  _parameters(2) = 1/3*hvec[i];
+}
+
+
+// SphericalVariogram
+double SphVariogram::get_vario_univ(const double & h) const {
+  double vario_value;
+  if (h==0) {
+    vario_value = 0;
+  }
+  else if (h>=_parameters(2)) {
+    vario_value = _parameters(0) + _parameters(1);
+  }
+  else {
+    double tmp(h/_parameters(2));
+    vario_value = _parameters(0) + _parameters(1)*(3/2*tmp - 1/2*tmp*tmp*tmp);
+  };
+  return vario_value;
+}
+
+MatrixXd SphVariogram::compute_jacobian(const std::vector<double> & h_vec, unsigned int card_h) const {
+  MatrixXd jacobian (card_h,3);
+  for (size_t i=0; i<card_h; i++) {
+    jacobian(i,1) = 1;
+    if (h_vec[i] >= _parameters(2)) {
+      jacobian(i,2) = 1;
+      jacobian(i,3) = 0;
+    }
+    else {
+      double tmp1(h_vec[i]/_parameters(2));
+      double tmp2(tmp1/_parameters(2));
+      jacobian(i,2) = (3/2*tmp1 - 1/2*tmp1*tmp1*tmp1);
+      jacobian(i,3) = -3/2*_parameters(1)*(tmp2-tmp2*tmp2*h_vec[i]);
     }
   }
-  double c0 = get_covario_univ(0);
-  gamma_matrix = gamma_matrix + gamma_matrix.transpose() + c0*MatrixXd::Identity(_N,_N);
-  return (gamma_matrix);
+  return jacobian;
+}
+
+void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
+  std::vector<double> emp_vario_values(emp_vario.get_emp_vario_values());
+  std::vector<unsigned int> N_hvec(emp_vario.get_N_hvec());
+  std::vector<double> hvec(emp_vario.get_hvec());
+
+  std::vector<double> first_two(2);
+  first_two[0] = emp_vario_values[0];
+  first_two[1] = emp_vario_values[1];
+
+  unsigned int card_h(emp_vario.get_card_h());
+  std::vector<double> last_four(4);
+  last_four[0] = emp_vario_values[card_h-4];
+  last_four[1] = emp_vario_values[card_h-3];
+  last_four[2] = emp_vario_values[card_h-2];
+  last_four[3] = emp_vario_values[card_h-1];
+
+  std::vector<unsigned int> N_h_first_two(2);
+  N_h_first_two[0] = N_hvec[0];
+  N_h_first_two[1] = N_hvec[1];
+  std::vector<unsigned int> N_h_last_four(4);
+  N_h_last_four[0] = N_hvec[card_h-4];
+  N_h_last_four[1] = N_hvec[card_h-3];
+  N_h_last_four[2] = N_hvec[card_h-2];
+  N_h_last_four[3] = N_hvec[card_h-1];
+
+  double sill = weighted_median(last_four, N_h_last_four);
+  _parameters(0) = weighted_median(first_two, N_h_first_two);
+  _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
+
+  double tol = 0.01*sill;
+  size_t i = 0;
+  while (abs(emp_vario_values[i]-sill) > tol) {
+    i++;
+  }
+  _parameters(2) = hvec[i];
 }
