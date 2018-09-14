@@ -10,19 +10,19 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
   Id.setIdentity(_N,_N);
   inv_gamma_matrix= gamma_matrix.llt().solve(Id);
 
-  MatrixXd A(_(_n*(_n+1))/2, (_n*(_n+1))/2);
-  A = _design_matrix.transpose()*inv_gamma_matrix*_design_matrix;
+  MatrixXd A(_num_cov, _num_cov);
+  A.triangularView<Lower>() = _design_matrix.transpose()*inv_gamma_matrix*_design_matrix;
   A.triangularView<StrictlyUpper>() = A.transpose();
 
   LeastSquaresConjugateGradient<MatrixXd> lscg;
   lscg.compute(A);
 
-  Vec b((_n*(_n+1))/2);
+  Vec b(_num_cov);
   Vec y(_N);
 
-  MatrixXd tmp((_n*(_n+1))/2), _N);
+  MatrixXd tmp(_num_cov, _N);
   tmp = _design_matrix.transpose()*inv_gamma_matrix;
-  for(size_t l=0; l< (_n*(_n+1))/2); l++){
+  for(size_t l=0; l< _num_coeff; l++){
     y = _fitted_values.col(l);
     b = tmp*y;
     _beta_matrix.col(l) = lscg.solve(b);
