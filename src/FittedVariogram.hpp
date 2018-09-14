@@ -15,7 +15,7 @@ protected:
   // const SpMat& _distanceMatrix; // SERVE COSTRUTTORE CHE LA RICEVA COME PARAMETRO
   double weighted_median (const std::vector<double> &, const std::vector<unsigned int> &);
   virtual void get_init_par(const EmpiricalVariogram &) = 0;
-  void backtrack(const Vec &,Vec &,Vec &,MatrixXd &,const std::vector<double> &, unsigned int, double, double, const Vec&);
+  void backtrack(const Vector3d &,Vector3d &,Vec &,MatrixXd &,const std::vector<double> &, unsigned int, double, double, const Vec&);
   virtual MatrixXd compute_jacobian(const std::vector<double> &, unsigned int) const = 0;
 
 public:

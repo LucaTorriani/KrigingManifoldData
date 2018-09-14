@@ -41,15 +41,29 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   Vec vario_residuals = get_vario_vec(h_vec, card_h)  - emp_vario_values;
   Vec new_vario_residuals = vario_residuals;
 
-  MatrixXd J = compute_jacobian(h_vec, card_h);
+  MatrixXd J (card_h, 3);
+  J = compute_jacobian(h_vec, card_h);
+
+
+
 
   // GaussNewton
-  Vec gk =  J.transpose()*vario_residuals;
+  Vector3d gk(J.transpose()*vario_residuals);
+
+  Matrix3d JJ;
+  Vector3d bb;
+  LDLT<Matrix3d> solver(3);
+  Vector3d dir;
 
   while(!converged && iter < max_iter){
 
     iter++;
-    Vec dir = J.fullPivHouseholderQr().solve(-vario_residuals);
+
+    JJ = J.transpose()*J;
+    solver.compute(JJ);
+    bb = - J.transpose()*(vario_residuals);
+    dir = solver.solve(bb);
+
     vario_residuals = new_vario_residuals;
     backtrack(dir, gk, new_vario_residuals, J, h_vec, card_h, c,s, emp_vario_values);
     converged = (abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
@@ -58,7 +72,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
 
 }
 
-void FittedVariogram::backtrack(const Vec &dir,Vec &gk, Vec &res,MatrixXd &J,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values){
+void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,MatrixXd &J,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values){
 
   double alpha = 1;
   const double alphamin = 1.e-5;
