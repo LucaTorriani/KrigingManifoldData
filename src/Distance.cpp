@@ -66,7 +66,7 @@ SpMat Distance::create_distance_matrix(const Coordinates & coordinates) const{
   tripletList.reserve((N*(N-1))/2);
   for (size_t i=0; i<(N-1); i++ ) {
     for (size_t j=(i+1); j<N; j++ ) {
-      tripletList.push_back(TripType(i,j,compute_distance(coords.row(i), coords.row(j)));
+      tripletList.push_back( TripType(i,j,compute_distance(coords.row(i), coords.row(j))) );
     }
   }
 

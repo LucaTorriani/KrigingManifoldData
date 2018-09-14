@@ -53,9 +53,10 @@ logarithmicMap::logarithmicMap(const distances_manifold::DistanceManifold& dista
     Id.setIdentity();
     MatrixXd sqrtSigmaInv(n,n);
     sqrtSigmaInv = solver.solve(Id);
+
+    maps.insert(std::pair<std::string, std::function<MatrixXd(const MatrixXd&)>> ("Frobenius", logMapFrob(sqrtSigma, sqrtSigmaInv)));
   }
 
-  maps.insert(std::pair<std::string, std::function<MatrixXd(const MatrixXd&)>> ("Frobenius", logMapFrob(sqrtSigma, sqrtSigmaInv)));
   maps.insert(std::pair<std::string, std::function<MatrixXd(const MatrixXd&)>> ("SquareRoot", logMapSqRoot(Sigma)));
   maps.insert(std::pair<std::string, std::function<MatrixXd(const MatrixXd&)>> ("LogEuclidean", logMapLogEucl(Sigma)));
 }

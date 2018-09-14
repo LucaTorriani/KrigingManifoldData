@@ -1,7 +1,8 @@
 #ifndef _DISTANCE_HPP_
 #define _DISTANCE_HPP_
 
-#include "Point.hpp"
+#include "Helpers.hpp"
+#include "Coordinates.hpp"
 #include <vector>
 #include <utility>
 #include <map>

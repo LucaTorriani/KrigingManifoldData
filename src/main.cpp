@@ -11,7 +11,7 @@ using namespace Eigen;
 
 int main(){
   unsigned int N(7); // Number of stations
-  unsigned int n(2); // Dimensione delle matrici sulla manifold
+  unsigned int n(2); // Dimension of the matrices on the manifold
 
   // Tangent point
   MatrixXd tangent_point(n,n); // Matrice simmmetrica e definita positiva
@@ -36,6 +36,10 @@ int main(){
   MatrixXd coords_mat(N, 2);
   coords_mat = MatrixXd::Random(N,2);
   Coordinates coords(coords_mat);
+
+  // Distance Matrix
+  SpMat distance_matrix(N,N);
+  distanceMatrix = distance.create_distance_matrix();
 
   // Data manifold
   std::vector<MatrixXd> data_manifold(N);
@@ -92,7 +96,7 @@ int main(){
     rediduals = model.get_residuals();
     emp_vario.update_emp_vario(rediduals);
     the_variogram->evaluate_par_fitted(emp_vario);
-    gamma_matrix = the_variogram->compute_gamma_matrix();
+    gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix, N);
     beta_old_vec_matrices = beta_vec_matrices;
     model.update_model(gamma_matrix);
     beta = model.getBeta();

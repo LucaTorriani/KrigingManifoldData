@@ -74,8 +74,8 @@ void EmpiricalVariogram::compute_hmax(const Coordinates& coords, const distances
   Vec max_point(n_coords);
   MatrixXd mat_coords (coords.get_coords());
 
-  Vec min_point = mat_coords.colwise().minCoeff();
-  Vec max_point = mat_coords.colwise().maxCoeff();
+  min_point = mat_coords.colwise().minCoeff();
+  max_point = mat_coords.colwise().maxCoeff();
 
   _hmax = (1/3*distance.compute_distance(min_point, max_point));
 }
