@@ -22,7 +22,7 @@ Helpers.o: Helpers.hpp
 VariogramFactoryProxy.o: HelpersFactory.hpp FittedVariogram.hpp
 FittedVariogram.o: EmpiricalVariogram.hpp FittedVariogram.hpp
 EmpiricalVariogram.o: EmpiricalVariogram.hpp Distance_Tplane.hpp Coordinates.hpp Distance.hpp Helpers.hpp
-main2.o: Helpers.hpp FittedVariogram.hpp EmpiricalVariogram.hpp HelpersFactory.hpp
+main2.o: Coordinates.hpp DesignMatrix.hpp Distance_Manifold.hpp Distance_Tplane.hpp Distance.hpp EmpiricalVariogram.hpp FittedVariogram.hpp Helpers.hpp HelpersFactory.hpp MapFunctions.hpp Model.hpp
 Distance_Manifold.o: Distance_Manifold.hpp Helpers.hpp
 MapFunctions.o: MapFunctions.hpp Distance_Manifold.hpp
 DesignMatrix.o: DesignMatrix.hpp Coordinates.hpp

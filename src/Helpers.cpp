@@ -1,5 +1,7 @@
 #include "Helpers.hpp"
 
+using namespace matrix_manipulation;
+
 // EXPMAT
 MatrixXd matrix_manipulation::expMat(const MatrixXd& A) {
   unsigned int n(A.cols());
@@ -18,7 +20,7 @@ MatrixXd matrix_manipulation::expMat(const MatrixXd& A) {
   return result;
 };
 
-// LOMAT
+// LOGMAT
 MatrixXd matrix_manipulation::logMat(const MatrixXd& A) {
 
   unsigned int n(A.cols());
@@ -56,7 +58,8 @@ MatrixXd matrix_manipulation::sqrtMat(const MatrixXd& A) {
   return result;
 };
 
-std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int n){
+// BIG MATRIX -> VEC of MATRICES
+std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int n){
   unsigned int N(bigMatrix.rows());
   std::vector<MatrixXd> result(N);
   unsigned int k;
@@ -76,7 +79,8 @@ std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned 
   return(result);
 };
 
-MatrixXd VecMatrices2bigMatrix(const std::vector<MatrixXd>& vecMatrices) {
+// VEC of MATRICES -> BIG MATRIX
+MatrixXd matrix_manipulation::VecMatrices2bigMatrix(const std::vector<MatrixXd>& vecMatrices) {
   unsigned int N (vecMatrices.size());
   unsigned int n((vecMatrices[0]).rows());
   MatrixXd bigMatrix(N, ((n+1)*n)/2);

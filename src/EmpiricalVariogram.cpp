@@ -5,19 +5,17 @@ using namespace variogram_evaluation;
 
 // EmpiricalVariogram
 EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const SpMat& distanceMatrix, const Vec & weights):
-  _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _weights(weights), _n_h(n_h) {
+  _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _weights(weights), _n_h(n_h) {
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
-    _N = coords.get_N_station();
 }
 
 EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const SpMat& distanceMatrix):
-  _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _n_h(n_h) {
+  _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _n_h(n_h) {
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
-    _N = coords.get_N_station();
 
     _weights.resize(_N);
     _weights.setOnes(_N);
@@ -29,7 +27,7 @@ unsigned int EmpiricalVariogram::get_N() const {
 
 void EmpiricalVariogram::update_emp_vario(const MatrixXd& resMatrix) {
   std::vector<MatrixXd> res(_N);
-  res = matrix_manipulation::bigMatrix2VecMatrices(resMatrix);
+  res = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, _n);
   _emp_vario_values.clear();
   _hvec.clear();
   _N_hvec.clear();

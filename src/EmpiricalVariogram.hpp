@@ -15,7 +15,8 @@ class EmpiricalVariogram {
   std::vector<unsigned int> _N_hvec;
   unsigned int _card_h;
   // Costanti
-  unsigned int _N;
+  const unsigned int _N;
+  const unsigned int _n;
   Vec _d; // Vettore h+-deltah
   double _hmax;
   const distances_tplane::DistanceTplane _distanceTplane;

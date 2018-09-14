@@ -2,12 +2,29 @@
 #include<vector>
 #include<utility>
 #include<memory>
+#include "Coordinates.hpp"
+#include "DesignMatrix.hpp"
+#include "Distance_Manifold.hpp"
+#include "Distance_Tplane.hpp"
+#include "Distance.hpp"
+#include "EmpiricalVariogram.hpp"
+#include "FittedVariogram.hpp"
 #include "Helpers.hpp"
 #include "HelpersFactory.hpp"
-#include "FittedVariogram.hpp"
-#include "EmpiricalVariogram.hpp"
+#include "MapFunctions.hpp"
+#include "Model.hpp"
+
 
 using namespace Eigen;
+using namespace distances;
+using namespace distances_tplane;
+using namespace distances_manifold;
+using namespace map_functions;
+using namespace variogram_evaluation;
+using namespace vario_factory;
+using namespace design_matrix;
+using namespace model_fit;
+using namespace matrix_manipulation;
 
 int main(){
   unsigned int N(7); // Number of stations
@@ -24,10 +41,10 @@ int main(){
   std::string distance_Tplane_name("Frobenius"); //(Frobenius, FrobeniusScaled)
   DistanceTplane distanceTplane (distance_Tplane_name, tangent_point);
 
-  std::string log_map_and_Manifold_name("Frobenius"); //(Frobenius, SquareRoot, LogEuclidean)
-  DistanceManifold distanceManifold (log_map_and_Manifold_name, tangent_point);
+  std::string distance_Manifold_name("Frobenius"); //(Frobenius, SquareRoot, LogEuclidean)
+  DistanceManifold distanceManifold (distance_Manifold_name, tangent_point);
 
-  logarithmicMap logMap(log_map_and_Manifold_name);
+  logarithmicMap logMap(distanceManifold);
 
 
   // FIXED DATA (Opzione1) passare e salvare come const reference nelle classi a cui servono
@@ -38,8 +55,8 @@ int main(){
   Coordinates coords(coords_mat);
 
   // Distance Matrix
-  SpMat distance_matrix(N,N);
-  distanceMatrix = distance.create_distance_matrix();
+  SpMat distanceMatrix(N,N);
+  distanceMatrix = distance.create_distance_matrix(coords);
 
   // Data manifold
   std::vector<MatrixXd> data_manifold(N);
@@ -55,52 +72,54 @@ int main(){
     data_tspace[i]=logMap.map2tplane(data_manifold[i]);
   }
   MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
-  big_matrix_data_tspace = VecMatrices2bigMatrix(data_tspace, n);
+  big_matrix_data_tspace = VecMatrices2bigMatrix(data_tspace);
 
   // Emp vario
-  unsigned int n_h;
-  EmpiricalVariogram emp_vario(coords, distance, n_h, distanceTplane);
+  unsigned int n_h(15);
+  EmpiricalVariogram emp_vario(coords, distance, n_h, distanceTplane, distanceMatrix);
 
   // Fitted vario
   VariogramFactory & vf(VariogramFactory::Instance());
   std::string variogram_type("Gaussian"); // (Gaussian, Exponential, Spherical) //IMPLEMENTAREEE
-  unique_ptr<FittedVariogram> the_variogram = vf.create(variogram_type);
+  std::unique_ptr<FittedVariogram> the_variogram = vf.create(variogram_type);
 
   // Gamma matrix
   MatrixXd gamma_matrix(MatrixXd::Identity(N,N));
 
   // Design matrix
   registerDesignMatrices();
-  DesignMatrixFactory& design_matrix = DesignMatrixFactory::Instance();
+  DesignMatrixFactory& design_matrix_fac = DesignMatrixFactory::Instance();
   std::string model_name("Coord1"); //(Intercept, Coord1, Coord2, Additive)
-  std::unique_ptr<DesignMatrix> theDesign_matrix = design_matrices.create(model_name);
+  std::unique_ptr<DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
-  MatrixXd result = theDesign_matrix->compute_design_matrix(coords);
+  MatrixXd design_matrix = theDesign_matrix->compute_design_matrix(coords);
 
 
   // Model
   unsigned int n_covariates(design_matrix.cols());
-  Model model(data_tspace, design_matrix);
+  Model model(big_matrix_data_tspace, design_matrix, n);
   model.update_model(gamma_matrix);
   MatrixXd residuals(N, ((n+1)*n)/2);
   MatrixXd beta(N, ((n+1)*n)/2);
-  MatrixXd beta_old(N, (n+1)*n)/2);
-  beta = model.getBeta();
-  beta_vec_matrices = bigMatrix2VecMatrices(beta);
+  MatrixXd beta_old(N, ((n+1)*n)/2);
+  beta = model.get_beta();
+  std::vector<MatrixXd> beta_vec_matrices(n_covariates);
+  beta_vec_matrices= bigMatrix2VecMatrices(beta, n);
+  std::vector<MatrixXd> beta_old_vec_matrices(n_covariates);
 
   unsigned int num_iter(0);
-  unsigned int max_iter;
-  double tolerance;
+  unsigned int max_iter(100);
+  double tolerance(1e-4);
   double tol = tolerance+1;
   while (num_iter < max_iter && tol > tolerance) {
-    rediduals = model.get_residuals();
-    emp_vario.update_emp_vario(rediduals);
+    residuals = model.get_residuals();
+    emp_vario.update_emp_vario(residuals);
     the_variogram->evaluate_par_fitted(emp_vario);
     gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix, N);
     beta_old_vec_matrices = beta_vec_matrices;
     model.update_model(gamma_matrix);
-    beta = model.getBeta();
-    beta_vec_matrices = bigMatrix2VecMatrices(beta);
+    beta = model.get_beta();
+    beta_vec_matrices = bigMatrix2VecMatrices(beta, n);
     tol=0;
     for (size_t i=0; i<N; i++) {
       tol += distanceTplane.compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
