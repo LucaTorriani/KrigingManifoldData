@@ -75,3 +75,17 @@ SpMat Distance::create_distance_matrix(const Coordinates & coordinates) const{
 
   return (distance_matrix);
 }
+
+std::vector<double> Distance::create_distance_vector(const Coordinates & coordinates, const Vec & new_coord) const{
+  unsigned int N(coordinates.get_N_station());
+  unsigned int n(coordinates.get_n_coords());
+
+  MatrixXd coords(N, n);
+  coords = coordinates.get_coords();
+
+  std::vector<double> distance_vector(N);
+  for (size_t i=0; i<N; i++) {
+    distance_vector(i) = compute_distance(coords.row(i), new_coord);
+  }
+  return (distance_vector);
+}

@@ -30,6 +30,8 @@ public:
   Distance(const std::string &);
   double compute_distance(const Vec&, const Vec&) const;
   SpMat create_distance_matrix(const Coordinates &) const;
+  std::vector<double> create_distance_vector(const Coordinates &, const Vec &) const;
+
 
 };
 

@@ -140,6 +140,18 @@ MatrixXd FittedVariogram::compute_gamma_matrix(const SpMat & distanceMatrix, uns
   return (gamma_matrix);
 }
 
+Vec FittedVariogram::get_covario_vec(const std::vector<double> & h_vec, unsigned int card_h) const {
+  Vec covario_values(card_h);
+  for (size_t i=0; i<card_h; i++) {
+    covario_values(i) = get_covario_univ(h_vec[i]);
+  }
+  return covario_values;
+}
+
+void FittedVariogram::set_parameters(const Vector3d& parameters) {
+  _parameters = parameters
+}
+
 // GaussianVariogram
 double GaussVariogram::get_vario_univ(const double & h) const {
   double vario_value;
