@@ -28,6 +28,7 @@ public:
   double get_covario_univ(const double &) const;
   Vec get_vario_vec(const std::vector<double> &, unsigned int) const;
   MatrixXd compute_gamma_matrix(const SpMat&, unsigned int) const;
+  Vector3d get_parameters() const;
 };
 
 

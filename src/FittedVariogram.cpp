@@ -333,3 +333,7 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   }
   _parameters(2) = hvec[i];
 }
+
+Vector3d FittedVariogram::get_parameters() const{
+  return _parameters;
+}
