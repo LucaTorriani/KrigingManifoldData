@@ -15,7 +15,10 @@ model_ts = "Coord1"                # "Intercept" or "Coord1" or "Coord2" or "Add
 
 ### Data manifold: matrix (Nx3) or array of matrices (Nxpxp or pxpxN)   (N= number of observations)
 # data_manifold_model = data_manifold_tot  
-data_manifold_model = rCov
+library(plyr)
+
+data_manifold_model = alply(rCov,3)
+
 # data_manifold_matrix = matrixArray_to_matrix(data_manifold_model)
 # data_manifold_array = matrix_to_matrixArray (data_manifold_matrix, p=2)
 
@@ -40,8 +43,8 @@ beta_gamma_opt = model_GLS_sigma_fixed(data_manifold = data_manifold_model, coor
                                        vario_model = vario_model, n_h = 15,  
                                        max_it = 100, tolerance = 10^(-4))
 
-model = list(Sigma_opt = beta_gamma_opt$Sigma, beta_opt = beta_gamma_opt$beta, gamma_matrix = beta_gamma_opt$gamma_matrix,
-             residuals = beta_gamma_opt$residuals, par = beta_gamma_opt$par)
+# model = list(Sigma_opt = beta_gamma_opt$Sigma, beta_opt = beta_gamma_opt$beta, gamma_matrix = beta_gamma_opt$gamma_matrix,
+             # residuals = beta_gamma_opt$residuals, par = beta_gamma_opt$par)
 
 
 if(FALSE){

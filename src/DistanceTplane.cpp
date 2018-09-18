@@ -1,4 +1,4 @@
-#include "Distance_Tplane.hpp"
+#include "DistanceTplane.hpp"
 
 #include <cmath>
 

@@ -39,8 +39,7 @@ double GeoDist::operator()(const Vec& P1, const Vec& P2) const{
   double sin_2((sin( (long2-long1)/2*coeff )));
   double sqrth(sqrt( sin_1*sin_1 + cos(lat1*coeff)*cos(lat2*coeff)* sin_2*sin_2 ));
 
-  if (sqrth > 1)
-    sqrth = 1;
+  if (sqrth > 1) sqrth = 1;
 
   return (Earth_R*asin(sqrth));
 
@@ -57,15 +56,20 @@ double Distance::compute_distance(const Vec& P1, const Vec& P2) const{
 
 SpMat Distance::create_distance_matrix(const Coordinates & coordinates) const{
   unsigned int N(coordinates.get_N_station());
-  unsigned int n(coordinates.get_n_coords());
+  unsigned int num_coords(coordinates.get_n_coords());
 
-  MatrixXd coords(N, n);
-  coords = coordinates.get_coords();
+  // MatrixXd coords(N, num_coords);
+  // coords = coordinates.get_coords();
+  // std::cout << coords.row(i)<< std::endl;
+
+  const MatrixXd & coords = coordinates.get_coords();
+  // std::cout << coords.row(1)<< std::endl;
 
   std::vector<TripType> tripletList;
   tripletList.reserve((N*(N-1))/2);
   for (size_t i=0; i<(N-1); i++ ) {
     for (size_t j=(i+1); j<N; j++ ) {
+
       tripletList.push_back( TripType(i,j,compute_distance(coords.row(i), coords.row(j))) );
     }
   }

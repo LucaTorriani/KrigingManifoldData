@@ -1,4 +1,4 @@
-#include "Distance_Manifold.hpp"
+#include "DistanceManifold.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -12,7 +12,7 @@ double Frobenius::operator()(const MatrixXd& M1, const MatrixXd& M2) const{
   MatrixXd matrix_result(n,n);
   matrix_result = solver.solve(M2);
 
-  VectorXcd eigenvalues =  matrix_result.eigenvalues().real();
+  VectorXcd eigenvalues =  matrix_result.eigenvalues();
 
   double ssq = 0.0;
   for(auto i = 0;i < eigenvalues.size(); i++)  ssq += (std::log(eigenvalues(i).real())*std::log(eigenvalues(i).real()));

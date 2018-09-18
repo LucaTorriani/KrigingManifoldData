@@ -2,7 +2,7 @@
 #define _EMPIRICAL_VARIOGRAM_HPP
 
 #include "Helpers.hpp"
-#include "Distance_Tplane.hpp"
+#include "DistanceTplane.hpp"
 #include "Distance.hpp"
 #include "Coordinates.hpp"
 

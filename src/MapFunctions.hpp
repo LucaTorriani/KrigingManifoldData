@@ -1,7 +1,7 @@
 #ifndef _MAPFUNCTIONS_HPP_
 #define _MAPFUNCTIONS_HPP_
 
-#include "Distance_Manifold.hpp"
+#include "DistanceManifold.hpp"
 
 namespace map_functions {
 

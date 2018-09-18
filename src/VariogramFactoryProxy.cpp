@@ -6,6 +6,6 @@
 namespace {
   using vario_factory::VariogramProxy;
   VariogramProxy<variogram_evaluation::GaussVariogram> GAU("Gaussian");
-  //VariogramProxy<ExpVariogram> EXP("Exponential");
-  //VariogramProxy<SphVariogram> SPH("Spherical");
+  VariogramProxy<variogram_evaluation::ExpVariogram> EXP("Exponential");
+  VariogramProxy<variogram_evaluation::SphVariogram> SPH("Spherical");
 }
