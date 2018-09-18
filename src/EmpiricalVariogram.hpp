@@ -28,13 +28,13 @@ class EmpiricalVariogram {
 
 public:
   EmpiricalVariogram()= default;
-  EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &, const SpMat&, const Vec &);
   EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &, const SpMat&);
+  void update_emp_vario(const std::vector<MatrixXd>&);
+  void set_weight(const Vec&);
   std::vector<double> get_emp_vario_values () const;
   std::vector<unsigned int> get_N_hvec() const;
   std::vector<double> get_hvec() const;
   unsigned int get_card_h() const;
-  void update_emp_vario(const MatrixXd&);
   unsigned int get_N() const;
 };
 
