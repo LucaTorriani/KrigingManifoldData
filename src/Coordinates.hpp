@@ -7,7 +7,7 @@
 #include "Helpers.hpp"
 
 class Coordinates {
-  const MatrixXd& _coords;
+  MatrixXd _coords;
 public:
   Coordinates(const MatrixXd& coords): _coords(coords){};
   unsigned int get_N_station() const;

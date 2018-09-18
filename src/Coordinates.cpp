@@ -2,6 +2,7 @@
 
 
 const MatrixXd& Coordinates::get_coords () const {
+  std::cout << _coords << std::endl;
   return _coords;
 }
 

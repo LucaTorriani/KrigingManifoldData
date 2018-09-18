@@ -61,11 +61,12 @@ extern "C"{
       std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Euclidean)
       distances::Distance distance(distance_name);
 
-      // // Coordinates
+      // Coordinates
       const Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
+      // Rcpp::Rcout << coords_mat << "\n";
 
       Coordinates coords(coords_mat);
-      Rcpp::Rcout << coords.get_coords() << "\n";
+      // Rcpp::Rcout << coords.get_coords() << "\n";
       // Rcpp::Rcout << coords_mat << "\n";
 
       // Distance Matrix
