@@ -20,19 +20,18 @@
 extern "C"{
 // CREATE MODEL
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
-    SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h
+    SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_weight) {
+
+      Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
+      Rcpp::Nullable<Vec> weight(s_weight);
 
       // Punto tangente
       Eigen::Map<Eigen::MatrixXd> Sigma(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma));
       unsigned int n = Sigma.rows();
 
-      // Distance
-      std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Euclidean)
-      distances::Distance distance(distance_name);
-
       // Distance tplane
-      std::string distance_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
+      std::string distance_Tplane_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
       distances_tplane::DistanceTplane distanceTplane (distance_Tplane_name, Sigma);
 
       // Distance manifold
@@ -41,14 +40,6 @@ extern "C"{
 
       // Map functions
       map_functions::logarithmicMap logMap(distanceManifold);
-
-      // Coordinates
-      Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
-      Coordinates coords(coords_mat);
-
-      // Distance Matrix
-      SpMat distanceMatrix(N,N);
-      distanceMatrix = distance.create_distance_matrix(coords);
 
       // Data manifold
       Rcpp::List list_data_manifold(s_data_manifold);
@@ -64,9 +55,26 @@ extern "C"{
       Eigen::MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
       big_matrix_data_tspace = matrix_manipulation::VecMatrices2bigMatrix(data_tspace);
 
+      // Distance
+      std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Euclidean)
+      distances::Distance distance(distance_name);
+
+      // Coordinates
+      Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
+      Coordinates coords(coords_mat);
+
+      // Distance Matrix
+      SpMat distanceMatrix(N,N);
+      distanceMatrix = distance.create_distance_matrix(coords);
+
       // Emp vario
       unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
       variogram_evaluation::EmpiricalVariogram emp_vario(coords, distance, n_h, distanceTplane, distanceMatrix);
+      if(weight.isNotNull()) {
+        Eigen::Map<Vec> weight(Rcpp::as<Eigen::Map<Vec>> (s_weight));
+        emp_vario.set_weight(weight);
+      }
+
 
       // Fitted vario
       vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
@@ -82,15 +90,19 @@ extern "C"{
       std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
       std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
-      Eigen::MatrixXd design_matrix = theDesign_matrix->compute_design_matrix(coords);
+      Eigen::MatrixXd design_matrix;
+      if(X.isNotNull()) {
+        Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
+        design_matrix = theDesign_matrix->compute_design_matrix(coords, X);
+      }
+      else design_matrix = theDesign_matrix->compute_design_matrix(coords);
 
-      // MANCA: Gestione di s_X
 
       // Model
       unsigned int n_covariates(design_matrix.cols());
       model_fit::Model model(big_matrix_data_tspace, design_matrix, n);
       model.update_model(gamma_matrix);
-      Eigen::MatrixXd residuals(N, ((n+1)*n)/2);
+      Eigen::MatrixXd resMatrix(N, ((n+1)*n)/2);
       Eigen::MatrixXd beta(N, ((n+1)*n)/2);
       Eigen::MatrixXd beta_old(N, ((n+1)*n)/2);
       beta = model.get_beta();
@@ -101,13 +113,13 @@ extern "C"{
       unsigned int num_iter(0);
       unsigned int max_iter(Rcpp::as<unsigned int> (s_max_it));
       double tolerance(Rcpp::as<unsigned int> (s_tolerance));
-      std::vector<MatrixXd> res(_N);
+      std::vector<MatrixXd> resVec(N);
 
       double tol = tolerance+1;
       while (num_iter < max_iter && tol > tolerance) {
         resMatrix = model.get_residuals();
-        residuals = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, _n);
-        emp_vario.update_emp_vario(residuals);
+        resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, n);
+        emp_vario.update_emp_vario(resVec);
         the_variogram->evaluate_par_fitted(emp_vario);
         gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix, N);
         beta_old_vec_matrices = beta_vec_matrices;
@@ -126,20 +138,22 @@ extern "C"{
     Eigen::Vector3d parameters = the_variogram->get_parameters();
 
 
-    List result = List::create(Named("beta") = beta_vec_matrices,
-                           Named("gamma_matrix") = gamma_matrix,
-                           Named("residuals") = residuals,
-                           Named("vario_parameters") = parameters);
+    Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
+                           Rcpp::Named("gamma_matrix") = gamma_matrix,
+                           Rcpp::Named("residuals") = resVec,
+                           Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
+                           Rcpp::Named("h_vec") = emp_vario.get_hvec(),
+                           Rcpp::Named("vario_parameters") = parameters);
 
-    return wrap(result);
+    return Rcpp::wrap(result);
   }
 
 
-
+/*
 // KRIGING
-  RcppExport SEXP get_model (SEXP s_coordinates, SEXP s_new_coordinates, SEXP s_new_X, SEXP s_Sigma,
+  RcppExport SEXP kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
-    SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals)
+    SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, Rcpp::Nullable<Eigen::MatrixXd>s _X)
 
     // Punto tangente
     Eigen::Map<Eigen::MatrixXd> Sigma(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma));
@@ -228,8 +242,8 @@ extern "C"{
     List result = List::create(Named("prediction") = manifold_prediction);  // Solo questo?
 
     return wrap(result);
-
-
+  }
+*/
 }
 
 
