@@ -85,7 +85,7 @@ std::vector<double> Distance::create_distance_vector(const Coordinates & coordin
 
   std::vector<double> distance_vector(N);
   for (size_t i=0; i<N; i++) {
-    distance_vector(i) = compute_distance(coords.row(i), new_coord);
+    distance_vector[i] = compute_distance(coords.row(i), new_coord);
   }
   return (distance_vector);
 }

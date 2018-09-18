@@ -149,7 +149,7 @@ Vec FittedVariogram::get_covario_vec(const std::vector<double> & h_vec, unsigned
 }
 
 void FittedVariogram::set_parameters(const Vector3d& parameters) {
-  _parameters = parameters
+  _parameters = parameters;
 }
 
 // GaussianVariogram
