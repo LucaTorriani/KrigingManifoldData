@@ -140,12 +140,14 @@ extern "C"{
         num_iter++;
       }
 
+      Vec fit_vario_values = the_variogram->get_vario_vec(emp_vario.get_hvec(), emp_vario.get_card_h());
 
 
     Eigen::Vector3d parameters = the_variogram->get_parameters();
 
 
     Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
+                           Rcpp::Named("fit_vario_values") = fit_vario_values,
                            Rcpp::Named("gamma_matrix") = gamma_matrix,
                            Rcpp::Named("residuals") = resVec,
                            Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),

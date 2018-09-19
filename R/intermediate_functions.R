@@ -2,27 +2,12 @@ dyn.load("/vagrant/KrigingManifoldData/src/interface_function.so")
 library("Rcpp")
 library("RcppEigen")
 
-
-plot_variogram = function(empirical_variogram, fitted_par_vario, model, distance){
+plot_variogram = function (empirical_variogram, fitted_variogram, model, distance) {
   xx<-seq(0,max(empirical_variogram$h), by = 0.01)
-  if(model == 'Gaussian'){
-    plot(xx[2:length(xx)],gauss_vario(fitted_par_vario,xx[2:length(xx)]),  col = 'blue', type = 'l', 
-         ylim = c(0,1.15*max(empirical_variogram$emp_vario_values)), ylab = "GaussVariogram", xlab = distance)
-    points(empirical_variogram$h, empirical_variogram$emp_vario_values, pch = 4, col = 'blue')
-  }
-  else if(model == 'Exponential'){
-    plot(xx[2:length(xx)],exp_vario(fitted_par_vario,xx[2:length(xx)]),  col = 'blue', type = 'l', 
-         ylim = c(0,1.15*max(empirical_variogram$emp_vario_values)), ylab = "ExpVariogram", xlab = distance)
-    points(empirical_variogram$h, empirical_variogram$emp_vario_values, pch = 4, col = 'blue')
-  }
-  else if (model == 'Spherical'){
-    plot(xx[2:length(xx)],sph_vario(fitted_par_vario,xx[2:length(xx)]),  col = 'blue', type = 'l', 
-         ylim = c(0,1.15*max(empirical_variogram$emp_vario_values)), ylab = "SphVariogram", xlab = distance)
-    points(empirical_variogram$h, empirical_variogram$emp_vario_values, pch = 4, col = 'blue')
-  }
-  else {
-    stop('Model not available')
-  }
+  plot(xx[2:length(xx)],fitted_variogram[2:length(xx)],  col = 'blue', type = 'l', 
+       ylim = c(0,1.15*max(empirical_variogram$emp_vario_values)), ylab = model, xlab = distance)
+  points(empirical_variogram$h, empirical_variogram$emp_vario_values, pch = 4, col = 'blue')
+  
 }
 
 
@@ -44,9 +29,10 @@ model_GLS_sigma_fixed = function(data_manifold, coords,X = NULL, Sigma, metric_m
   beta = result$beta
   W = result$gamma_matrix
   residuals = result$residuals
+  fitted_variogram = result$fit_vario_values
 
 
-  plot_variogram(empirical_variogram = empirical_variogram, fitted_par_vario = fitted_par_vario, model = vario_model,
+  plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
                 distance = distance)
 
   return (list(beta_opt = beta, gamma_matrix = W, residuals = residuals, par = fitted_par_vario))
