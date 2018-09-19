@@ -4,7 +4,7 @@
 using namespace variogram_evaluation;
 
 // EmpiricalVariogram
-EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const SpMat& distanceMatrix):
+EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const std::shared_ptr<const SpMat> distanceMatrix):
   _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _n_h(n_h) {
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
@@ -31,10 +31,9 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
   _N_hvec.clear();
   std::vector<double> w_ij;
   std::vector<double> tplanedist2_ij;
-  unsigned int card_esitmate = ((_N-1)*_N)/_n_h;  // Numero diversi valori di distanze tra _N punti è (_N-1)*_N/2
-  w_ij.reserve(card_esitmate);
-  tplanedist2_ij.reserve(card_esitmate);
-  _card_h = 0;
+  unsigned int card_estimate = ((_N-1)*_N)/_n_h;  // Numero diversi valori di distanze tra _N punti è (_N-1)*_N/2
+  w_ij.reserve(card_estimate);
+  tplanedist2_ij.reserve(card_estimate);
 
   for (size_t l=1; l<(_n_h+1); l++) {
     w_ij.clear();
@@ -42,7 +41,7 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
     for (size_t j =0; j<(_N-1); j++) {
 
       for (size_t i=(j+1); i<_N; i++) {
-        if (_distanceMatrix.coeff(i,j) >= _d(l-1) && _distanceMatrix.coeff(i,j) <= _d(l)) {
+        if (_distanceMatrix->coeff(i,j) >= _d(l-1) && _distanceMatrix->coeff(i,j) <= _d(l)) {
           tplanedist2_ij.push_back( (_distanceTplane.compute_distance(res[i], res[j]))*(_distanceTplane.compute_distance(res[i], res[j])) );
           w_ij.push_back(_weights(i)*_weights(j));
         }
@@ -50,7 +49,6 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
     }
     unsigned int actual_size = tplanedist2_ij.size();
     if (actual_size>0) {
-      _card_h += actual_size;
       _N_hvec.push_back(actual_size);
       double num_sum = 0;
       double denom_sum = 0;
@@ -62,16 +60,18 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
       _hvec.push_back((_d(l)+_d(l-1))/2);
     }
   }
+  _card_h = _hvec.size();
+
 }
 
 void EmpiricalVariogram::compute_hmax(const Coordinates& coords, const distances::Distance& distance) {
   unsigned int n_coords = coords.get_n_coords();
   Vec min_point(n_coords);
   Vec max_point(n_coords);
-  MatrixXd mat_coords (coords.get_coords());
+  const std::shared_ptr<const MatrixXd> mat_coords (coords.get_coords());
 
-  min_point = mat_coords.colwise().minCoeff();
-  max_point = mat_coords.colwise().maxCoeff();
+  min_point = (mat_coords->colwise()).minCoeff();
+  max_point = (mat_coords->colwise()).maxCoeff();
 
   _hmax = (1/3*distance.compute_distance(min_point, max_point));
 }

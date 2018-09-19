@@ -26,7 +26,7 @@ MatrixXd Coord1DM::compute_design_matrix(const Coordinates& coords) const{
   const unsigned int N(coords.get_N_station());
   MatrixXd Z(N,2);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
-  Z.block(0,1,N,1) = (coords.get_coords()).col(0);
+  Z.block(0,1,N,1) = (coords.get_coords())->col(0);
   return(Z);
 }
 
@@ -36,7 +36,7 @@ MatrixXd Coord1DM::compute_design_matrix(const Coordinates& coords, const Matrix
 
   MatrixXd Z(N,n+2);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
-  Z.block(0,1,N,1) = coords.get_coords().col(0);
+  Z.block(0,1,N,1) = (coords.get_coords())->col(0);
   Z.block(0,2, N,n) = X;
 
   return(Z);
@@ -47,7 +47,7 @@ MatrixXd Coord2DM::compute_design_matrix(const Coordinates& coords) const{
   const unsigned int N(coords.get_N_station());
   MatrixXd Z(N,2);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
-  Z.block(0,1,N,1) = coords.get_coords().col(1);
+  Z.block(0,1,N,1) = (coords.get_coords())->col(1);
   return(Z);
 }
 
@@ -57,7 +57,7 @@ MatrixXd Coord2DM::compute_design_matrix(const Coordinates& coords, const Matrix
 
   MatrixXd Z(N,n+2);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
-  Z.block(0,1,N,1) = coords.get_coords().col(1);
+  Z.block(0,1,N,1) = (coords.get_coords())->col(1);
   Z.block(0,2, N,n) = X;
 
   return(Z);
@@ -69,7 +69,7 @@ MatrixXd AdditiveDM::compute_design_matrix(const Coordinates& coords) const{
   const unsigned int N(coords.get_N_station());
   MatrixXd Z(N,3);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
-  Z.block(0,1,N,2) = coords.get_coords();
+  Z.block(0,1,N,2) = *(coords.get_coords());
   return(Z);
 }
 
@@ -79,7 +79,7 @@ MatrixXd AdditiveDM::compute_design_matrix(const Coordinates& coords, const Matr
 
   MatrixXd Z(N,n+3);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
-  Z.block(0,1,N,2) = coords.get_coords();
+  Z.block(0,1,N,2) = *(coords.get_coords());
   Z.block(0,3, N,n) = X;
 
   return(Z);

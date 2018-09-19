@@ -46,7 +46,7 @@ double GeoDist::operator()(const Vec& P1, const Vec& P2) const{
 }
 
 Distance::Distance(const std::string& distance_type):_distance_type(distance_type){
-  _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Euclidean", EuclDist()));
+  _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Eucldist", EuclDist()));
   _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Geodist", GeoDist()));
 }
 
@@ -54,23 +54,16 @@ double Distance::compute_distance(const Vec& P1, const Vec& P2) const{
   return _dist.at(_distance_type)(P1, P2);
 }
 
-SpMat Distance::create_distance_matrix(const Coordinates & coordinates) const{
-  unsigned int N(coordinates.get_N_station());
+SpMat Distance::create_distance_matrix(const Coordinates & coordinates, unsigned int N) const{
   unsigned int num_coords(coordinates.get_n_coords());
 
-  // MatrixXd coords(N, num_coords);
-  // coords = coordinates.get_coords();
-  // std::cout << coords.row(i)<< std::endl;
-
-  const MatrixXd & coords = coordinates.get_coords();
-  // std::cout << coords.row(1)<< std::endl;
+  const std::shared_ptr<const MatrixXd> coords = coordinates.get_coords();
 
   std::vector<TripType> tripletList;
   tripletList.reserve((N*(N-1))/2);
   for (size_t i=0; i<(N-1); i++ ) {
     for (size_t j=(i+1); j<N; j++ ) {
-
-      tripletList.push_back( TripType(i,j,compute_distance(coords.row(i), coords.row(j))) );
+      tripletList.push_back( TripType(i,j,compute_distance(coords->row(i), coords->row(j))) );
     }
   }
 
@@ -84,12 +77,11 @@ std::vector<double> Distance::create_distance_vector(const Coordinates & coordin
   unsigned int N(coordinates.get_N_station());
   unsigned int n(coordinates.get_n_coords());
 
-  MatrixXd coords(N, n);
-  coords = coordinates.get_coords();
+  const std::shared_ptr<const MatrixXd> coords = coordinates.get_coords();
 
   std::vector<double> distance_vector(N);
   for (size_t i=0; i<N; i++) {
-    distance_vector[i] = compute_distance(coords.row(i), new_coord);
+    distance_vector[i] = compute_distance(coords->row(i), new_coord);
   }
   return (distance_vector);
 }

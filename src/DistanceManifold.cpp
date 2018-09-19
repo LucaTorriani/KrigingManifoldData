@@ -36,7 +36,7 @@ double SqRoot::operator()(const MatrixXd& M1, const MatrixXd& M2) const {
 
 // CLASS DISTANCE MANIFOLD
 
-DistanceManifold::DistanceManifold(const std::string& distanceManifold, const MatrixXd& Sigma):_distanceManifold(distanceManifold),
+DistanceManifold::DistanceManifold(const std::string& distanceManifold, const std::shared_ptr<const MatrixXd> Sigma):_distanceManifold(distanceManifold),
   _Sigma(Sigma)
 
 {
@@ -50,7 +50,7 @@ double DistanceManifold::compute_distance (const MatrixXd& M1, const MatrixXd& M
   return result;
 }
 
-const MatrixXd&  DistanceManifold::get_Sigma() const {
+const std::shared_ptr<const MatrixXd> DistanceManifold::get_Sigma() const {
   return _Sigma;
 }
 

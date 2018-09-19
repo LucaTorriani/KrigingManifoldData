@@ -26,25 +26,20 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   unsigned int max_iter = 100;
 
   get_init_par(emp_vario);
-
   unsigned int card_h(emp_vario.get_card_h());
   std::vector<double> h_vec(card_h);
   h_vec = emp_vario.get_hvec();
 
-  // Vec emp_vario_values((emp_vario.get_emp_vario_values()).data()); // Metodo 1
   std::vector<double> emp_vario_val(emp_vario.get_emp_vario_values());  // Metodo 2
   Vec emp_vario_values = Eigen::Map<Vec, Eigen::Unaligned>(emp_vario_val.data(), emp_vario_val.size());
   // TRASFORMAZIONE STD::VECTOR<DOUBLE> --> VEC: https://stackoverflow.com/questions/17036818/initialise-eigenvector-with-stdvector
-
-  // auto compute_residual = [&h_vec, &emp_vario_values](){return (this->get_vario_vec(h_vec) - emp_vario_values)};
 
   Vec vario_residuals = get_vario_vec(h_vec, card_h)  - emp_vario_values;
   Vec new_vario_residuals = vario_residuals;
 
   MatrixXd J (card_h, 3);
+
   J = compute_jacobian(h_vec, card_h);
-
-
 
 
   // GaussNewton
@@ -169,9 +164,9 @@ MatrixXd GaussVariogram::compute_jacobian(const std::vector<double> & h_vec, uns
 
   for (size_t i=0; i<card_h; i++) {
     double tmp = exp(-(h_vec[i]*h_vec[i])/(_parameters(2)*_parameters(2)));
-    jacobian(i,1) = 1;
-    jacobian(i,2) = 1-tmp;
-    jacobian(i,3) = -2*(h_vec[i]*h_vec[i])*_parameters(1)*tmp/(_parameters(2)*_parameters(2)*_parameters(2));
+    jacobian(i,0) = 1;
+    jacobian(i,1) = 1-tmp;
+    jacobian(i,2) = -2*(h_vec[i]*h_vec[i])*_parameters(1)*tmp/(_parameters(2)*_parameters(2)*_parameters(2));
   }
   return jacobian;
 }
@@ -230,9 +225,9 @@ MatrixXd ExpVariogram::compute_jacobian(const std::vector<double> & h_vec, unsig
 
   for (size_t i=0; i<card_h; i++) {
     double tmp = exp(-h_vec[i]/_parameters(2));
-    jacobian(i,1) = 1;
-    jacobian(i,2) = 1-tmp;
-    jacobian(i,3) = _parameters(1)*tmp/(_parameters(2)*_parameters(2));
+    jacobian(i,0) = 1;
+    jacobian(i,1) = 1-tmp;
+    jacobian(i,2) = _parameters(1)*tmp/(_parameters(2)*_parameters(2));
   }
   return jacobian;
 }
@@ -292,20 +287,22 @@ double SphVariogram::get_vario_univ(const double & h) const {
 }
 
 MatrixXd SphVariogram::compute_jacobian(const std::vector<double> & h_vec, unsigned int card_h) const {
+
   MatrixXd jacobian (card_h,3);
   for (size_t i=0; i<card_h; i++) {
-    jacobian(i,1) = 1;
+    jacobian(i,0) = 1;
     if (h_vec[i] >= _parameters(2)) {
-      jacobian(i,2) = 1;
-      jacobian(i,3) = 0;
+      jacobian(i,1) = 1;
+      jacobian(i,2) = 0;
     }
     else {
       double tmp1(h_vec[i]/_parameters(2));
       double tmp2(tmp1/_parameters(2));
-      jacobian(i,2) = (3/2*tmp1 - 1/2*tmp1*tmp1*tmp1);
-      jacobian(i,3) = -3/2*_parameters(1)*(tmp2-tmp2*tmp2*h_vec[i]);
+      jacobian(i,1) = (3/2*tmp1 - 1/2*tmp1*tmp1*tmp1);
+      jacobian(i,2) = -3/2*_parameters(1)*(tmp2-tmp2*tmp2*h_vec[i]);
     }
   }
+
   return jacobian;
 }
 

@@ -3,15 +3,20 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
+
 
 #include "Helpers.hpp"
 
 class Coordinates {
-  MatrixXd _coords;
+  const std::shared_ptr<const MatrixXd> _coords;
 public:
-  Coordinates(const MatrixXd& coords): _coords(coords){};
+  Coordinates(const std::shared_ptr<const MatrixXd> coords): _coords(coords){};
+  // Coordinates(const Coordinates&) = delete;
+  // Coordinates& operator=(const Coordinates&) = delete;
+
   unsigned int get_N_station() const;
-  const MatrixXd& get_coords() const;
+  const std::shared_ptr<const MatrixXd> get_coords() const;
   unsigned int get_n_coords() const;
 };
 

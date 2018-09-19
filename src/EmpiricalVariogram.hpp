@@ -20,7 +20,7 @@ class EmpiricalVariogram {
   Vec _d; // Vettore h+-deltah
   double _hmax;
   const distances_tplane::DistanceTplane _distanceTplane;
-  const SpMat & _distanceMatrix;
+  const std::shared_ptr<const SpMat> _distanceMatrix;
   Vec _weights;
   const unsigned int _n_h;
 
@@ -28,7 +28,7 @@ class EmpiricalVariogram {
 
 public:
   EmpiricalVariogram()= default;
-  EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &, const SpMat&);
+  EmpiricalVariogram (const Coordinates&, const distances::Distance&, unsigned int, const distances_tplane::DistanceTplane &, const std::shared_ptr<const SpMat>);
   void update_emp_vario(const std::vector<MatrixXd>&);
   void set_weight(const Vec&);
   std::vector<double> get_emp_vario_values () const;

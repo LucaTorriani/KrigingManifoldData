@@ -1,5 +1,6 @@
 #ifndef _MAPFUNCTIONS_HPP_
 #define _MAPFUNCTIONS_HPP_
+#include <memory>
 
 #include "DistanceManifold.hpp"
 
@@ -15,16 +16,16 @@ namespace map_functions {
   };
 
   class logMapLogEucl{
-    MatrixXd _Sigma;
+    const std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    logMapLogEucl(const MatrixXd&);
+    logMapLogEucl(const std::shared_ptr<const MatrixXd>);
     MatrixXd operator()(const MatrixXd&) const;
   };
 
   class logMapSqRoot{
-    MatrixXd _Sigma;
+    const std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    logMapSqRoot(const MatrixXd&);
+    logMapSqRoot(const std::shared_ptr<const MatrixXd>);
     MatrixXd operator()(const MatrixXd&) const;
   };
 
@@ -47,16 +48,16 @@ namespace map_functions {
   };
 
   class expMapLogEucl{
-    MatrixXd _Sigma;
+    const std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    expMapLogEucl(const MatrixXd&);
+    expMapLogEucl(const std::shared_ptr<const MatrixXd>);
     MatrixXd operator()(const MatrixXd&) const;
   };
 
   class expMapSqRoot{
-    MatrixXd _Sigma;
+    const std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    expMapSqRoot(const MatrixXd&);
+    expMapSqRoot(const std::shared_ptr<const MatrixXd>);
     MatrixXd operator()(const MatrixXd&) const;
   };
 

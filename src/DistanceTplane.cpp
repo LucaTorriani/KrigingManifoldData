@@ -19,7 +19,7 @@ double FrobeniusScaled::norm(const MatrixXd& M) const{
 
   unsigned int n(M.rows());
   Eigen::LDLT<MatrixXd> solver(n); // Piu veloce specificando prima la dimensione
-  solver.compute(_Sigma);
+  solver.compute(*(_Sigma));
   MatrixXd Id(n,n);
   Id.setIdentity();
   MatrixXd SigmaInv(n,n);
@@ -35,7 +35,7 @@ double FrobeniusScaled::operator()(const MatrixXd& M1, const MatrixXd& M2) const
 }
 
 
-DistanceTplane::DistanceTplane(const std::string & distanceTplane, const MatrixXd& Sigma):_distanceTplane(distanceTplane){
+DistanceTplane::DistanceTplane(const std::string & distanceTplane, const std::shared_ptr<const MatrixXd> Sigma):_distanceTplane(distanceTplane){
   _distances.insert(std::pair<std::string, std::function<double(const MatrixXd&, const MatrixXd&)> >("Frobenius", Frobenius()));
   _distances.insert(std::pair<std::string, std::function<double(const MatrixXd&, const MatrixXd&)> >("FrobeniusScaled", FrobeniusScaled(Sigma)));
 

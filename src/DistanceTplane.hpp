@@ -6,6 +6,7 @@
 #include <utility>
 #include <map>
 #include <functional>
+#include <memory>
 
 namespace distances_tplane{
 
@@ -16,9 +17,9 @@ public:
 };
 
 class FrobeniusScaled{
-  const MatrixXd& _Sigma;
+  const std::shared_ptr<const MatrixXd> _Sigma;
 public:
-  FrobeniusScaled(const MatrixXd &Sigma):_Sigma(Sigma){};
+  FrobeniusScaled(const std::shared_ptr<const MatrixXd> Sigma):_Sigma(Sigma){};
   double norm (const MatrixXd &) const; // Attenzione al nome
   double operator()(const MatrixXd &, const MatrixXd&) const;
 };
@@ -28,7 +29,7 @@ class DistanceTplane{
   std::map<std::string, std::function<double(const MatrixXd&, const MatrixXd&)>> _distances;
   const std::string _distanceTplane;
 public:
-  DistanceTplane(const std::string &, const MatrixXd &);
+  DistanceTplane(const std::string &, const std::shared_ptr<const MatrixXd>);
   double compute_distance(const MatrixXd&, const MatrixXd&) const;
 };
 
