@@ -2,8 +2,8 @@ dyn.load("/vagrant/KrigingManifoldData/src/interface_function.so")
 library("Rcpp")
 library("RcppEigen")
 
+
 plot_variogram = function(empirical_variogram, fitted_par_vario, model, distance){
-  x11()
   xx<-seq(0,max(empirical_variogram$h), by = 0.01)
   if(model == 'Gaussian'){
     plot(xx[2:length(xx)],gauss_vario(fitted_par_vario,xx[2:length(xx)]),  col = 'blue', type = 'l', 
@@ -39,7 +39,7 @@ model_GLS_sigma_fixed = function(data_manifold, coords,X = NULL, Sigma, metric_m
                         n_h, max_it, tolerance,weight )
 
   
-  empirical_variogram = list(result$emp_vario_values, result$h_vec)
+  empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_par_vario = result$vario_parameters
   beta = result$beta
   W = result$gamma_matrix
