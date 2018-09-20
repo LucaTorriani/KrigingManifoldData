@@ -9,6 +9,8 @@ EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distanc
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
+    std::cout << "d " << _d << "\n" <<std::endl;
+    std::cout << "h " << _hmax << "\n" <<std::endl;
 
     _weights.resize(_N);
     _weights.setOnes(_N);
@@ -24,8 +26,6 @@ void EmpiricalVariogram::set_weight(const Vec& weights){
 }
 
 void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
-  // std::vector<MatrixXd> res(_N);
-  // res = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, _n);
   _emp_vario_values.clear();
   _hvec.clear();
   _N_hvec.clear();
@@ -38,11 +38,12 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
   for (size_t l=1; l<(_n_h+1); l++) {
     w_ij.clear();
     tplanedist2_ij.clear();
-    for (size_t j =0; j<(_N-1); j++) {
+    for (size_t i =0; i<(_N-1); i++) {
 
-      for (size_t i=(j+1); i<_N; i++) {
+      for (size_t j=(i+1); j<_N; j++) {
         if (_distanceMatrix->coeff(i,j) >= _d(l-1) && _distanceMatrix->coeff(i,j) <= _d(l)) {
-          tplanedist2_ij.push_back( (_distanceTplane.compute_distance(res[i], res[j]))*(_distanceTplane.compute_distance(res[i], res[j])) );
+          double tmp(_distanceTplane.compute_distance(res[i], res[j]));
+          tplanedist2_ij.push_back( tmp*tmp );
           w_ij.push_back(_weights(i)*_weights(j));
         }
       }
@@ -52,9 +53,9 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
       _N_hvec.push_back(actual_size);
       double num_sum = 0;
       double denom_sum = 0;
-      for (size_t i=0; i <actual_size; i++) {
-        num_sum += tplanedist2_ij[i]*w_ij[i];
-        denom_sum += w_ij[i];
+      for (size_t k=0; k <actual_size; k++) {
+        num_sum += tplanedist2_ij[k]*w_ij[k];
+        denom_sum += w_ij[k];
       }
       _emp_vario_values.push_back(num_sum/(2*denom_sum));
       _hvec.push_back((_d(l)+_d(l-1))/2);
@@ -72,8 +73,7 @@ void EmpiricalVariogram::compute_hmax(const Coordinates& coords, const distances
 
   min_point = (mat_coords->colwise()).minCoeff();
   max_point = (mat_coords->colwise()).maxCoeff();
-
-  _hmax = (1/3*distance.compute_distance(min_point, max_point));
+  _hmax = (1.0/3)*distance.compute_distance(min_point, max_point);
 }
 
 unsigned int EmpiricalVariogram::get_card_h() const {

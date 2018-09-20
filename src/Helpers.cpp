@@ -69,7 +69,7 @@ std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd&
     for(size_t i=0; i<n; i++){
       result[l](i,i) = bigMatrix(l,k);
       k++;
-      for(size_t j=i; j<n; j++){
+      for(size_t j=i+1; j<n; j++){
         result[l](i,j) = bigMatrix(l,k);
         result[l](j,i) = bigMatrix(l,k);
         k++;

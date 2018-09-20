@@ -54,12 +54,14 @@ extern "C"{
       for (size_t i=0; i<N; i++) {
         data_tspace[i] = logMap.map2tplane(data_manifold[i]);
       }
+
       Eigen::MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
       big_matrix_data_tspace = matrix_manipulation::VecMatrices2bigMatrix(data_tspace);
 
       // Distance
       std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Eucldist)
       distances::Distance distance(distance_name);
+
 
       // Coordinates
       const Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
@@ -108,7 +110,7 @@ extern "C"{
       Eigen::MatrixXd resMatrix(N, ((n+1)*n)/2);
       Eigen::MatrixXd beta(n_covariates, ((n+1)*n)/2);
       Eigen::MatrixXd beta_old(n_covariates, ((n+1)*n)/2);
-      beta = model.get_beta();
+      beta = model.get_beta(); // OK fino a qui
 
       std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
       beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, n);
@@ -121,10 +123,30 @@ extern "C"{
       std::vector<MatrixXd> resVec(N);
 
       double tol = tolerance+1;
-      while (num_iter < max_iter && tol > tolerance) {
+      // while (num_iter < max_iter && tol > tolerance) {
         resMatrix = model.get_residuals();
+        std::cout << resMatrix.row(15) << "\n" << std::endl;
+
         resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, n);
+        std::cout << resVec[15] << "\n" << std::endl;
+
         emp_vario.update_emp_vario(resVec);
+
+        std::cout << "\n" << "hvec: " << std::endl;
+        for(size_t i=0; i<emp_vario.get_card_h(); i++){
+          std::cout << emp_vario.get_hvec()[i] << std::endl;
+        }
+        std::cout << "\n" << "_N_hvec: " << std::endl;
+        for(size_t i=0; i<emp_vario.get_card_h(); i++){
+          std::cout  << emp_vario.get_N_hvec()[i] << std::endl;
+        }
+
+        std::cout << "\n" << "Emp vario: " << std::endl;
+        for(size_t i=0; i<emp_vario.get_card_h(); i++){
+          std::cout  << emp_vario.get_emp_vario_values()[i]  << std::endl;
+        }
+
+
         the_variogram->evaluate_par_fitted(emp_vario);
 
         gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix, N);
@@ -138,7 +160,7 @@ extern "C"{
           tol += distanceTplane.compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
         }
         num_iter++;
-      }
+      // }
 
       Vec fit_vario_values = the_variogram->get_vario_vec(emp_vario.get_hvec(), emp_vario.get_card_h());
 
