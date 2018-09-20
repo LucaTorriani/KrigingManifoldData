@@ -40,7 +40,7 @@ extern "C"{
 
       // Map functions
       map_functions::logarithmicMap logMap(distanceManifold);
-    //
+
       // Data manifold
       Rcpp::List list_data_manifold(s_data_manifold);
       size_t N = list_data_manifold.size();
@@ -129,7 +129,7 @@ extern "C"{
         emp_vario.update_emp_vario(resVec);
         the_variogram -> evaluate_par_fitted(emp_vario);
 
-        std::cout << the_variogram->get_parameters() << "\n" <<std::endl;
+        // std::cout << the_variogram->get_parameters() << "\n" <<std::endl;
 
         gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix, N);
         beta_old_vec_matrices = beta_vec_matrices;

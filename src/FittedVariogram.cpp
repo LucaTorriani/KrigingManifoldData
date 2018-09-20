@@ -39,23 +39,21 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   Vec new_vario_residuals = vario_residuals;
 
   MatrixXd J (card_h, 3);
-
   J = compute_jacobian(h_vec, card_h);
-
 
   // GaussNewton
   Vector3d gk(J.transpose()*vario_residuals);
-
   Matrix3d JJ;
   Vector3d bb;
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
   while(!converged && iter < max_iter){
-
-    iter++;
-
     JJ = J.transpose()*J;
+    // std::cout <<"************ Iterazione ***********" <<std::endl;
+    // std::cout<< J << "\n"<<std::endl;
+    // std::cout<< _parameters << std::endl;
+
     solver.compute(JJ);
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
@@ -65,6 +63,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
     converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
+    iter++;
   }
 
 
@@ -74,9 +73,9 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
 
   double alpha = 1;
   const double alphamin = 1.e-5;
+  // std::cout << "alphamin " << alphamin << std::endl;
 
   double fk = res.squaredNorm();
-
 
   Vector3d parameters_k = _parameters;
   _parameters = parameters_k + alpha*dir;
@@ -89,7 +88,7 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
     res = get_vario_vec(h_vec, card_h) - emp_vario_values;
 
   }
-  std::cout << alpha << std::endl;
+  // std::cout << "alpha " << alpha << std::endl;
 }
 
 double FittedVariogram::weighted_median (const std::vector<double> & values, const std::vector<unsigned int> & card) {
@@ -207,6 +206,7 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
 
   double sill = weighted_median(last_four, N_h_last_four);
   _parameters(0) = weighted_median(first_two, N_h_first_two);
+  if (_parameters(0) == 0) _parameters(0) = 1.e-6;
   _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
   double tol = 0.0505*sill;
@@ -268,6 +268,7 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
 
   double sill = weighted_median(last_four, N_h_last_four);
   _parameters(0) = weighted_median(first_two, N_h_first_two);
+  if (_parameters(0) == 0) _parameters(0) = 1.e-6;
   _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
   double tol = 0.0505*sill;
@@ -360,6 +361,7 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   // std::cout << "\n" << std::endl;
 
   _parameters(0) = weighted_median(first_two, N_h_first_two);
+  if (_parameters(0) == 0) _parameters(0) = 1.e-6;
   _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
   double tol = 0.01*sill;
