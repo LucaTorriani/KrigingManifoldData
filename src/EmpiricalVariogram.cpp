@@ -9,9 +9,6 @@ EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distanc
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
-    std::cout << "d " << _d << "\n" <<std::endl;
-    std::cout << "h " << _hmax << "\n" <<std::endl;
-
     _weights.resize(_N);
     _weights.setOnes(_N);
 }

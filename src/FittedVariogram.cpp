@@ -26,6 +26,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   unsigned int max_iter = 100;
 
   get_init_par(emp_vario);
+  // std::cout << _parameters << std::endl;
   unsigned int card_h(emp_vario.get_card_h());
   std::vector<double> h_vec(card_h);
   h_vec = emp_vario.get_hvec();
@@ -60,46 +61,46 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
     dir = solver.solve(bb);
 
     vario_residuals = new_vario_residuals;
-    backtrack(dir, gk, new_vario_residuals, J, h_vec, card_h, c,s, emp_vario_values);
-    converged = (abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
+    backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values);
+    J = compute_jacobian(h_vec, card_h);
+    gk =  J.transpose()*new_vario_residuals;
+    converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
   }
 
 
 }
 
-void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,MatrixXd &J,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values){
+void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values){
 
   double alpha = 1;
   const double alphamin = 1.e-5;
-  Vec vario_residuals(res);
-  double fk = vario_residuals.squaredNorm();
+
+  double fk = res.squaredNorm();
+
+
   Vector3d parameters_k = _parameters;
   _parameters = parameters_k + alpha*dir;
-  J = compute_jacobian(h_vec, card_h);
-  Vec new_vario_residuals = get_vario_vec(h_vec, card_h)  - emp_vario_values;
-  while(new_vario_residuals.squaredNorm() > fk + alpha*c*gk.transpose()*dir && alpha > alphamin){
+  res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
+
+  while(res.squaredNorm() > fk + alpha*c*gk.transpose()*dir && alpha > alphamin){
 
     alpha = alpha*s;
     _parameters = parameters_k + alpha*dir;
-    vario_residuals = new_vario_residuals;
-    fk = vario_residuals.squaredNorm();
-    new_vario_residuals = get_vario_vec(h_vec, card_h) - emp_vario_values;
-    gk =  J.transpose()*vario_residuals;
-    J = compute_jacobian(h_vec, card_h);
+    res = get_vario_vec(h_vec, card_h) - emp_vario_values;
 
   }
-
+  std::cout << alpha << std::endl;
 }
 
 double FittedVariogram::weighted_median (const std::vector<double> & values, const std::vector<unsigned int> & card) {
   unsigned int num_values = card.size();
-  std::vector<unsigned int> cumsums (num_values);
+  std::vector<int> cumsums (num_values);
   cumsums[0]= card[0];
   for (size_t i=1; i<num_values; i++) {
     cumsums[i]=card[i]+cumsums[i-1];
   }
 
-  unsigned int N = card[num_values-1];
+  unsigned int N = cumsums[num_values-1];
   size_t index = 0;
   if (N%2==1) {
     while (cumsums[index]< (N+1)/2) { index++;};
@@ -114,6 +115,14 @@ Vec FittedVariogram::get_vario_vec(const std::vector<double> & h_vec, unsigned i
   Vec vario_values(card_h);
   for (size_t i=0; i<card_h; i++) {
     vario_values(i) = get_vario_univ(h_vec[i]);
+  }
+  return vario_values;
+}
+
+Vec FittedVariogram::get_vario_vec(const Vec & h_vec, unsigned int card_h) const {
+  Vec vario_values(card_h);
+  for (size_t i=0; i<card_h; i++) {
+    vario_values(i) = get_vario_univ(h_vec(i));
   }
   return vario_values;
 }
@@ -202,7 +211,7 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
 
   double tol = 0.0505*sill;
   size_t i = 0;
-  while (abs(emp_vario_values[i]-0.95*sill) > tol) {
+  while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
     i++;
   }
   _parameters(2) = 1/3*hvec[i];
@@ -263,7 +272,7 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
 
   double tol = 0.0505*sill;
   size_t i = 0;
-  while (abs(emp_vario_values[i]-0.95*sill) > tol) {
+  while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
     i++;
   }
   _parameters(2) = 1/3*hvec[i];
@@ -331,15 +340,34 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   N_h_last_four[2] = N_hvec[card_h-2];
   N_h_last_four[3] = N_hvec[card_h-1];
 
-  double sill = weighted_median(last_four, N_h_last_four);
+  double sill(weighted_median(last_four, N_h_last_four));
+  // std::cout << "Sill: " << sill << "\n" <<std::endl;
+  //
+  // std::cout << "First two " << std::endl;
+  // for(auto el: first_two) std::cout << el <<  " ";
+  // std::cout << "\n" << std::endl;
+  //
+  // std::cout << "Last four " << std::endl;
+  // for(auto el: last_four) std::cout << el <<  " ";
+  // std::cout << "\n" << std::endl;
+  //
+  // std::cout << "N_h_first_two " << std::endl;
+  // for(auto el: N_h_first_two) std::cout << el <<  " ";
+  // std::cout << "\n" << std::endl;
+  //
+  // std::cout << "N_h_last_four " << std::endl;
+  // for(auto el: N_h_last_four) std::cout << el <<  " ";
+  // std::cout << "\n" << std::endl;
+
   _parameters(0) = weighted_median(first_two, N_h_first_two);
   _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
   double tol = 0.01*sill;
   size_t i = 0;
-  while (abs(emp_vario_values[i]-sill) > tol) {
+  while (std::abs(emp_vario_values[i]-sill) > tol) {
     i++;
   }
+  // std::cout << "i: " << i << std::endl;
   _parameters(2) = hvec[i];
 }
 
