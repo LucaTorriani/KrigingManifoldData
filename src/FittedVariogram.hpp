@@ -1,11 +1,6 @@
 #ifndef _FITTED_VARIOGRAM_HPP
 #define _FITTED_VARIOGRAM_HPP
 
-// #include "Point.hpp"
-// #include "Helpers.hpp"
-// #include "Distance_Tplane.hpp"
-// #include "Distance.hpp"
-// #include "Coordinates.hpp"
 #include "EmpiricalVariogram.hpp"
 #include <iostream>
 

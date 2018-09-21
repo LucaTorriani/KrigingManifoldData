@@ -26,12 +26,11 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   unsigned int max_iter = 100;
 
   get_init_par(emp_vario);
-  // std::cout << _parameters << std::endl;
   unsigned int card_h(emp_vario.get_card_h());
   std::vector<double> h_vec(card_h);
   h_vec = emp_vario.get_hvec();
 
-  std::vector<double> emp_vario_val(emp_vario.get_emp_vario_values());  // Metodo 2
+  std::vector<double> emp_vario_val(emp_vario.get_emp_vario_values());
   Vec emp_vario_values = Eigen::Map<Vec, Eigen::Unaligned>(emp_vario_val.data(), emp_vario_val.size());
   // TRASFORMAZIONE STD::VECTOR<DOUBLE> --> VEC: https://stackoverflow.com/questions/17036818/initialise-eigenvector-with-stdvector
 
@@ -49,11 +48,8 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   Vector3d dir;
 
   while((!converged) && iter < max_iter){
-    JJ = J.transpose()*J;
-    // std::cout <<"************ Iterazione ***********" <<std::endl;
-    // std::cout<< J << "\n"<<std::endl;
-    // std::cout<< _parameters << std::endl;
 
+    JJ = J.transpose()*J;
     solver.compute(JJ);
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
@@ -71,22 +67,22 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
 
   double alpha = 1;
   const double alphamin = 1.e-5;
-  // std::cout << "alphamin " << alphamin << std::endl;
-
   double fk = res.squaredNorm();
 
   Vector3d parameters_k = _parameters;
   _parameters = parameters_k + alpha*dir;
+  if (_parameters(0) < 0) _parameters(0) = 1e-7;
   res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
 
   while(res.squaredNorm() > fk + alpha*c*gk.transpose()*dir && alpha > alphamin){
 
     alpha = alpha*s;
     _parameters = parameters_k + alpha*dir;
+    if (_parameters(0) < 0) _parameters(0) = 1e-7;
+
     res = get_vario_vec(h_vec, card_h) - emp_vario_values;
 
   }
-  // std::cout << "alpha " << alpha << std::endl;
 }
 
 double FittedVariogram::weighted_median (const std::vector<double> & values, const std::vector<unsigned int> & card) {
@@ -130,14 +126,17 @@ double FittedVariogram::get_covario_univ(const double & h) const {
 
 MatrixXd FittedVariogram::compute_gamma_matrix(const SpMat & distanceMatrix, unsigned int N) const{
   MatrixXd gamma_matrix(N,N);
+  double c0 = get_covario_univ(0);
 
   for (size_t i=0; i<(N-1); i++ ) {
+    gamma_matrix(i,i) = c0;
     for (size_t j=(i+1); j<N; j++ ) {
       gamma_matrix(i,j) = get_covario_univ(distanceMatrix.coeff(i,j));
+      gamma_matrix(j,i) = gamma_matrix(i,j);
     }
   }
-  double c0 = get_covario_univ(0);
-  gamma_matrix = gamma_matrix + gamma_matrix.transpose() + c0*MatrixXd::Identity(N,N);
+  gamma_matrix(N-1,N-1) = c0;
+
   return (gamma_matrix);
 }
 
@@ -340,23 +339,6 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   N_h_last_four[3] = N_hvec[card_h-1];
 
   double sill(weighted_median(last_four, N_h_last_four));
-  // std::cout << "Sill: " << sill << "\n" <<std::endl;
-  //
-  // std::cout << "First two " << std::endl;
-  // for(auto el: first_two) std::cout << el <<  " ";
-  // std::cout << "\n" << std::endl;
-  //
-  // std::cout << "Last four " << std::endl;
-  // for(auto el: last_four) std::cout << el <<  " ";
-  // std::cout << "\n" << std::endl;
-  //
-  // std::cout << "N_h_first_two " << std::endl;
-  // for(auto el: N_h_first_two) std::cout << el <<  " ";
-  // std::cout << "\n" << std::endl;
-  //
-  // std::cout << "N_h_last_four " << std::endl;
-  // for(auto el: N_h_last_four) std::cout << el <<  " ";
-  // std::cout << "\n" << std::endl;
 
   _parameters(0) = weighted_median(first_two, N_h_first_two);
   if (_parameters(0) == 0) _parameters(0) = 1e-6;
@@ -367,7 +349,6 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   while (std::abs(emp_vario_values[i]-sill) > tol) {
     i++;
   }
-  // std::cout << "i: " << i << std::endl;
   _parameters(2) = hvec[i];
 }
 

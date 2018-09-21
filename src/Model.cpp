@@ -1,4 +1,5 @@
 #include "Model.hpp"
+#include <Eigen/Eigenvalues>
 
 using namespace model_fit;
 
@@ -14,11 +15,6 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
   A.triangularView<Lower>() = (_design_matrix->transpose()) *inv_gamma_matrix* (*(_design_matrix));
   A.triangularView<StrictlyUpper>() = A.transpose();
 
-  // ALTERNATIVA 1:
-  // FullPivHouseholderQR<MatrixXd> solver(_num_cov,_num_cov);
-  // solver.compute(A);
-
-  // ALTERNATIVA 2: molto piu veloce (circa 10 volte) ma A deve essere semidef pos e lo è se inv_gamma_matrix lo è
   LDLT<MatrixXd> solver(_num_cov);
   solver.compute(A);
 
@@ -37,7 +33,6 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
   _fitted_values = (*(_design_matrix))*_beta_matrix;
   _residuals = *(_data_tspace) - _fitted_values;
 }
-
 
 MatrixXd Model::get_residuals() const {
   return _residuals;

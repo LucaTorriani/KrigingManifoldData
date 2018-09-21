@@ -63,7 +63,6 @@ MatrixXd Coord2DM::compute_design_matrix(const Coordinates& coords, const Matrix
   return(Z);
 }
 
-
 // **** AdditiveDM ***
 MatrixXd AdditiveDM::compute_design_matrix(const Coordinates& coords) const{
   const unsigned int N(coords.get_N_station());
@@ -100,7 +99,6 @@ void DesignMatrixFactory::add(const Identifier& identifier, const Builder& build
   _storage.insert(std::make_pair(identifier, builder));
 
 }
-
 
 // *** Registration ***
 void design_matrix::registerDesignMatrices(){

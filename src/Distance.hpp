@@ -32,7 +32,6 @@ public:
   SpMat create_distance_matrix(const Coordinates &, unsigned int) const;
   std::vector<double> create_distance_vector(const Coordinates &, const Vec &) const;
 
-
 };
 
 
@@ -40,11 +39,4 @@ public:
 }
 
 
-// struct Distance{
-//   static double eucl_dist(const Point&, const Point&);
-//   static double geo_dist(const Point&, const Point&);
-//   static SpMat create_distance_matrix(const std::vector<Point>&, checkDistance);
-//   static const double Earth_R(6371.0);
-//   static const double eps_dbl(std::numeric_limits<double>::epsilon());
-// };
 #endif

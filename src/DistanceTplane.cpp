@@ -5,7 +5,6 @@
 using namespace distances_tplane;
 
 // FROBENIUS
-
 double Frobenius::norm(const MatrixXd& M1) const{
   return (M1.norm());
 }
@@ -18,7 +17,7 @@ double Frobenius::operator()(const MatrixXd& M1, const MatrixXd& M2) const{
 double FrobeniusScaled::norm(const MatrixXd& M) const{
 
   unsigned int n(M.rows());
-  Eigen::LDLT<MatrixXd> solver(n); // Piu veloce specificando prima la dimensione
+  Eigen::LDLT<MatrixXd> solver(n);
   solver.compute(*(_Sigma));
   MatrixXd Id(n,n);
   Id.setIdentity();

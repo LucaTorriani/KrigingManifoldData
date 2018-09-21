@@ -30,12 +30,12 @@ model_GLS_sigma_fixed = function(data_manifold, coords,X = NULL, Sigma, metric_m
   beta = result$beta
   W = result$gamma_matrix
   residuals = result$residuals
-  
+  iter = result$iterations
 
   plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
                 distance = distance)
 
-  return (list(beta_opt = beta, gamma_matrix = W, residuals = residuals, par = fitted_par_vario))
+  return (list(beta_opt = beta, gamma_matrix = W, residuals = residuals, par = fitted_par_vario, iter = iter))
 
 
 }

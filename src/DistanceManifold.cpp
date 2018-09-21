@@ -7,7 +7,7 @@ using namespace distances_manifold;
 // FROBENIUS
 double Frobenius::operator()(const MatrixXd& M1, const MatrixXd& M2) const{
   unsigned int n(M1.cols());
-  Eigen::LDLT<MatrixXd> solver(n); // Piu veloce specificando prima la dimensione
+  Eigen::LDLT<MatrixXd> solver(n);
   solver.compute(M1);
   MatrixXd matrix_result(n,n);
   matrix_result = solver.solve(M2);
@@ -35,7 +35,6 @@ double SqRoot::operator()(const MatrixXd& M1, const MatrixXd& M2) const {
 }
 
 // CLASS DISTANCE MANIFOLD
-
 DistanceManifold::DistanceManifold(const std::string& distanceManifold, const std::shared_ptr<const MatrixXd> Sigma):_distanceManifold(distanceManifold),
   _Sigma(Sigma)
 

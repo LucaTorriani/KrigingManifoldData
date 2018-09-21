@@ -34,7 +34,7 @@ class DistanceManifold{
   std::map<std::string,std::function<double(const MatrixXd&, const MatrixXd&)>> distances;
 public:
   DistanceManifold(const std::string&, const std::shared_ptr<const MatrixXd>);
-  double compute_distance(const MatrixXd&, const MatrixXd&) const; // Se vogliamo const togliamo static
+  double compute_distance(const MatrixXd&, const MatrixXd&) const; 
   const std::shared_ptr<const MatrixXd> get_Sigma() const;
   const std::string& get_distanceType() const;
 };

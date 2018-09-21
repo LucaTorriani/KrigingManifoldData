@@ -18,6 +18,7 @@
 
 
 extern "C"{
+  
 // CREATE MODEL
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
@@ -100,7 +101,6 @@ extern "C"{
       }
       else design_matrix = theDesign_matrix->compute_design_matrix(coords);
 
-
       // Model
       unsigned int n_covariates(design_matrix.cols());
       model_fit::Model model(std::make_shared<const Eigen::MatrixXd> (big_matrix_data_tspace), std::make_shared<const Eigen::MatrixXd> (design_matrix), n);
@@ -116,19 +116,17 @@ extern "C"{
 
       unsigned int num_iter(0);
       unsigned int max_iter(Rcpp::as<unsigned int> (s_max_it));
-      double tolerance(Rcpp::as<unsigned int> (s_tolerance));
+      double tolerance(Rcpp::as<double> (s_tolerance));
       std::vector<MatrixXd> resVec(N);
 
       double tol = tolerance+1;
 
       while (num_iter < max_iter && tol > tolerance) {
-
         resMatrix = model.get_residuals();
         resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, n);
+
         emp_vario.update_emp_vario(resVec);
         the_variogram -> evaluate_par_fitted(emp_vario);
-
-      // std::cout << the_variogram->get_parameters() << "\n" <<std::endl;
 
         gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix, N);
         beta_old_vec_matrices = beta_vec_matrices;
@@ -136,17 +134,15 @@ extern "C"{
         model.update_model(gamma_matrix);
         beta = model.get_beta();
         beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, n);
+
         tol=0.0;
-        // for (size_t i=0; i<n_covariates; i++) {
-        //   tol += distanceTplane.compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
-        // }
-        for(size_t i=0; i<N; i++){
-          tol += resVec[i].squaredNorm();
+        for (size_t i=0; i<n_covariates; i++) {
+          tol += distanceTplane.compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
         }
-        std::cout << tol << std::endl;
+
         num_iter++;
       }
-      // std::cout << num_iter << std::endl;
+
       unsigned int n_hh(1000);
       Vec hh(n_hh);
       std::vector<double> emp_vario_values(emp_vario.get_card_h());
@@ -159,7 +155,6 @@ extern "C"{
 
       Eigen::Vector3d parameters = the_variogram->get_parameters();
 
-      // std::cout << parameters << std::endl;
       Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                            Rcpp::Named("fit_vario_values") = fit_vario_values,
                            Rcpp::Named("hh") = hh,
@@ -167,10 +162,10 @@ extern "C"{
                            Rcpp::Named("residuals") = resVec,
                            Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
                            Rcpp::Named("h_vec") = emp_vario.get_hvec(),
-                           Rcpp::Named("vario_parameters") = parameters);
+                           Rcpp::Named("vario_parameters") = parameters,
+                           Rcpp::Named("iterations") = num_iter);
 
       return Rcpp::wrap(result);
-    // return Rcpp::wrap(1);
   }
 
 

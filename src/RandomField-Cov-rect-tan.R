@@ -9,8 +9,7 @@ source ("/vagrant/KrigingManifoldData/R/intermediate_functions.R")
 ### Model parameters
 metric_manifold = "Frobenius"      # "LogEuclidean" or "SquareRoot" or "Frobenius"
 metric_ts = "Frobenius"            # "Frobenius" or "FrobeniusScaled"
-# vario_model="Spherical"            # "Gaussian" or "Spherical" or "Exponential"
-vario_model="Exponential"            # "Gaussian" or "Spherical" or "Exponential"
+vario_model="Spherical"            # "Gaussian" or "Spherical" or "Exponential"
 
 distance = "Eucldist"              # "Eucldist" or "Geodist"
 model_ts = "Coord1"                # "Intercept" or "Coord1" or "Coord2" or "Additive"

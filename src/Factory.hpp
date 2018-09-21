@@ -6,18 +6,9 @@
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
+
 namespace generic_factory{
 
-  /*! @brief A generic factory.
-
-    It is implemented as a Singleton. The compulsory way to
-    access a method is Factory::Instance().method().
-    Typycally to access the factory one does
-    \code
-    auto&  myFactory = Factory<A,I,B>::Instance();
-    myFactory.add(...)
-    \endcode
-  */
   template <typename AbstractProduct, typename Identifier, typename Builder=std::function<std::unique_ptr<AbstractProduct> ()>>
   class Factory{
 
@@ -85,7 +76,7 @@ namespace generic_factory{
     return tmp;
   }
 
-}// end namespace
+}
 
 
-#endif /* BC_FACTORY1_HPP_ */
+#endif

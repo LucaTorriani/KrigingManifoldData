@@ -28,7 +28,7 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
   _N_hvec.clear();
   std::vector<double> w_ij;
   std::vector<double> tplanedist2_ij;
-  unsigned int card_estimate = ((_N-1)*_N)/_n_h;  // Numero diversi valori di distanze tra _N punti è (_N-1)*_N/2
+  unsigned int card_estimate = ((_N-1)*_N)/_n_h;  
   w_ij.reserve(card_estimate);
   tplanedist2_ij.reserve(card_estimate);
 
@@ -58,7 +58,7 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
       _hvec.push_back((_d(l)+_d(l-1))/2);
     }
   }
-  
+
   _card_h = _hvec.size();
 
 }

@@ -22,8 +22,8 @@ namespace generic_factory {
     }
 
   private:
-    Proxy(Proxy const &)=delete; // only C++11
-    Proxy & operator=(Proxy const &)=delete; // only C++11
+    Proxy(Proxy const &)=delete;
+    Proxy & operator=(Proxy const &)=delete; 
   };
 
 

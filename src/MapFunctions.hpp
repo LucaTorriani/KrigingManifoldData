@@ -37,8 +37,7 @@ namespace map_functions {
     MatrixXd map2tplane(const MatrixXd&) const;
   };
 
-
-  // EXPONENTIAL MAP MAP
+  // EXPONENTIAL MAP
   class expMapFrob{
     MatrixXd _sqrtSigma;
     MatrixXd _sqrtSigmaInv;

@@ -29,7 +29,6 @@ MatrixXd logMapLogEucl::operator()(const MatrixXd& M) const{
 }
 
 //LOGMAPSQROOT
-
 logMapSqRoot::logMapSqRoot(const std::shared_ptr<const MatrixXd> Sigma): _Sigma(Sigma){};
 
 MatrixXd logMapSqRoot::operator()(const MatrixXd& M) const{
@@ -37,7 +36,6 @@ MatrixXd logMapSqRoot::operator()(const MatrixXd& M) const{
 }
 
 //LOGARITHMICMAP
-
 logarithmicMap::logarithmicMap(const distances_manifold::DistanceManifold& distanceManifoldObj): _distanceManifold(distanceManifoldObj.get_distanceType()) {
 
 
@@ -47,8 +45,7 @@ logarithmicMap::logarithmicMap(const distances_manifold::DistanceManifold& dista
     MatrixXd sqrtSigma(n,n);
     sqrtSigma =  matrix_manipulation::sqrtMat(Sigma);
 
-    Eigen::LDLT<MatrixXd> solver(n); // Piu veloce specificando prima la dimensione
-    solver.compute(sqrtSigma);
+    Eigen::LDLT<MatrixXd> solver(n);
     MatrixXd Id(n,n);
     Id.setIdentity();
     MatrixXd sqrtSigmaInv(n,n);
@@ -99,7 +96,6 @@ MatrixXd expMapLogEucl::operator()(const MatrixXd& M) const{
 }
 
 //LOGMAPSQROOT
-
 expMapSqRoot::expMapSqRoot(const std::shared_ptr<const MatrixXd>  Sigma): _Sigma(Sigma){};
 
 MatrixXd expMapSqRoot::operator()(const MatrixXd& M) const{
@@ -113,8 +109,7 @@ MatrixXd expMapSqRoot::operator()(const MatrixXd& M) const{
   return (result);
 }
 
-//LOGARITHMICMAP
-
+//EXPONENTIALMAP
 exponentialMap::exponentialMap(const distances_manifold::DistanceManifold& distanceManifoldObj): _distanceManifold(distanceManifoldObj.get_distanceType()) {
 
   if(_distanceManifold == "Frobenius"){

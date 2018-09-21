@@ -12,7 +12,7 @@ namespace distances_tplane{
 
 class Frobenius{
 public:
-  double norm(const MatrixXd&) const; // Attenzione al nome
+  double norm(const MatrixXd&) const;
   double operator()(const MatrixXd &, const MatrixXd &) const;
 };
 
@@ -20,7 +20,7 @@ class FrobeniusScaled{
   const std::shared_ptr<const MatrixXd> _Sigma;
 public:
   FrobeniusScaled(const std::shared_ptr<const MatrixXd> Sigma):_Sigma(Sigma){};
-  double norm (const MatrixXd &) const; // Attenzione al nome
+  double norm (const MatrixXd &) const; 
   double operator()(const MatrixXd &, const MatrixXd&) const;
 };
 
