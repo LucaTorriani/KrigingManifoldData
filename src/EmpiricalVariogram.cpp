@@ -58,6 +58,7 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
       _hvec.push_back((_d(l)+_d(l-1))/2);
     }
   }
+  
   _card_h = _hvec.size();
 
 }

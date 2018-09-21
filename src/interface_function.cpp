@@ -62,7 +62,6 @@ extern "C"{
       std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Eucldist)
       distances::Distance distance(distance_name);
 
-
       // Coordinates
       const Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
       Coordinates coords(std::make_shared<const Eigen::MatrixXd>(coords_mat));
@@ -129,7 +128,7 @@ extern "C"{
         emp_vario.update_emp_vario(resVec);
         the_variogram -> evaluate_par_fitted(emp_vario);
 
-        // std::cout << the_variogram->get_parameters() << "\n" <<std::endl;
+      // std::cout << the_variogram->get_parameters() << "\n" <<std::endl;
 
         gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix, N);
         beta_old_vec_matrices = beta_vec_matrices;
@@ -137,11 +136,14 @@ extern "C"{
         model.update_model(gamma_matrix);
         beta = model.get_beta();
         beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, n);
-        tol=0;
-        for (size_t i=0; i<n_covariates; i++) {
-          tol += distanceTplane.compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
+        tol=0.0;
+        // for (size_t i=0; i<n_covariates; i++) {
+        //   tol += distanceTplane.compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
+        // }
+        for(size_t i=0; i<N; i++){
+          tol += resVec[i].squaredNorm();
         }
-        // std::cout << tol << std::endl;
+        std::cout << tol << std::endl;
         num_iter++;
       }
       // std::cout << num_iter << std::endl;
