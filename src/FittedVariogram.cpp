@@ -48,7 +48,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
-  while(!converged && iter < max_iter){
+  while((!converged) && iter < max_iter){
     JJ = J.transpose()*J;
     // std::cout <<"************ Iterazione ***********" <<std::endl;
     // std::cout<< J << "\n"<<std::endl;
@@ -65,8 +65,6 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
     converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
     iter++;
   }
-
-
 }
 
 void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values){
@@ -172,8 +170,8 @@ MatrixXd GaussVariogram::compute_jacobian(const std::vector<double> & h_vec, uns
 
   for (size_t i=0; i<card_h; i++) {
     double tmp = exp(-(h_vec[i]*h_vec[i])/(_parameters(2)*_parameters(2)));
-    jacobian(i,0) = 1;
-    jacobian(i,1) = 1-tmp;
+    jacobian(i,0) = 1.0;
+    jacobian(i,1) = 1.0-tmp;
     jacobian(i,2) = -2*(h_vec[i]*h_vec[i])*_parameters(1)*tmp/(_parameters(2)*_parameters(2)*_parameters(2));
   }
   return jacobian;
@@ -206,7 +204,7 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
 
   double sill = weighted_median(last_four, N_h_last_four);
   _parameters(0) = weighted_median(first_two, N_h_first_two);
-  if (_parameters(0) == 0) _parameters(0) = 1.e-6;
+  if (_parameters(0) == 0) _parameters(0) = 1e-6;
   _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
   double tol = 0.0505*sill;
@@ -214,7 +212,7 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
     i++;
   }
-  _parameters(2) = 1/3*hvec[i];
+  _parameters(2) = 1.0/3*hvec[i];
 }
 
 // ExponentialVariogram
@@ -234,9 +232,9 @@ MatrixXd ExpVariogram::compute_jacobian(const std::vector<double> & h_vec, unsig
 
   for (size_t i=0; i<card_h; i++) {
     double tmp = exp(-h_vec[i]/_parameters(2));
-    jacobian(i,0) = 1;
-    jacobian(i,1) = 1-tmp;
-    jacobian(i,2) = _parameters(1)*tmp/(_parameters(2)*_parameters(2));
+    jacobian(i,0) = 1.0;
+    jacobian(i,1) = 1.0-tmp;
+    jacobian(i,2) = -h_vec[i]* _parameters(1)*tmp/(_parameters(2)*_parameters(2));
   }
   return jacobian;
 }
@@ -268,7 +266,7 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
 
   double sill = weighted_median(last_four, N_h_last_four);
   _parameters(0) = weighted_median(first_two, N_h_first_two);
-  if (_parameters(0) == 0) _parameters(0) = 1.e-6;
+  if (_parameters(0) == 0) _parameters(0) = 1e-6;
   _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
   double tol = 0.0505*sill;
@@ -276,7 +274,7 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
     i++;
   }
-  _parameters(2) = 1/3*hvec[i];
+  _parameters(2) = 1.0/3*hvec[i];
 }
 
 
@@ -291,7 +289,7 @@ double SphVariogram::get_vario_univ(const double & h) const {
   }
   else {
     double tmp(h/_parameters(2));
-    vario_value = _parameters(0) + _parameters(1)*(3/2*tmp - 1/2*tmp*tmp*tmp);
+    vario_value = _parameters(0) + _parameters(1)*(3.0/2*tmp - 1.0/2*tmp*tmp*tmp);
   };
   return vario_value;
 }
@@ -300,16 +298,16 @@ MatrixXd SphVariogram::compute_jacobian(const std::vector<double> & h_vec, unsig
 
   MatrixXd jacobian (card_h,3);
   for (size_t i=0; i<card_h; i++) {
-    jacobian(i,0) = 1;
+    jacobian(i,0) = 1.0;
     if (h_vec[i] >= _parameters(2)) {
-      jacobian(i,1) = 1;
-      jacobian(i,2) = 0;
+      jacobian(i,1) = 1.0;
+      jacobian(i,2) = 0.0;
     }
     else {
       double tmp1(h_vec[i]/_parameters(2));
       double tmp2(tmp1/_parameters(2));
-      jacobian(i,1) = (3/2*tmp1 - 1/2*tmp1*tmp1*tmp1);
-      jacobian(i,2) = -3/2*_parameters(1)*(tmp2-tmp2*tmp2*h_vec[i]);
+      jacobian(i,1) = (3.0/2*tmp1 - 1.0/2*tmp1*tmp1*tmp1);
+      jacobian(i,2) = -3.0/2*_parameters(1)*(tmp2-tmp2*tmp2*h_vec[i]);
     }
   }
 
@@ -361,7 +359,7 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   // std::cout << "\n" << std::endl;
 
   _parameters(0) = weighted_median(first_two, N_h_first_two);
-  if (_parameters(0) == 0) _parameters(0) = 1.e-6;
+  if (_parameters(0) == 0) _parameters(0) = 1e-6;
   _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
   double tol = 0.01*sill;
