@@ -46,6 +46,7 @@ logarithmicMap::logarithmicMap(const distances_manifold::DistanceManifold& dista
     sqrtSigma =  matrix_manipulation::sqrtMat(Sigma);
 
     Eigen::LDLT<MatrixXd> solver(n);
+    solver.compute(sqrtSigma);
     MatrixXd Id(n,n);
     Id.setIdentity();
     MatrixXd sqrtSigmaInv(n,n);
