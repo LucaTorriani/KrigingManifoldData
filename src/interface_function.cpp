@@ -18,7 +18,7 @@
 
 
 extern "C"{
-  
+
 // CREATE MODEL
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
@@ -169,11 +169,13 @@ extern "C"{
   }
 
 
-/*
 // KRIGING
-  RcppExport SEXP kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
+  RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
-    SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, Rcpp::Nullable<Eigen::MatrixXd>s _X)
+    SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, SEXP s_X_new) {
+
+    Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
+
 
     // Punto tangente
     Eigen::Map<Eigen::MatrixXd> Sigma(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma));
@@ -185,35 +187,37 @@ extern "C"{
 
     // Distance manifold
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
-    distances_manifold::DistanceManifold distanceManifold (distance_Manifold_name, Sigma);
+    distances_manifold::DistanceManifold distanceManifold (distance_Manifold_name, std::make_shared<const Eigen::MatrixXd> (Sigma));
 
     // Map functions
     map_functions::exponentialMap expMap(distanceManifold);
 
     // Old coordinates
-    Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
-    Coordinates coords(coords_mat);
+    const Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
+    Coordinates coords(std::make_shared<const Eigen::MatrixXd>(coords_mat));
     unsigned int N = coords_mat.rows();
 
     // New coordinates
-    Eigen::Map<Eigen::MatrixXd> new_coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_new_coordinates));
-    Coordinates new_coords(new_coords_mat);
+    const Eigen::Map<Eigen::MatrixXd> new_coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_new_coordinates));
+    Coordinates new_coords(std::make_shared<const Eigen::MatrixXd>(new_coords_mat));
     unsigned int M = new_coords_mat.rows();
 
-    // X new
-    Eigen::Map<Eigen::MatrixXd> new_X (Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_new_coordinates));
-    // COME LA USO in DESIGN MATRIX?
-
-    // New design matrix
+    // New Design matrix
     design_matrix::registerDesignMatrices();
     design_matrix::DesignMatrixFactory& design_matrix_fac = design_matrix::DesignMatrixFactory::Instance();
     std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
     std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
-    Eigen::MatrixXd new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords);
+    Eigen::MatrixXd new_design_matrix;
+    if(X_new.isNotNull()) {
+      Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
+      new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords, X_new);
+    }
+    else new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords);
 
     // Fitted vario
-    Eigen::Map<Eigen::Vector3d> parameters(Rcpp::as<Eigen::Map<Eigen::Vector3d>>) (s_vario_parameters);
+    Eigen::Map<Eigen::VectorXd> parameters(Rcpp::as<Eigen::Map<Eigen::VectorXd>> (s_vario_parameters));
+    // Andrebbe fatto Vector3d ma non funziona
 
     vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
     std::string variogram_type (Rcpp::as<std::string> (s_vario_model)); // (Gaussian, Exponential, Spherical) //IMPLEMENTAREEE
@@ -223,18 +227,17 @@ extern "C"{
     // Gamma matrix
     Eigen::Map<Eigen::MatrixXd> gamma_matrix(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_gamma_matrix));
 
-    // Beta (vettore di matrici)
+    // Beta (lista di matrici)
     Rcpp::List list_beta(s_beta);
     size_t num_cov = list_beta.size();
     std::vector<Eigen::MatrixXd> beta_vec(N);
     for(size_t i=0; i<num_cov; i++) beta_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(list_beta,i));
 
-    // Beta (vettore di matrici)
+    // Residui (lista di matrici)
     Rcpp::List list_residuals(s_residuals);
     std::vector<Eigen::MatrixXd> residuals_vec(N);
     for(size_t i=0; i<N; i++) residuals_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(list_residuals,i));
 
-    // CODE
     std::vector<double> distanceVector(N);
     Vec ci(N);
     Vec lambda_vec(N);
@@ -243,9 +246,8 @@ extern "C"{
     solver.compute(gamma_matrix);
 
     Eigen::MatrixXd tmp(n,n);
-    tmp.setZeros(n,n);
-    auto weighted_sum_beta = [&beta_vec, &num_cov, tmp] (const Vec& design_matrix_row) { for (size_t j=0; j<num_cov; j++) tmp += beta[j]*design_matrix_row(j); return tmp}
-    auto weighted_sum_residuals = [&residuals_vec, &N, tmp] (const Vec& lambda_vec) { for (size_t j=0; j<N; j++) tmp += residuals[j]*lambda_vec(j); return tmp}
+    auto weighted_sum_beta = [&beta_vec, &num_cov, &tmp, n] (const Vec& design_matrix_row) { tmp.setZero(n,n); for (size_t j=0; j<num_cov; j++) tmp = tmp + beta_vec[j]*design_matrix_row(j); return tmp;};
+    auto weighted_sum_residuals = [&residuals_vec, &N, &tmp, n] (const Vec& lambda_vec) { tmp.setZero(n,n); for (size_t j=0; j<N; j++) tmp = tmp + residuals_vec[j]*lambda_vec(j); return tmp;};
 
     Eigen::MatrixXd tplane_prediction(n,n);
     std::vector<Eigen::MatrixXd> manifold_prediction(M);
@@ -259,13 +261,12 @@ extern "C"{
     }
 
 
-    List result = List::create(Named("prediction") = manifold_prediction);  // Solo questo?
+    Rcpp::List result = Rcpp::List::create(Rcpp::Named("prediction") = manifold_prediction);  // Solo questo?
 
-    return wrap(result);
+    return Rcpp::wrap(result);
   }
-*/
-}
 
+}
 
 
 
