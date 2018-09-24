@@ -1,3 +1,4 @@
 #PKG_CPPFLAGS = -I$/home/vagrant/R/x86_64-redhat-linux-gnu-library/3.5/RcppEigen/include -I$/home/vagrant/R/x86_64-redhat-linux-gnu-library/3.5/Rcpp/include -I$mkEigenInc
-PKG_CPPFLAGS = -I/u/sw/pkgs/toolchains/gcc-glibc/5/pkgs/R/3.2.5/lib64/R/library/Rcpp/include -I/u/sw/pkgs/toolchains/gcc-glibc/5/pkgs/R/3.2.5/lib64/R/library/RcppEigen/include
+#PKG_CPPFLAGS = -I/u/sw/pkgs/toolchains/gcc-glibc/5/pkgs/R/3.2.5/lib64/R/library/Rcpp/include -I/u/sw/pkgs/toolchains/gcc-glibc/5/pkgs/R/3.2.5/lib64/R/library/RcppEigen/include
+PKG_CPPFLAGS = -I$(R_HOME)/library/Rcpp/include -I$(R_HOME)/library/RcppEigen/include
 CXX_STD = CXX11
