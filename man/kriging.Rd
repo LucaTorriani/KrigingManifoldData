@@ -4,7 +4,7 @@
 \alias{kriging}
 \title{Kriging}
 \usage{
-kriging(GLS_model, Sigma, coords, new_coords, model_ts = "additive",
+kriging(GLS_model, Sigma, coords, new_coords, model_ts = "Additive",
   vario_model = "Gaussian", metric_manifold = "Frobenius",
   X_new = NULL, distance = "Geodist")
 }

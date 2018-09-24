@@ -3,4 +3,4 @@
 export(kriging)
 export(model_GLS)
 export(model_kriging)
-useDynLib(KrigingManifoldData)
+useDynLib(Manifoldgstat)
