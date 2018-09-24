@@ -1,5 +1,5 @@
 #' Kriging
-#' @useDynLib KrigingManifoldData
+#' @useDynLib Manifoldgstat
 #' @export
 #'
 

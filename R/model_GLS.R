@@ -1,5 +1,5 @@
 #' Model given the data
-#' @useDynLib KrigingManifoldData
+#' @useDynLib Manifoldgstat
 #' @export
 #'
 model_GLS = function(data_manifold, coords,X = NULL, Sigma, metric_manifold="Frobenius",

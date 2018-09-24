@@ -1,5 +1,5 @@
 .onAttach <- function(libname, pkgname)
-  packageStartupMessage("KrigingManifoldData 0.1.23 loaded\nCopyright Noi 2018")
+  packageStartupMessage("Manfidolgstat 0.1.23 loaded\n")
 
 .onUnload <- function(libpath)
-  library.dynam.unload("KrigingManifoldData",  libpath)
+  library.dynam.unload("Manfidolgstat",  libpath)
