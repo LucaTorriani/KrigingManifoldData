@@ -4,7 +4,7 @@
 #'
 model_GLS_sigma_fixed = function(data_manifold, coords,X = NULL, Sigma, metric_manifold="Frobenius",
                                  metric_ts = "Frobenius", model_ts="additive", vario_model="Gaussian",
-                                 n_h=15, distance="Geodist", max_it = 100, tolerance = 10^(-4), weight=NULL){
+                                 n_h=15, distance="Geodist", max_it = 100, tolerance = 10^(-4), weight=NULL, plot = TRUE){
 
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist without two coordinates")
@@ -24,8 +24,11 @@ model_GLS_sigma_fixed = function(data_manifold, coords,X = NULL, Sigma, metric_m
   residuals = result$residuals
   iter = result$iterations
 
+  if(plot){
   plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
                 distance = distance)
+  }
+  class(result) <- "modelGLS"
 
-  return (list(beta_opt = beta, gamma_matrix = W, residuals = residuals, par = fitted_par_vario, iter = iter))
+  return (result)
 }
