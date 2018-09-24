@@ -1,3 +1,7 @@
+#' Plot the variogram
+#' @useDynLib KrigingManifoldData
+#' @export
+#'
 plot_variogram = function (empirical_variogram, fitted_variogram, model, distance) {
   hh = fitted_variogram$hh
   plot(hh[2:length(hh)],fitted_variogram$fit_vario_values[2:length(hh)],  col = 'blue', type = 'l',

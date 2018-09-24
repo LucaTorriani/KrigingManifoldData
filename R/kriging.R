@@ -1,3 +1,8 @@
+#' Kriging
+#' @useDynLib KrigingManifoldData
+#' @export
+#'
+
 kriging = function(GLS_model, Sigma, coords, new_coords, model_ts= "additive", vario_model="Gaussian",
                    metric_manifold="Frobenius",X_new = NULL, distance = "Geodist") {
   coords = as.matrix(coords)
