@@ -1,6 +1,7 @@
 *.o
 *.a
 *.so
+*.dll
 .DS_Store
 /mydev
 main
@@ -8,3 +9,4 @@ main
 *.Rhistory
 .idea
 cmake-build-debug
+*.pdf
