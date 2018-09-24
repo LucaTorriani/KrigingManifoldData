@@ -3,7 +3,7 @@
 #' @export
 #'
 
-kriging = function(GLS_model, Sigma, coords, new_coords, model_ts= "additive", vario_model="Gaussian",
+kriging = function(GLS_model, Sigma, coords, new_coords, model_ts= "Additive", vario_model="Gaussian",
                    metric_manifold="Frobenius",X_new = NULL, distance = "Geodist") {
   coords = as.matrix(coords)
   new_coords = as.matrix(new_coords)

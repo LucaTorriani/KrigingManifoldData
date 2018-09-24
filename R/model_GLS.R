@@ -18,12 +18,6 @@ model_GLS = function(data_manifold, coords,X = NULL, Sigma, metric_manifold="Fro
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
 
-  fitted_par_vario = result$vario_parameters
-  beta = result$beta
-  W = result$gamma_matrix
-  residuals = result$residuals
-  iter = result$iterations
-
   if(plot){
   plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
                 distance = distance)
