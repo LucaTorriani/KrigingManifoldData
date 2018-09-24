@@ -1,4 +1,4 @@
-Package: KrigingManifoldData
+Package: Manifoldgstat
 Type: Package
 Title: kriging prediction for manifold-valued random fields
 Version: 1.0.0
