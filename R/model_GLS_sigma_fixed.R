@@ -2,7 +2,7 @@
 #' @useDynLib KrigingManifoldData
 #' @export
 #'
-model_GLS_sigma_fixed = function(data_manifold, coords,X = NULL, Sigma, metric_manifold="Frobenius",
+model_GLS = function(data_manifold, coords,X = NULL, Sigma, metric_manifold="Frobenius",
                                  metric_ts = "Frobenius", model_ts="additive", vario_model="Gaussian",
                                  n_h=15, distance="Geodist", max_it = 100, tolerance = 10^(-4), weight=NULL, plot = TRUE){
 
