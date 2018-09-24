@@ -28,7 +28,7 @@ model_GLS = function(data_manifold, coords,X = NULL, Sigma, metric_manifold="Fro
   plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
                 distance = distance)
   }
-  class(result) <- "modelGLS"
+  #class(result) <- "modelGLS"
 
   return (result)
 }
