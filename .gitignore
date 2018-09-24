@@ -1,6 +1,7 @@
 *.o
 *.a
 *.so
+*.dll
 .DS_Store
 /mydev
 main
