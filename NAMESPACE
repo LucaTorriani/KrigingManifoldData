@@ -3,5 +3,4 @@
 export(kriging)
 export(model_GLS_sigma_fixed)
 export(model_kriging_sigma_fixed)
-export(plot_variogram)
 useDynLib(KrigingManifoldData)
