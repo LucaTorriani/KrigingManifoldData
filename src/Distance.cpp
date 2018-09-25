@@ -5,7 +5,7 @@
 
 using namespace distances;
 
-double EuclDist::operator()(const Vec& P1, const Vec& P2) const{
+double EuclDist::compute_distance(const Vec& P1, const Vec& P2) const{
   return ((P1-P2).norm());
 }
 
@@ -29,7 +29,7 @@ double EuclDist::operator()(const Vec& P1, const Vec& P2) const{
 // }
 
 // Haversine formula (To be tested)
-double GeoDist::operator()(const Vec& P1, const Vec& P2) const{
+double GeoDist::compute_distance(const Vec& P1, const Vec& P2) const{
   double coeff = M_PI_2/90;
   double lat1 =  P1(1);
   double long1 =  P1(2);
@@ -45,14 +45,14 @@ double GeoDist::operator()(const Vec& P1, const Vec& P2) const{
 
 }
 
-Distance::Distance(const std::string& distance_type):_distance_type(distance_type){
-  _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Eucldist", EuclDist()));
-  _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Geodist", GeoDist()));
-}
+// Distance::Distance(const std::string& distance_type):_distance_type(distance_type){
+//   _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Eucldist", EuclDist()));
+//   _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Geodist", GeoDist()));
+// }
 
-double Distance::compute_distance(const Vec& P1, const Vec& P2) const{
-  return _dist.at(_distance_type)(P1, P2);
-}
+// double Distance::compute_distance(const Vec& P1, const Vec& P2) const{
+//   return _dist.at(_distance_type)(P1, P2);
+// }
 
 SpMat Distance::create_distance_matrix(const Coordinates & coordinates, unsigned int N) const{
   unsigned int num_coords(coordinates.get_n_coords());

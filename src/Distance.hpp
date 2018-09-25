@@ -10,30 +10,29 @@
 
 namespace distances{
 
-class EuclDist{
-public:
-      double operator()(const Vec&, const Vec& ) const;
+  class Distance{
+    // std::string _distance_type;
+    // std::map<std::string,std::function<double(const Vec&, const Vec&)>> _dist;
+  public:
+    // Distance(const std::string &);
+    virtual double compute_distance(const Vec&, const Vec&) const = 0;
+    SpMat create_distance_matrix(const Coordinates &, unsigned int) const;
+    std::vector<double> create_distance_vector(const Coordinates &, const Vec &) const;
+
   };
 
-class GeoDist{
-  static double constexpr Earth_R = 6371.0;
-  static double constexpr eps_dbl = std::numeric_limits<double>::epsilon();
+  class EuclDist : public Distance{
+  public:
+    double compute_distance(const Vec&, const Vec&) const override;
+  };
 
-public:
-  double operator()(const Vec&, const Vec&) const;
+  class GeoDist : public Distance{
+    static double constexpr Earth_R = 6371.0;
+    static double constexpr eps_dbl = std::numeric_limits<double>::epsilon();
+
+  public:
+    double compute_distance(const Vec&, const Vec&) const override;
 };
-
-class Distance{
-  std::string _distance_type;
-  std::map<std::string,std::function<double(const Vec&, const Vec&)>> _dist;
-public:
-  Distance(const std::string &);
-  double compute_distance(const Vec&, const Vec&) const;
-  SpMat create_distance_matrix(const Coordinates &, unsigned int) const;
-  std::vector<double> create_distance_vector(const Coordinates &, const Vec &) const;
-
-};
-
 
 
 }

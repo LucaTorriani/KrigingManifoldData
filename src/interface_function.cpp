@@ -60,8 +60,9 @@ extern "C"{
       big_matrix_data_tspace = matrix_manipulation::VecMatrices2bigMatrix(data_tspace);
 
       // Distance
-      std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Eucldist)
-      distances::Distance distance(distance_name);
+      distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+      std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+      std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
 
       // Coordinates
       const Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
@@ -69,11 +70,11 @@ extern "C"{
 
       // Distance Matrix
       SpMat distanceMatrix(N,N);
-      distanceMatrix = distance.create_distance_matrix(coords, N);
+      distanceMatrix = theDistance->create_distance_matrix(coords, N);
 
       // Emp vario
       unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-      variogram_evaluation::EmpiricalVariogram emp_vario(coords, distance, n_h, distanceTplane, std::make_shared<const SpMat> (distanceMatrix));
+      variogram_evaluation::EmpiricalVariogram emp_vario(coords, *(theDistance), n_h, distanceTplane, std::make_shared<const SpMat> (distanceMatrix));
 
       if(weight.isNotNull()) {
         Eigen::Map<Vec> weight(Rcpp::as<Eigen::Map<Vec>> (s_weight));
@@ -89,7 +90,6 @@ extern "C"{
       Eigen::MatrixXd gamma_matrix(Eigen::MatrixXd::Identity(N,N));
 
       // Design matrix
-      // design_matrix::registerDesignMatrices();
       design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
       std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
       std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
@@ -182,8 +182,9 @@ extern "C"{
     unsigned int n = Sigma.rows();
 
     // Distance
-    std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Euclidean)
-    distances::Distance distance(distance_name);
+    distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+    std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+    std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
 
     // Distance manifold
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
@@ -253,7 +254,7 @@ extern "C"{
     std::vector<Eigen::MatrixXd> manifold_prediction(M);
 
     for (size_t i=0; i<M; i++) {
-      distanceVector = distance.create_distance_vector(coords, new_coords_mat.row(i));
+      distanceVector = theDistance->create_distance_vector(coords, new_coords_mat.row(i));
       ci = the_variogram->get_covario_vec(distanceVector, N);
       lambda_vec = solver.solve(ci);
       tplane_prediction = weighted_sum_beta(new_design_matrix.row(i)) + weighted_sum_residuals(lambda_vec);
@@ -308,8 +309,9 @@ extern "C"{
         big_matrix_data_tspace = matrix_manipulation::VecMatrices2bigMatrix(data_tspace);
 
         // Distance
-        std::string distance_name = Rcpp::as<std::string> (s_distance) ; //(Geodist, Eucldist)
-        distances::Distance distance(distance_name);
+        distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+        std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+        std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
 
         // Coordinates
         const Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
@@ -317,11 +319,11 @@ extern "C"{
 
         // Distance Matrix
         SpMat distanceMatrix(N,N);
-        distanceMatrix = distance.create_distance_matrix(coords, N);
+        distanceMatrix = theDistance->create_distance_matrix(coords, N);
 
         // Emp vario
         unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-        variogram_evaluation::EmpiricalVariogram emp_vario(coords, distance, n_h, distanceTplane, std::make_shared<const SpMat> (distanceMatrix));
+        variogram_evaluation::EmpiricalVariogram emp_vario(coords, *(theDistance), n_h, distanceTplane, std::make_shared<const SpMat> (distanceMatrix));
 
         if(weight.isNotNull()) {
           Eigen::Map<Vec> weight(Rcpp::as<Eigen::Map<Vec>> (s_weight));
@@ -434,7 +436,7 @@ extern "C"{
         std::vector<Eigen::MatrixXd> manifold_prediction(M);
 
         for (size_t i=0; i<M; i++) {
-          distanceVector = distance.create_distance_vector(coords, new_coords_mat.row(i));
+          distanceVector = theDistance->create_distance_vector(coords, new_coords_mat.row(i));
           ci = the_variogram->get_covario_vec(distanceVector, N);
           lambda_vec = solver.solve(ci);
           tplane_prediction = weighted_sum_beta(new_design_matrix.row(i)) + weighted_sum_residuals(lambda_vec);
