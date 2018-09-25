@@ -45,15 +45,6 @@ double GeoDist::compute_distance(const Vec& P1, const Vec& P2) const{
 
 }
 
-// Distance::Distance(const std::string& distance_type):_distance_type(distance_type){
-//   _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Eucldist", EuclDist()));
-//   _dist.insert(std::pair<std::string, std::function<double(const Vec&, const Vec&)>>("Geodist", GeoDist()));
-// }
-
-// double Distance::compute_distance(const Vec& P1, const Vec& P2) const{
-//   return _dist.at(_distance_type)(P1, P2);
-// }
-
 SpMat Distance::create_distance_matrix(const Coordinates & coordinates, unsigned int N) const{
   unsigned int num_coords(coordinates.get_n_coords());
 
