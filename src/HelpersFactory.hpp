@@ -4,6 +4,8 @@
 #include "FittedVariogram.hpp"
 #include "DesignMatrix.hpp"
 #include "Distance.hpp"
+#include "MapFunctions.hpp"
+
 #include "Factory.hpp"
 #include "Proxy.hpp"
 
@@ -26,6 +28,17 @@ namespace distance_factory {
 
   template<typename ConcreteProduct>
   using DistanceProxy = generic_factory::Proxy<DistanceFactory,ConcreteProduct>;
+}
+
+namespace map_factory {
+  typedef generic_factory::Factory<map_functions::logarithmicMap, std::string> LogMapFactory;  // Use standard Builder
+  typedef generic_factory::Factory<map_functions::exponentialMap, std::string> ExpMapFactory;  // Use standard Builder
+
+  template<typename ConcreteProduct>
+  using LogMapProxy = generic_factory::Proxy<LogMapFactory,ConcreteProduct>;
+
+  template<typename ConcreteProduct>
+  using ExpMapProxy = generic_factory::Proxy<ExpMapFactory,ConcreteProduct>;
 }
 
 #endif

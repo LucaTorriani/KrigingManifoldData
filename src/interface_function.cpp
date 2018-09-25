@@ -40,7 +40,9 @@ extern "C"{
       distances_manifold::DistanceManifold distanceManifold (distance_Manifold_name, std::make_shared<const Eigen::MatrixXd> (Sigma));
 
       // Map functions
-      map_functions::logarithmicMap logMap(distanceManifold);
+      map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
+      std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
+      theLogMap->initialize_members(std::make_shared<const MatrixXd> (Sigma));
 
       // Data manifold
       Rcpp::List list_data_manifold(s_data_manifold);
@@ -53,7 +55,7 @@ extern "C"{
       // Data tangent space
       std::vector<Eigen::MatrixXd> data_tspace(N);
       for (size_t i=0; i<N; i++) {
-        data_tspace[i] = logMap.map2tplane(data_manifold[i]);
+        data_tspace[i] = theLogMap->map2tplane(data_manifold[i]);
       }
 
       Eigen::MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
@@ -191,7 +193,10 @@ extern "C"{
     distances_manifold::DistanceManifold distanceManifold (distance_Manifold_name, std::make_shared<const Eigen::MatrixXd> (Sigma));
 
     // Map functions
-    map_functions::exponentialMap expMap(distanceManifold);
+    map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+    std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+    theExpMap->initialize_members(std::make_shared<const MatrixXd> (Sigma));
+
 
     // Old coordinates
     const Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
@@ -204,7 +209,6 @@ extern "C"{
     unsigned int M = new_coords_mat.rows();
 
     // New Design matrix
-    // design_matrix::registerDesignMatrices();
     design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
     std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
     std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
@@ -258,7 +262,7 @@ extern "C"{
       ci = the_variogram->get_covario_vec(distanceVector, N);
       lambda_vec = solver.solve(ci);
       tplane_prediction = weighted_sum_beta(new_design_matrix.row(i)) + weighted_sum_residuals(lambda_vec);
-      manifold_prediction[i] = expMap.map2manifold(tplane_prediction);
+      manifold_prediction[i] = theExpMap->map2manifold(tplane_prediction);
     }
 
     Rcpp::List result = Rcpp::List::create(Rcpp::Named("prediction") = manifold_prediction);  // Solo questo?
@@ -289,7 +293,9 @@ extern "C"{
         distances_manifold::DistanceManifold distanceManifold (distance_Manifold_name, std::make_shared<const Eigen::MatrixXd> (Sigma));
 
         // Map functions
-        map_functions::logarithmicMap logMap(distanceManifold);
+        map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
+        std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
+        theLogMap->initialize_members(std::make_shared<const MatrixXd> (Sigma));
 
         // Data manifold
         Rcpp::List list_data_manifold(s_data_manifold);
@@ -302,7 +308,7 @@ extern "C"{
         // Data tangent space
         std::vector<Eigen::MatrixXd> data_tspace(N);
         for (size_t i=0; i<N; i++) {
-          data_tspace[i] = logMap.map2tplane(data_manifold[i]);
+          data_tspace[i] = theLogMap->map2tplane(data_manifold[i]);
         }
 
         Eigen::MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
@@ -339,7 +345,6 @@ extern "C"{
         Eigen::MatrixXd gamma_matrix(Eigen::MatrixXd::Identity(N,N));
 
         // Design matrix
-        // design_matrix::registerDesignMatrices();
         design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
         std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
         std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
@@ -404,7 +409,9 @@ extern "C"{
 
         // KRIGING
         // Map functions
-        map_functions::exponentialMap expMap(distanceManifold);
+        map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+        std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Tplane_name);
+        theExpMap->initialize_members(std::make_shared<const MatrixXd> (Sigma));
 
         // New coordinates
         const Eigen::Map<Eigen::MatrixXd> new_coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_new_coordinates));
@@ -440,7 +447,7 @@ extern "C"{
           ci = the_variogram->get_covario_vec(distanceVector, N);
           lambda_vec = solver.solve(ci);
           tplane_prediction = weighted_sum_beta(new_design_matrix.row(i)) + weighted_sum_residuals(lambda_vec);
-          manifold_prediction[i] = expMap.map2manifold(tplane_prediction);
+          manifold_prediction[i] = theExpMap->map2manifold(tplane_prediction);
         }
 
 

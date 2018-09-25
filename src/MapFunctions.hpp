@@ -7,66 +7,71 @@
 namespace map_functions {
 
 // LOGARITHMIC MAP
-  class logMapFrob{
+  class logarithmicMap{
+  public:
+    // logarithmicMap(const distances_manifold::DistanceManifold&);
+    virtual MatrixXd map2tplane(const MatrixXd&) const = 0;
+    virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
+  };
+
+  class logMapFrob : public logarithmicMap{
     MatrixXd  _sqrtSigma;
     MatrixXd  _sqrtSigmaInv;
   public:
-    logMapFrob(const MatrixXd&, const MatrixXd&);
-    MatrixXd operator()(const MatrixXd&) const;
+    MatrixXd map2tplane(const MatrixXd&) const override;
+    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
   };
 
-  class logMapLogEucl{
-    const std::shared_ptr<const MatrixXd> _Sigma;
+  class logMapLogEucl : public logarithmicMap{
+    std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    logMapLogEucl(const std::shared_ptr<const MatrixXd>);
-    MatrixXd operator()(const MatrixXd&) const;
+    MatrixXd map2tplane(const MatrixXd&) const override;
+    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
   };
 
-  class logMapSqRoot{
-    const std::shared_ptr<const MatrixXd> _Sigma;
+  class logMapSqRoot : public logarithmicMap{
+    std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    logMapSqRoot(const std::shared_ptr<const MatrixXd>);
-    MatrixXd operator()(const MatrixXd&) const;
+    MatrixXd map2tplane(const MatrixXd&) const override;
+    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
   };
 
-  class logarithmicMap{
-    const std::string& _distanceManifold;
-    std::map<std::string, std::function<MatrixXd(const MatrixXd&)>> maps;
-  public:
-    logarithmicMap(const distances_manifold::DistanceManifold&);
-    MatrixXd map2tplane(const MatrixXd&) const;
-  };
+
 
   // EXPONENTIAL MAP
-  class expMapFrob{
+
+  class exponentialMap{
+  public:
+    virtual MatrixXd map2manifold(const MatrixXd&) const = 0;
+    virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
+
+  };
+
+
+  class expMapFrob : public exponentialMap{
     MatrixXd _sqrtSigma;
     MatrixXd _sqrtSigmaInv;
   public:
-    expMapFrob(const MatrixXd&, const MatrixXd&);
-    MatrixXd operator()(const MatrixXd&) const;
+    MatrixXd map2manifold(const MatrixXd&) const override;
+    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+
   };
 
-  class expMapLogEucl{
-    const std::shared_ptr<const MatrixXd> _Sigma;
+  class expMapLogEucl : public exponentialMap{
+    std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    expMapLogEucl(const std::shared_ptr<const MatrixXd>);
-    MatrixXd operator()(const MatrixXd&) const;
+    MatrixXd map2manifold(const MatrixXd&) const override;
+    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
   };
 
-  class expMapSqRoot{
-    const std::shared_ptr<const MatrixXd> _Sigma;
+  class expMapSqRoot : public exponentialMap{
+    std::shared_ptr<const MatrixXd> _Sigma;
   public:
-    expMapSqRoot(const std::shared_ptr<const MatrixXd>);
-    MatrixXd operator()(const MatrixXd&) const;
+    MatrixXd map2manifold(const MatrixXd&) const override;
+    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
   };
 
-  class exponentialMap{
-    const std::string& _distanceManifold;
-    std::map<std::string, std::function<MatrixXd(const MatrixXd&)>> maps;
-  public:
-    exponentialMap(const distances_manifold::DistanceManifold&);
-    MatrixXd map2manifold(const MatrixXd&) const;
-  };
+
 }
 
 

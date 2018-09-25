@@ -8,6 +8,10 @@ namespace {
   using vario_factory::VariogramProxy;
   using design_factory::DesignProxy;
   using distance_factory::DistanceProxy;
+  using map_factory::LogMapProxy;
+  using map_factory::ExpMapProxy;
+
+
 
   VariogramProxy<variogram_evaluation::GaussVariogram> gau("Gaussian");
   VariogramProxy<variogram_evaluation::ExpVariogram> exp("Exponential");
@@ -20,6 +24,14 @@ namespace {
 
   DistanceProxy<distances::EuclDist> eucldist("Eucldist");
   DistanceProxy<distances::GeoDist> geodist("Geodist");
+
+  LogMapProxy<map_functions::logMapFrob> logfrob("Frobenius");
+  LogMapProxy<map_functions::logMapLogEucl> loglogeucl("LogEuclidean");
+  LogMapProxy<map_functions::logMapSqRoot> logsqroot("SquareRoot");
+
+  ExpMapProxy<map_functions::expMapFrob> expfrob("Frobenius");
+  ExpMapProxy<map_functions::expMapLogEucl> explogeucl("LogEuclidean");
+  ExpMapProxy<map_functions::expMapSqRoot> expsqroot("SquareRoot");
 
 
 }
