@@ -5,7 +5,7 @@ using namespace map_functions;
 // *** Logarithmic Map ***
 
 //LOGMAPFROB
-logMapFrob::logMapFrob(const MatrixXd& sqrtSigma, const MatrixXd& sqrtSigmaInv):_sqrtSigma(sqrtSigma),_sqrtSigmaInv(sqrtSigmaInv){};
+logMapFrob::logMapFrob(const MatrixXd& sqrtSigma, const MatrixXd& sqrtSigmaInv):_sqrtSigma(sqrtSigma),_sqrtSigmaInv(sqrtSigmaInv){}
 
 MatrixXd logMapFrob::operator()(const MatrixXd& M) const {
   unsigned int n(_sqrtSigmaInv.cols());
@@ -22,14 +22,14 @@ MatrixXd logMapFrob::operator()(const MatrixXd& M) const {
 }
 
 //LOGMAPLOEGEUCL
-logMapLogEucl::logMapLogEucl(const std::shared_ptr<const MatrixXd> Sigma):_Sigma(Sigma){};
+logMapLogEucl::logMapLogEucl(const std::shared_ptr<const MatrixXd> Sigma):_Sigma(Sigma){}
 
 MatrixXd logMapLogEucl::operator()(const MatrixXd& M) const{
   return (matrix_manipulation::logMat(M) - matrix_manipulation::logMat(*_Sigma));
 }
 
 //LOGMAPSQROOT
-logMapSqRoot::logMapSqRoot(const std::shared_ptr<const MatrixXd> Sigma): _Sigma(Sigma){};
+logMapSqRoot::logMapSqRoot(const std::shared_ptr<const MatrixXd> Sigma): _Sigma(Sigma){}
 
 MatrixXd logMapSqRoot::operator()(const MatrixXd& M) const{
   return (matrix_manipulation::sqrtMat(M) - matrix_manipulation::sqrtMat(*_Sigma));
@@ -67,7 +67,7 @@ MatrixXd logarithmicMap::map2tplane(const MatrixXd& M) const{
 // *** Exponential Map ***
 
 //EXPMAPFROB
-expMapFrob::expMapFrob(const MatrixXd& sqrtSigma, const MatrixXd& sqrtSigmaInv):_sqrtSigma(sqrtSigma),_sqrtSigmaInv(sqrtSigmaInv){};
+expMapFrob::expMapFrob(const MatrixXd& sqrtSigma, const MatrixXd& sqrtSigmaInv):_sqrtSigma(sqrtSigma),_sqrtSigmaInv(sqrtSigmaInv){}
 
 MatrixXd expMapFrob::operator()(const MatrixXd& M) const{
   unsigned int n(_sqrtSigmaInv.cols());
@@ -83,7 +83,7 @@ MatrixXd expMapFrob::operator()(const MatrixXd& M) const{
 }
 
 //EXPMAPLOEGEUCL
-expMapLogEucl::expMapLogEucl(const std::shared_ptr<const MatrixXd> Sigma):_Sigma(Sigma){};
+expMapLogEucl::expMapLogEucl(const std::shared_ptr<const MatrixXd> Sigma):_Sigma(Sigma){}
 
 MatrixXd expMapLogEucl::operator()(const MatrixXd& M) const{
   unsigned int n(M.cols());
@@ -97,7 +97,7 @@ MatrixXd expMapLogEucl::operator()(const MatrixXd& M) const{
 }
 
 //LOGMAPSQROOT
-expMapSqRoot::expMapSqRoot(const std::shared_ptr<const MatrixXd>  Sigma): _Sigma(Sigma){};
+expMapSqRoot::expMapSqRoot(const std::shared_ptr<const MatrixXd>  Sigma): _Sigma(Sigma){}
 
 MatrixXd expMapSqRoot::operator()(const MatrixXd& M) const{
   unsigned int n(M.cols());

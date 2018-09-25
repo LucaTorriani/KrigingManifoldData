@@ -38,7 +38,7 @@ public:
   unsigned int get_N() const;
 };
 
-};
+}
 
 
 #endif

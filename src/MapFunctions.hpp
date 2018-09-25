@@ -67,7 +67,7 @@ namespace map_functions {
     exponentialMap(const distances_manifold::DistanceManifold&);
     MatrixXd map2manifold(const MatrixXd&) const;
   };
-};
+}
 
 
 #endif

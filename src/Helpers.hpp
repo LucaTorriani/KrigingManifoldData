@@ -23,7 +23,7 @@ namespace matrix_manipulation {
   std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd&, unsigned int);
   MatrixXd VecMatrices2bigMatrix(const std::vector<MatrixXd>&);
 
-};
+}
 
 
 #endif

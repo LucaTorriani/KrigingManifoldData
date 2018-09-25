@@ -31,6 +31,6 @@ public:
   MatrixXd get_fitted_values() const;
 };
 
-};
+}
 
 #endif

@@ -22,21 +22,6 @@ namespace design_matrix {
 
   };
 
-  // class DesignMatrixFactory{
-  //   typedef std::string Identifier;
-  //   typedef std::function<std::unique_ptr<DesignMatrix>()> Builder;
-  //   DesignMatrixFactory() = default;
-  //   DesignMatrixFactory(const DesignMatrixFactory&) = delete;
-  //   DesignMatrixFactory& operator=(const DesignMatrixFactory&) = delete;
-  //   std::map<Identifier, Builder> _storage;
-  //
-  // public:
-  //   static DesignMatrixFactory& Instance();
-  //   std::unique_ptr<DesignMatrix> create(const Identifier&) const;
-  //   void add(const Identifier&, const Builder&);
-  //
-  // };
-
   class InterceptDM : public DesignMatrix {
   public:
     MatrixXd compute_design_matrix(const Coordinates&) const override;
@@ -67,6 +52,6 @@ namespace design_matrix {
 
   // void registerDesignMatrices();
 
-};
+}
 
 #endif
