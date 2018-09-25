@@ -37,7 +37,7 @@ coords_model = rGrid    # Sample of the grid
 ##############################################################################
 ################################## MODEL #####################################
 ##############################################################################
-
+if (FALSE) {
 beta_gamma_opt = model_GLS_sigma_fixed(data_manifold = data_manifold_model, coords = coords_model,  
                                        Sigma = Sigma, distance = distance, metric_manifold = metric_manifold, 
                                        metric_ts = metric_ts, model_ts = model_ts,
@@ -125,7 +125,7 @@ for(i in 1:250)
 
 }
 rect(x.min, y.min, x.max, y.max)
-
+}
 # ###############################################################################
 # ############################## Test single value ##############################
 # ###############################################################################

@@ -1,6 +1,6 @@
 .onAttach <- function(libname, pkgname)
-  packageStartupMessage("Manfidolgstat 0.1.23 loaded\n")
+  packageStartupMessage("Manifoldgstat 0.1.23 loaded\n")
 
 .onUnload <- function(libpath){
-  library.dynam.unload("Manfidolgstat",  libpath)
+  library.dynam.unload("Manifoldgstat",  libpath)
 }
