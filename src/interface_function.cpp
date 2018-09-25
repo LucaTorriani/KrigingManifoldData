@@ -201,7 +201,6 @@ extern "C"{
     const Eigen::Map<Eigen::MatrixXd> new_coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_new_coordinates));
     Coordinates new_coords(std::make_shared<const Eigen::MatrixXd>(new_coords_mat));
     unsigned int M = new_coords_mat.rows();
-    Rcpp::Rcout << "N " << N << "\n";
 
     // New Design matrix
     design_matrix::registerDesignMatrices();
@@ -225,25 +224,19 @@ extern "C"{
     std::unique_ptr<variogram_evaluation::FittedVariogram> the_variogram = vf.create(variogram_type);
     the_variogram->set_parameters(parameters);
 
-    Rcpp::Rcout<< "Parameters " << the_variogram->get_parameters()<< "\n";
-
     // Gamma matrix
     Eigen::Map<Eigen::MatrixXd> gamma_matrix(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_gamma_matrix));
-    Rcpp::Rcout<< "Gamma(12,4) " << gamma_matrix(12,4)<< "\n";
 
     // Beta (lista di matrici)
     Rcpp::List list_beta(s_beta);
     size_t num_cov = list_beta.size();
-    std::cout << "Num cov " << num_cov << "\n";
     std::vector<Eigen::MatrixXd> beta_vec(N);
     for(size_t i=0; i<num_cov; i++) beta_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(list_beta,i));
-    Rcpp::Rcout<< "Beta[1] " << beta_vec[1]<< "\n";
 
     // Residui (lista di matrici)
     Rcpp::List list_residuals(s_residuals);
     std::vector<Eigen::MatrixXd> residuals_vec(N);
     for(size_t i=0; i<N; i++) residuals_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(list_residuals,i));
-    Rcpp::Rcout<< "Residui[18] " << residuals_vec[18]<< "\n";
 
     std::vector<double> distanceVector(N);
     Vec ci(N);
@@ -266,10 +259,6 @@ extern "C"{
       tplane_prediction = weighted_sum_beta(new_design_matrix.row(i)) + weighted_sum_residuals(lambda_vec);
       manifold_prediction[i] = expMap.map2manifold(tplane_prediction);
     }
-    Rcpp::Rcout << "ci(24) " << ci[24] << "\n";
-    Rcpp::Rcout << "lambda_vec(24) " << lambda_vec[24] << "\n";
-    Rcpp::Rcout << "Manifold pred[73] " << manifold_prediction[73] << "\n";
-
 
     Rcpp::List result = Rcpp::List::create(Rcpp::Named("prediction") = manifold_prediction);  // Solo questo?
 
@@ -429,11 +418,6 @@ extern "C"{
         else new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords);
 
         std::vector<double> distanceVector(N);
-        Rcpp::Rcout << "N " << N << "\n";
-        Rcpp::Rcout<< "Parameters " << the_variogram->get_parameters()<< "\n";
-        Rcpp::Rcout<< "Gamma(12,4) " << gamma_matrix(12,4)<< "\n";
-        Rcpp::Rcout<< "Beta[1] " << beta_vec_matrices[1]<< "\n";
-        Rcpp::Rcout<< "Residui[18] " << resVec[18]<< "\n";
 
         Vec ci(N);
         Vec lambda_vec(N);
@@ -442,7 +426,6 @@ extern "C"{
         solver.compute(gamma_matrix);
 
         unsigned int num_cov(beta_vec_matrices.size());
-        Rcpp::Rcout << "Num cov " << num_cov << "\n";
         Eigen::MatrixXd tmp(n,n);
         auto weighted_sum_beta = [&beta_vec_matrices, &num_cov, &tmp, n] (const Vec& design_matrix_row) { tmp.setZero(n,n); for (size_t j=0; j<num_cov; j++) tmp = tmp + beta_vec_matrices[j]*design_matrix_row(j); return tmp;};
         auto weighted_sum_residuals = [&resVec, &N, &tmp, n] (const Vec& lambda_vec) { tmp.setZero(n,n); for (size_t j=0; j<N; j++) tmp = tmp + resVec[j]*lambda_vec(j); return tmp;};
@@ -458,9 +441,6 @@ extern "C"{
           manifold_prediction[i] = expMap.map2manifold(tplane_prediction);
         }
 
-        Rcpp::Rcout << "ci(24) " << ci[24] << "\n";
-        Rcpp::Rcout << "lambda_vec(24) " << lambda_vec[24] << "\n";
-        Rcpp::Rcout << "Manifold pred[73] " << manifold_prediction[73] << "\n";
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                              Rcpp::Named("fit_vario_values") = fit_vario_values,
