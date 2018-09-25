@@ -89,8 +89,8 @@ extern "C"{
       Eigen::MatrixXd gamma_matrix(Eigen::MatrixXd::Identity(N,N));
 
       // Design matrix
-      design_matrix::registerDesignMatrices();
-      design_matrix::DesignMatrixFactory& design_matrix_fac = design_matrix::DesignMatrixFactory::Instance();
+      // design_matrix::registerDesignMatrices();
+      design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
       std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
       std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
@@ -203,8 +203,8 @@ extern "C"{
     unsigned int M = new_coords_mat.rows();
 
     // New Design matrix
-    design_matrix::registerDesignMatrices();
-    design_matrix::DesignMatrixFactory& design_matrix_fac = design_matrix::DesignMatrixFactory::Instance();
+    // design_matrix::registerDesignMatrices();
+    design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
     std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
     std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
@@ -337,8 +337,8 @@ extern "C"{
         Eigen::MatrixXd gamma_matrix(Eigen::MatrixXd::Identity(N,N));
 
         // Design matrix
-        design_matrix::registerDesignMatrices();
-        design_matrix::DesignMatrixFactory& design_matrix_fac = design_matrix::DesignMatrixFactory::Instance();
+        // design_matrix::registerDesignMatrices();
+        design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
         std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
         std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 

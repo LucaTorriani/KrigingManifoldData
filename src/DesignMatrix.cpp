@@ -85,27 +85,27 @@ MatrixXd AdditiveDM::compute_design_matrix(const Coordinates& coords, const Matr
 }
 
 // *** DesignMatrixFactory ***
-DesignMatrixFactory& DesignMatrixFactory::Instance(){
-  static DesignMatrixFactory theDesignMatrixFactory;
-  return theDesignMatrixFactory;
-}
-
-std::unique_ptr<DesignMatrix> DesignMatrixFactory::create(const Identifier& model_name) const {
-  auto f = _storage.find(model_name);
-  return (f==_storage.end()) ? std::unique_ptr<DesignMatrix>():std::unique_ptr<DesignMatrix>(f->second());
-}
-
-void DesignMatrixFactory::add(const Identifier& identifier, const Builder& builder){
-  _storage.insert(std::make_pair(identifier, builder));
-
-}
-
-// *** Registration ***
-void design_matrix::registerDesignMatrices(){
-  DesignMatrixFactory& design_matrices = DesignMatrixFactory::Instance();
-  design_matrices.add("Intercept", InterceptDM());
-  design_matrices.add("Coord1", Coord1DM());
-  design_matrices.add("Coord2", Coord2DM());
-  design_matrices.add("Additive", AdditiveDM());
-
-};
+// DesignMatrixFactory& DesignMatrixFactory::Instance(){
+//   static DesignMatrixFactory theDesignMatrixFactory;
+//   return theDesignMatrixFactory;
+// }
+//
+// std::unique_ptr<DesignMatrix> DesignMatrixFactory::create(const Identifier& model_name) const {
+//   auto f = _storage.find(model_name);
+//   return (f==_storage.end()) ? std::unique_ptr<DesignMatrix>():std::unique_ptr<DesignMatrix>(f->second());
+// }
+//
+// void DesignMatrixFactory::add(const Identifier& identifier, const Builder& builder){
+//   _storage.insert(std::make_pair(identifier, builder));
+//
+// }
+//
+// // *** Registration ***
+// void design_matrix::registerDesignMatrices(){
+//   DesignMatrixFactory& design_matrices = DesignMatrixFactory::Instance();
+//   design_matrices.add("Intercept", InterceptDM());
+//   design_matrices.add("Coord1", Coord1DM());
+//   design_matrices.add("Coord2", Coord2DM());
+//   design_matrices.add("Additive", AdditiveDM());
+//
+// };

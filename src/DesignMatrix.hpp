@@ -1,3 +1,6 @@
+#ifndef _DESIGN_MATRIX_HPP_
+#define _DESIGN_MATRIX_HPP_
+
 #include <memory>
 #include<iostream>
 #include<utility>
@@ -19,20 +22,20 @@ namespace design_matrix {
 
   };
 
-  class DesignMatrixFactory{
-    typedef std::string Identifier;
-    typedef std::function<std::unique_ptr<DesignMatrix>()> Builder;
-    DesignMatrixFactory() = default;
-    DesignMatrixFactory(const DesignMatrixFactory&) = delete;
-    DesignMatrixFactory& operator=(const DesignMatrixFactory&) = delete;
-    std::map<Identifier, Builder> _storage;
-
-  public:
-    static DesignMatrixFactory& Instance();
-    std::unique_ptr<DesignMatrix> create(const Identifier&) const;
-    void add(const Identifier&, const Builder&);
-
-  };
+  // class DesignMatrixFactory{
+  //   typedef std::string Identifier;
+  //   typedef std::function<std::unique_ptr<DesignMatrix>()> Builder;
+  //   DesignMatrixFactory() = default;
+  //   DesignMatrixFactory(const DesignMatrixFactory&) = delete;
+  //   DesignMatrixFactory& operator=(const DesignMatrixFactory&) = delete;
+  //   std::map<Identifier, Builder> _storage;
+  //
+  // public:
+  //   static DesignMatrixFactory& Instance();
+  //   std::unique_ptr<DesignMatrix> create(const Identifier&) const;
+  //   void add(const Identifier&, const Builder&);
+  //
+  // };
 
   class InterceptDM : public DesignMatrix {
   public:
@@ -62,6 +65,8 @@ namespace design_matrix {
     std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new AdditiveDM));}
   };
 
-  void registerDesignMatrices();
+  // void registerDesignMatrices();
 
-}
+};
+
+#endif
