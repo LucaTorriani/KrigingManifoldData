@@ -254,7 +254,7 @@ extern "C"{
 
     for (size_t i=0; i<M; i++) {
       distanceVector = distance.create_distance_vector(coords, new_coords_mat.row(i));
-      ci = the_variogram->get_covario_vec(distanceVector, M);
+      ci = the_variogram->get_covario_vec(distanceVector, N); 
       lambda_vec = solver.solve(ci);
       tplane_prediction = weighted_sum_beta(new_design_matrix.row(i)) + weighted_sum_residuals(lambda_vec);
       manifold_prediction[i] = expMap.map2manifold(tplane_prediction);
