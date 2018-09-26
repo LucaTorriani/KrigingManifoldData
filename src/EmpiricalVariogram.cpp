@@ -4,8 +4,8 @@
 using namespace variogram_evaluation;
 
 // EmpiricalVariogram
-EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const distances_tplane::DistanceTplane & distanceTplane, const std::shared_ptr<const SpMat> distanceMatrix):
-  _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceTplane(distanceTplane), _distanceMatrix(distanceMatrix), _n_h(n_h) {
+EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const std::shared_ptr<const SpMat> distanceMatrix):
+  _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceMatrix(distanceMatrix), _n_h(n_h) {
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);
@@ -22,13 +22,13 @@ void EmpiricalVariogram::set_weight(const Vec& weights){
   _weights = weights;
 }
 
-void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
+void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res, const distances_tplane::DistanceTplane & distanceTplane) {
   _emp_vario_values.clear();
   _hvec.clear();
   _N_hvec.clear();
   std::vector<double> w_ij;
   std::vector<double> tplanedist2_ij;
-  unsigned int card_estimate = ((_N-1)*_N)/_n_h;  
+  unsigned int card_estimate = ((_N-1)*_N)/_n_h;
   w_ij.reserve(card_estimate);
   tplanedist2_ij.reserve(card_estimate);
 
@@ -39,7 +39,7 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res) {
 
       for (size_t j=(i+1); j<_N; j++) {
         if (_distanceMatrix->coeff(i,j) >= _d(l-1) && _distanceMatrix->coeff(i,j) <= _d(l)) {
-          double tmp(_distanceTplane.compute_distance(res[i], res[j]));
+          double tmp(distanceTplane.compute_distance(res[i], res[j]));
           tplanedist2_ij.push_back( tmp*tmp );
           w_ij.push_back(_weights(i)*_weights(j));
         }
@@ -80,12 +80,12 @@ unsigned int EmpiricalVariogram::get_card_h() const {
 
 std::vector<double> EmpiricalVariogram::get_emp_vario_values () const {
   return _emp_vario_values;
-};
+}
 
 std::vector<unsigned int> EmpiricalVariogram::get_N_hvec() const {
   return _N_hvec;
-};
+}
 
 std::vector<double> EmpiricalVariogram::get_hvec() const {
   return _hvec;
-};
+}
