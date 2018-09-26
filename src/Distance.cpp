@@ -45,7 +45,7 @@ double GeoDist::compute_distance(const Vec& P1, const Vec& P2) const{
 
 }
 
-SpMat Distance::create_distance_matrix(const Coordinates & coordinates, unsigned int N) const{
+std::shared_ptr<const SpMat> Distance::create_distance_matrix(const Coordinates & coordinates, unsigned int N) const{
   unsigned int num_coords(coordinates.get_n_coords());
 
   const std::shared_ptr<const MatrixXd> coords = coordinates.get_coords();
@@ -61,7 +61,7 @@ SpMat Distance::create_distance_matrix(const Coordinates & coordinates, unsigned
   SpMat distance_matrix(N, N);
   distance_matrix.setFromTriplets(tripletList.begin(), tripletList.end());
 
-  return (distance_matrix);
+  return (std::make_shared<const SpMat> (distance_matrix));
 }
 
 std::vector<double> Distance::create_distance_vector(const Coordinates & coordinates, const Vec & new_coord) const{
