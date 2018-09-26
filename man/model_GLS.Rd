@@ -4,11 +4,12 @@
 \alias{model_GLS}
 \title{Model given the data}
 \usage{
-model_GLS(data_manifold, coords, X = NULL, Sigma,
+model_GLS(data_manifold, coords, X = NULL, Sigma = NULL,
   metric_manifold = "Frobenius", metric_ts = "Frobenius",
   model_ts = "additive", vario_model = "Gaussian", n_h = 15,
-  distance = "Geodist", max_it = 100, tolerance = 10^(-4),
-  weight = NULL, plot = TRUE)
+  distance = "Geodist", max_it = 100, tolerance = 1e-06,
+  weight_vario = NULL, weights_intrinsic = NULL,
+  tolerance_intrinsic = 1e-06, plot = TRUE)
 }
 \description{
 Model given the data
