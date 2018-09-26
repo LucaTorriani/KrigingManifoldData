@@ -9,7 +9,6 @@ namespace map_functions {
 // LOGARITHMIC MAP
   class logarithmicMap{
   public:
-    // logarithmicMap(const distances_manifold::DistanceManifold&);
     virtual MatrixXd map2tplane(const MatrixXd&) const = 0;
     virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
   };
