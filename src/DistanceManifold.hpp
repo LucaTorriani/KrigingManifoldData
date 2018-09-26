@@ -12,32 +12,31 @@
 using namespace Eigen;
 namespace distances_manifold{
 
-class Frobenius{
-public:
-  double operator()(const MatrixXd&, const MatrixXd& ) const;
+  class DistanceManifold{
+  // protected:
+    // const std::shared_ptr<const MatrixXd> _Sigma;
+    // std::map<std::string,std::function<double(const MatrixXd&, const MatrixXd&)>> distances;
+  public:
+    virtual double compute_distance(const MatrixXd&, const MatrixXd&) const = 0;
   };
 
-class LogEuclidean{
-public:
-  double operator()(const MatrixXd&, const MatrixXd& ) const;
-};
 
-class SqRoot{
-public:
-  double operator()(const MatrixXd&, const MatrixXd& ) const;
-};
+  class Frobenius : public DistanceManifold{
+  public:
+    double compute_distance(const MatrixXd&, const MatrixXd& ) const override;
+    };
+
+  class LogEuclidean : public DistanceManifold{
+  public:
+    double compute_distance(const MatrixXd&, const MatrixXd& ) const override;
+  };
+
+  class SqRoot : public DistanceManifold{
+  public:
+    double compute_distance(const MatrixXd&, const MatrixXd& ) const override;
+  };
 
 
-class DistanceManifold{
-  const std::string _distanceManifold;
-  const std::shared_ptr<const MatrixXd> _Sigma;
-  std::map<std::string,std::function<double(const MatrixXd&, const MatrixXd&)>> distances;
-public:
-  DistanceManifold(const std::string&, const std::shared_ptr<const MatrixXd>);
-  double compute_distance(const MatrixXd&, const MatrixXd&) const; 
-  const std::shared_ptr<const MatrixXd> get_Sigma() const;
-  const std::string& get_distanceType() const;
-};
 
 
 
