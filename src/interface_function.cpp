@@ -127,12 +127,12 @@ extern "C"{
         design_matrix = theDesign_matrix->compute_design_matrix(coords, X);
       }
       else design_matrix = theDesign_matrix->compute_design_matrix(coords);
+      unsigned int n_covariates(design_matrix.cols());
 
       std::shared_ptr<const Eigen::MatrixXd> design_matrix_ptr = std::make_shared<const Eigen::MatrixXd> (design_matrix);
       design_matrix.resize(0,0);
 
       // Model
-      unsigned int n_covariates(design_matrix.cols());
       model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, n);
       model.update_model(gamma_matrix);
 
@@ -170,7 +170,6 @@ extern "C"{
         for (size_t i=0; i<n_covariates; i++) {
           tol += theTplaneDist->compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
         }
-
         num_iter++;
       }
 
