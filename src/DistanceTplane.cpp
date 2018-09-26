@@ -13,7 +13,7 @@ double Frobenius::norm(const MatrixXd& M1) const{
   return (M1.norm());
 }
 
-void Frobenius::initialize_members(const std::shared_ptr<const MatrixXd>) {}
+void Frobenius::set_members(const MatrixXd& Sigma) {}
 
 // FROBENIUS SCALED
 double FrobeniusScaled::norm(const MatrixXd& M) const{
@@ -22,10 +22,10 @@ double FrobeniusScaled::norm(const MatrixXd& M) const{
   return (sqrt(tmp.trace()));
 }
 
-void FrobeniusScaled::initialize_members(const std::shared_ptr<const MatrixXd> Sigma) {
-  _n = Sigma->rows();
+void FrobeniusScaled::set_members(const MatrixXd& Sigma) {
+  _n = Sigma.rows();
   Eigen::LDLT<MatrixXd> solver(_n);
-  solver.compute(*(Sigma));
+  solver.compute(Sigma);
   MatrixXd Id(_n,_n);
   Id.setIdentity();
   _SigmaInv = solver.solve(Id);
