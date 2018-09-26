@@ -19,9 +19,9 @@ MatrixXd logMapFrob::map2tplane(const MatrixXd& M) const {
   return result;
 }
 
-void logMapFrob::initialize_members(const std::shared_ptr<const MatrixXd> Sigma) {
-  unsigned int n = Sigma->cols();
-  _sqrtSigma =  matrix_manipulation::sqrtMat(*(Sigma));
+void logMapFrob::set_members(const MatrixXd& Sigma) {
+  unsigned int n = Sigma.cols();
+  _sqrtSigma =  matrix_manipulation::sqrtMat(Sigma);
 
   Eigen::LDLT<MatrixXd> solver(n);
   solver.compute(_sqrtSigma);
@@ -32,19 +32,21 @@ void logMapFrob::initialize_members(const std::shared_ptr<const MatrixXd> Sigma)
 
 //LOGMAPLOGEUCL
 MatrixXd logMapLogEucl::map2tplane(const MatrixXd& M) const{
-  return (matrix_manipulation::logMat(M) - matrix_manipulation::logMat(*_Sigma));
+  return (matrix_manipulation::logMat(M) - matrix_manipulation::logMat(_Sigma));
 }
 
-void logMapLogEucl::initialize_members(const std::shared_ptr<const MatrixXd> Sigma) {
+
+void logMapLogEucl::set_members(const MatrixXd& Sigma) {
   _Sigma = Sigma;
 }
 
 //LOGMAPSQROOT
 MatrixXd logMapSqRoot::map2tplane(const MatrixXd& M) const{
-  return (matrix_manipulation::sqrtMat(M) - matrix_manipulation::sqrtMat(*_Sigma));
+  return (matrix_manipulation::sqrtMat(M) - matrix_manipulation::sqrtMat(_Sigma));
 }
 
-void logMapSqRoot::initialize_members(const std::shared_ptr<const MatrixXd> Sigma){
+
+void logMapSqRoot::set_members(const MatrixXd& Sigma) {
   _Sigma = Sigma;
 }
 
@@ -64,10 +66,10 @@ MatrixXd expMapFrob::map2manifold(const MatrixXd& M) const{
   return result;
 }
 
-void expMapFrob::initialize_members(const std::shared_ptr<const MatrixXd> Sigma){
+void expMapFrob::set_members(const MatrixXd& Sigma){
 
-  unsigned int n = Sigma->cols();
-  _sqrtSigma =  matrix_manipulation::sqrtMat(*(Sigma));
+  unsigned int n = Sigma.cols();
+  _sqrtSigma =  matrix_manipulation::sqrtMat(Sigma);
 
   Eigen::LDLT<MatrixXd> solver(n);
   solver.compute(_sqrtSigma);
@@ -76,20 +78,19 @@ void expMapFrob::initialize_members(const std::shared_ptr<const MatrixXd> Sigma)
   _sqrtSigmaInv = solver.solve(Id);
 }
 
-
 //EXPMAPLOEGEUCL
 MatrixXd expMapLogEucl::map2manifold(const MatrixXd& M) const{
   unsigned int n(M.cols());
 
   MatrixXd tmp(n,n);
-  tmp = matrix_manipulation::logMat(*_Sigma) + M;
+  tmp = matrix_manipulation::logMat(_Sigma) + M;
   MatrixXd result(n,n);
   result = tmp.transpose()*tmp;
 
   return (result);
 }
 
-void expMapLogEucl::initialize_members(const std::shared_ptr<const MatrixXd> Sigma){
+void expMapLogEucl::set_members(const MatrixXd& Sigma){
   _Sigma = Sigma;
 }
 
@@ -98,13 +99,13 @@ MatrixXd expMapSqRoot::map2manifold(const MatrixXd& M) const{
   unsigned int n(M.cols());
 
   MatrixXd tmp(n,n);
-  tmp = matrix_manipulation::sqrtMat(*_Sigma) + M;
+  tmp = matrix_manipulation::sqrtMat(_Sigma) + M;
   MatrixXd result(n,n);
   result = tmp.transpose()*tmp;
 
   return (result);
 }
 
-void expMapSqRoot::initialize_members(const std::shared_ptr<const MatrixXd> Sigma){
+void expMapSqRoot::set_members(const MatrixXd& Sigma){
   _Sigma = Sigma;
 }

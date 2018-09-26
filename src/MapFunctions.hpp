@@ -10,7 +10,10 @@ namespace map_functions {
   class logarithmicMap{
   public:
     virtual MatrixXd map2tplane(const MatrixXd&) const = 0;
-    virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
+    // virtual MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const = 0;
+    // virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
+    virtual void set_members(const MatrixXd&) = 0;
+
   };
 
   class logMapFrob : public logarithmicMap{
@@ -18,21 +21,33 @@ namespace map_functions {
     MatrixXd  _sqrtSigmaInv;
   public:
     MatrixXd map2tplane(const MatrixXd&) const override;
-    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    // MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
+    // void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    void set_members(const MatrixXd&) override;
   };
 
   class logMapLogEucl : public logarithmicMap{
-    std::shared_ptr<const MatrixXd> _Sigma;
+    // std::shared_ptr<const MatrixXd> _Sigma;
+    MatrixXd _Sigma;
+
   public:
     MatrixXd map2tplane(const MatrixXd&) const override;
-    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    // MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
+    // void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    void set_members(const MatrixXd&) override;
+
   };
 
   class logMapSqRoot : public logarithmicMap{
-    std::shared_ptr<const MatrixXd> _Sigma;
+    // std::shared_ptr<const MatrixXd> _Sigma;
+    MatrixXd _Sigma;
+
   public:
     MatrixXd map2tplane(const MatrixXd&) const override;
-    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    // MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
+    // void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    void set_members(const MatrixXd&) override;
+
   };
 
 
@@ -42,7 +57,9 @@ namespace map_functions {
   class exponentialMap{
   public:
     virtual MatrixXd map2manifold(const MatrixXd&) const = 0;
-    virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
+    // virtual MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const = 0;
+
+    virtual void set_members(const MatrixXd&) = 0;
 
   };
 
@@ -52,22 +69,25 @@ namespace map_functions {
     MatrixXd _sqrtSigmaInv;
   public:
     MatrixXd map2manifold(const MatrixXd&) const override;
-    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    // MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
+    void set_members(const MatrixXd&) override;
 
   };
 
   class expMapLogEucl : public exponentialMap{
-    std::shared_ptr<const MatrixXd> _Sigma;
+    MatrixXd _Sigma;
   public:
     MatrixXd map2manifold(const MatrixXd&) const override;
-    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    // MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
+    void set_members(const MatrixXd&) override;
   };
 
   class expMapSqRoot : public exponentialMap{
-    std::shared_ptr<const MatrixXd> _Sigma;
+    MatrixXd _Sigma;
   public:
     MatrixXd map2manifold(const MatrixXd&) const override;
-    void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+    // MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
+    void set_members(const MatrixXd&) override;
   };
 
 
