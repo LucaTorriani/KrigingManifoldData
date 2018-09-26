@@ -1,8 +1,6 @@
 #include<vector>
 #include<utility>
 #include "HelpersFactory.hpp"
-// #include "FittedVariogram.hpp"
-// #include "DesignMatrix.hpp"
 
 namespace {
   using vario_factory::VariogramProxy;
@@ -10,7 +8,8 @@ namespace {
   using distance_factory::DistanceProxy;
   using map_factory::LogMapProxy;
   using map_factory::ExpMapProxy;
-
+  using manifold_factory::ManifoldProxy;
+  using tplane_factory::TplaneProxy;
 
 
   VariogramProxy<variogram_evaluation::GaussVariogram> gau("Gaussian");
@@ -32,6 +31,15 @@ namespace {
   ExpMapProxy<map_functions::expMapFrob> expfrob("Frobenius");
   ExpMapProxy<map_functions::expMapLogEucl> explogeucl("LogEuclidean");
   ExpMapProxy<map_functions::expMapSqRoot> expsqroot("SquareRoot");
+
+  ManifoldProxy<distances_manifold::Frobenius> manfrob("Frobenius");
+  ManifoldProxy<distances_manifold::LogEuclidean> manlogeucl("LogEuclidean");
+  ManifoldProxy<distances_manifold::SqRoot> mansqroot("SquareRoot");
+
+  TplaneProxy<distances_tplane::Frobenius> tplanfrob("Frobenius");
+  TplaneProxy<distances_tplane::FrobeniusScaled> tplanfrobscal("FrobeniusScaled");
+
+
 
 
 }

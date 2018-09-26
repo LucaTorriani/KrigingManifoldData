@@ -5,6 +5,8 @@
 #include "DesignMatrix.hpp"
 #include "Distance.hpp"
 #include "MapFunctions.hpp"
+#include "DistanceManifold.hpp"
+#include "DistanceTplane.hpp"
 
 #include "Factory.hpp"
 #include "Proxy.hpp"
@@ -39,6 +41,20 @@ namespace map_factory {
 
   template<typename ConcreteProduct>
   using ExpMapProxy = generic_factory::Proxy<ExpMapFactory,ConcreteProduct>;
+}
+
+namespace manifold_factory{
+  typedef generic_factory::Factory<distances_manifold::DistanceManifold, std::string> ManifoldFactory;  // Use standard Builder
+
+  template<typename ConcreteProduct>
+  using ManifoldProxy = generic_factory::Proxy<ManifoldFactory,ConcreteProduct>;
+}
+
+namespace tplane_factory{
+  typedef generic_factory::Factory<distances_tplane::DistanceTplane, std::string> TplaneFactory;  // Use standard Builder
+
+  template<typename ConcreteProduct>
+  using TplaneProxy = generic_factory::Proxy<TplaneFactory,ConcreteProduct>;
 }
 
 #endif

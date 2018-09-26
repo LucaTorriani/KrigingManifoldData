@@ -10,27 +10,27 @@
 
 namespace distances_tplane{
 
-class Frobenius{
-public:
-  double norm(const MatrixXd&) const;
-  double operator()(const MatrixXd &, const MatrixXd &) const;
-};
+  class DistanceTplane{
+  public:
+    double compute_distance(const MatrixXd&, const MatrixXd&) const;
+    virtual double norm(const MatrixXd&) const = 0;
+    virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
+  };
 
-class FrobeniusScaled{
-  const std::shared_ptr<const MatrixXd> _Sigma;
-public:
-  FrobeniusScaled(const std::shared_ptr<const MatrixXd> Sigma):_Sigma(Sigma){};
-  double norm (const MatrixXd &) const; 
-  double operator()(const MatrixXd &, const MatrixXd&) const;
-};
+ class Frobenius : public DistanceTplane{
+ public:
+   double norm(const MatrixXd &) const override;
+   void initialize_members(const std::shared_ptr<const MatrixXd>) override;
 
+ };
 
-class DistanceTplane{
-  std::map<std::string, std::function<double(const MatrixXd&, const MatrixXd&)>> _distances;
-  const std::string _distanceTplane;
-public:
-  DistanceTplane(const std::string &, const std::shared_ptr<const MatrixXd>);
-  double compute_distance(const MatrixXd&, const MatrixXd&) const;
+ class FrobeniusScaled : public DistanceTplane{
+   MatrixXd _SigmaInv;
+   unsigned int _n;
+ public:
+   double norm(const MatrixXd &) const override;
+   void initialize_members(const std::shared_ptr<const MatrixXd>) override;
+
 };
 
 
