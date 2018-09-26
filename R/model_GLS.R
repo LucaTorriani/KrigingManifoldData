@@ -9,6 +9,11 @@ model_GLS = function(data_manifold, coords,X = NULL, Sigma, metric_manifold="Fro
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist without two coordinates")
   }
+
+  if( is.array(data_manifold_model){
+    data_manifold_model = alply(data_manifold,3)
+  }
+  
   if(!is.null(X)) {X = as.matrix(X)}
   coords = as.matrix(coords)
   result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
