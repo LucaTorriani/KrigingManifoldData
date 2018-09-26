@@ -31,17 +31,17 @@ double EuclDist::compute_distance(const Vec& P1, const Vec& P2) const{
 // Haversine formula (To be tested)
 double GeoDist::compute_distance(const Vec& P1, const Vec& P2) const{
   double coeff = M_PI_2/90;
-  double lat1 =  P1(1);
-  double long1 =  P1(2);
-  double lat2 =  P2(1);
-  double long2 =  P2(2);
+  double lat1 =  P1(0);
+  double long1 =  P1(1);
+  double lat2 =  P2(0);
+  double long2 =  P2(1);
   double sin_1(sin( (lat2-lat1)/2*coeff ));
   double sin_2((sin( (long2-long1)/2*coeff )));
   double sqrth(sqrt( sin_1*sin_1 + cos(lat1*coeff)*cos(lat2*coeff)* sin_2*sin_2 ));
 
   if (sqrth > 1) sqrth = 1;
 
-  return (Earth_R*asin(sqrth));
+  return (2*Earth_R*asin(sqrth));
 
 }
 
