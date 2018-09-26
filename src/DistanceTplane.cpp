@@ -5,7 +5,7 @@
 using namespace distances_tplane;
 
 double DistanceTplane::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const{
-  return (DistanceTplane::norm(M1-M2));
+  return (norm(M1-M2));
 }
 
 // FROBENIUS
