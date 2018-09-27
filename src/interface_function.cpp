@@ -458,6 +458,7 @@ extern "C"{
 
       num_iter++;
     }
+    if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
 
     unsigned int n_hh(1000);
     Vec hh(n_hh);
