@@ -10,11 +10,9 @@ kriging(GLS_model, coords, new_coords, model_ts = "Additive",
 }
 \arguments{
 \item{GLS_model}{the object returned by \code{model_GLS}, or a \code{list} containing the fields:
-\item{\code{Sigma}}{tangent point} 
-\item{\code{beta}}{vector of the beta matrices of the fitted model}
-\item{\code{gamma_matrix}}{\code{N*N} covariogram matrix}
-\item{\code{residuals}}{vector of the \code{N} residual matrices}
-\item{\code{fitted_par_vario}}{estimates of \code{nugget}, \code{sill-nugget} and \code{practical range}}}
+\code{Sigma} (tangent point), \code{beta} (vector of the beta matrices of the fitted model),
+\code{gamma_matrix} (\code{N*N} covariogram matrix), \code{residuals} (vector of the \code{N} residual matrices)
+\code{fitted_par_vario} (estimates of \code{nugget}, \code{sill-nugget} and \code{practical range})}
 
 \item{coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 be provided in signed decimal degrees}
@@ -33,13 +31,13 @@ be provided in signed decimal degrees}
 }
 \value{
 A \code{list} with a single field:
-\item{\code{prediction}} {vector of matrices predicted at the new locations}
+\item{\code{prediction}}{vector of matrices predicted at the new locations}
 }
 \description{
 Given the GLS model kriging prediction on new location is performed
 }
 \details{
-The model provided is used to perform simple/ordinary kriging on the tangent space in correspondence of the new locations. 
+The model provided is used to perform simple/ordinary kriging on the tangent space in correspondence of the new locations.
 The estimates are then mapped to the manifold to produce the actual prediction.
 }
 \examples{
@@ -49,7 +47,7 @@ coords_model <- Manifoldgstat::rGrid
 coords_tot <- Manifoldgstat::gridCov
 Sigma <- matrix(c(2,1,1,1), 2,2)
 model = model_GLS(data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
-                   metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, 
+                   metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15,
                    distance = "Eucldist", max_it = 100, tolerance = 1e-7, plot = TRUE)
 result = kriging (GLS_model = model, coords = coords_model, new_coords = coords_model, model_ts="Coord1",
                   vario_model= "Spherical", metric_manifold = "Frobenius", distance="Eucldist")

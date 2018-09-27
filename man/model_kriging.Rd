@@ -62,7 +62,7 @@ A \code{list} with the following fields:
 \item{\code{fitted_par_vario}}{estimates of \code{nugget}, \code{sill-nugget} and \code{practical range}}
 \item{\code{iterations}}{number of iterations of the main loop}
 \item{\code{Sigma}}{tangent point}
-\item{\code{prediction}} {vector of matrices predicted at the new locations}
+\item{\code{prediction}}{vector of matrices predicted at the new locations}
 }
 \description{
 Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then
