@@ -24,6 +24,7 @@ extern "C"{
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic) {
 
+      BEGIN_RCPP
       Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
       Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
       Rcpp::Nullable<Eigen::MatrixXd> Sigma_n(s_Sigma);
@@ -198,6 +199,7 @@ extern "C"{
                            Rcpp::Named("Sigma")= Sigma);
 
       return Rcpp::wrap(result);
+      END_RCPP
   }
 
 

@@ -51,9 +51,9 @@ namespace generic_factory{
     auto f = _storage.find(name); //C++11
     if (f == _storage.end()) {
 	     std::string out="Identifier " + name + " is not stored in the factory";
-	      // throw std::invalid_argument(out);
+	      throw std::invalid_argument(out);
         // Rcpp::stop(out);
-        throw Rcpp::exception("ERROR");
+        // throw Rcpp::exception("ERROR");
     }
     else {
 	       return std::unique_ptr<AbstractProduct>(f->second());
