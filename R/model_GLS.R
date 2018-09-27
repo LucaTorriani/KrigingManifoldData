@@ -24,16 +24,29 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
   #result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
   #                      n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic )
 
-  result = tryCall(.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                        n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic ))
+  result = tryCatch({
 
-  empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
-  fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
+              .Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+                        n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic )
 
-  if(plot){
-  plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
-                distance = distance)
-  }
+
+        }, error = function(err){
+        print(err)
+        return (1)
+        },
+        finally ={
+
+          empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
+          fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
+
+          if(plot){
+            plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
+                      distance = distance)
+          }
+
+
+        } )
+
 
   return (result)
 }
