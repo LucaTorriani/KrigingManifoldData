@@ -530,7 +530,7 @@ extern "C"{
                              Rcpp::Named("residuals") = resVec,
                              Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
                              Rcpp::Named("h_vec") = emp_vario.get_hvec(),
-                             Rcpp::Named("vario_parameters") = the_variogram->get_parameters(),
+                             Rcpp::Named("fitted_par_vario") = the_variogram->get_parameters(),
                              Rcpp::Named("iterations") = num_iter,
                              Rcpp::Named("Sigma") = Sigma,
                              Rcpp::Named("prediction") = manifold_prediction);
