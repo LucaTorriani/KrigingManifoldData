@@ -6,6 +6,8 @@
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
+#include <Rcpp.h>
+
 
 namespace generic_factory{
 
@@ -49,7 +51,8 @@ namespace generic_factory{
     auto f = _storage.find(name); //C++11
     if (f == _storage.end()) {
 	     std::string out="Identifier " + name + " is not stored in the factory";
-	      throw std::invalid_argument(out);
+	      // throw std::invalid_argument(out);
+        Rcpp::stop(out);
     }
     else {
 	       return std::unique_ptr<AbstractProduct>(f->second());
@@ -62,8 +65,7 @@ namespace generic_factory{
 
     auto f =  _storage.insert(std::make_pair(name, func));
     if (f.second == false)
-      throw std::invalid_argument("Double registration in Factory");
-
+      Rcpp::stop("Double registration in Factory");
   }
 
 
