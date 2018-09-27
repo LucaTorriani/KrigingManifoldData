@@ -7,8 +7,9 @@
 model_kriging(data_manifold, coords, X = NULL, Sigma,
   metric_manifold = "Frobenius", metric_ts = "Frobenius",
   model_ts = "additive", vario_model = "Gaussian", n_h = 15,
-  distance = "Geodist", max_it = 100, tolerance = 10^(-4),
-  weight = NULL, new_coords, X_new = NULL, plot = TRUE)
+  distance = "Geodist", max_it = 100, tolerance = 1e-06,
+  weight_vario = NULL, weight_intrinsic = NULL,
+  tolerance_intrinsic = 1e-06, new_coords, X_new = NULL, plot = TRUE)
 }
 \description{
 Model and Kriging together

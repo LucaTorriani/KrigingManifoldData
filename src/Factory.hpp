@@ -63,6 +63,7 @@ namespace generic_factory{
     auto f =  _storage.insert(std::make_pair(name, func));
     if (f.second == false)
       throw std::invalid_argument("Double registration in Factory");
+
   }
 
 

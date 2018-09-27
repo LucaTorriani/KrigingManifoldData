@@ -1,4 +1,6 @@
 #include "IntrinsicMean.hpp"
+#include <iostream>
+#include <Rcpp.h>
 
 MatrixXd intrinsic_mean(const std::vector<MatrixXd>& data_manifold,  map_functions::logarithmicMap& logMap,
    map_functions::exponentialMap& expMap,  distances_tplane::DistanceTplane& distanceTplane, double tolerance, const Vec& weight){
@@ -54,6 +56,7 @@ MatrixXd intrinsic_mean(const std::vector<MatrixXd>& data_manifold,  map_functio
       }
       num_iter++;
     }
+    if(num_iter == 100) Rcpp::warning("Reached max number of iterations in intrinsic_mean");
 
     return (Sigma);
 
