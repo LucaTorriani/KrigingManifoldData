@@ -1,19 +1,79 @@
-#' Model and Kriging together
+#' Create a GLS model and directly perform kriging
+#'
+#' @param data_manifold list or array [\code{n,n,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}
+#' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
+#' be provided in signed decimal degrees
+#' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
+#' @param Sigma \code{n*n} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
+#' of \code{data_manifold}
+#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
+#' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
+#' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
+#' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
+#' @param n_h number of bins in the emprical variogram
+#' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+#' @param max_it max number of iterations for the main loop
+#' @param tolerance tolerance for the main loop
+#' @param weight_vario vector of length \code{N} to weight the locations in the computation of the empirical variogram. If NULL
+#' a vector of ones is used
+#' @param weight_intrinsic vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
+#' a vector of ones is used. Not needed if Sigma is provided
+#' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
+#' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
+#' @param new_coords matrix of coordinates for the new locations where to perform kriging
+#' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
+#' @return A \code{list} with the following fields:
+#' \item{\code{beta}}{vector of the beta matrices of the fitted model}
+#' \item{\code{gamma_matrix}}{\code{N*N} covariogram matrix}
+#' \item{\code{residuals}}{vector of the \code{N} residual matrices}
+#' \item{\code{emp_vario_values}}{vector of empircal variogram values in correspondence of \code{h_vec}}
+#' \item{\code{h_vec}}{vector of positions at which the empirical variogram is computed}
+#' \item{\code{fitted_par_vario}}{estimates of \code{nugget}, \code{sill-nugget} and \code{practical range}}
+#' \item{\code{iterations}}{number of iterations of the main loop}
+#' \item{\code{Sigma}}{tangent point}
+#' \item{\code{prediction}} {vector of matrices predicted at the new locations}
+#' @description Given the corrisponding coordinates and corresponding manifold values, this function creates a GLS model on the tangent space.
+#' @details The manifold values are mapped on the tangent space and a first estimate of the beta coefficients is obtained
+#' assuming spatially uncorellated errors. Then in the main the loop the residuals are updated according to the new estimates
+#' of the beta obtained as a result of a weighted least square where the weight matrix is the inverse of \code{gamma_matrix}. The
+#' parameters of the fitted variogram, used in the computation of the \code{gamma_matrix}, are computed using Gauss-Newton with backtrack method
+#' to solve the associated non-linear least square problem. Once the model is computed, simple kriging on the tangent space is performed and eventually
+#' the estimates are mapped to the manifold.
+#' @references D. Pigoli, A. Menafoglio & P. Secchi (2016):
+#' Kriging prediction for manifold-valued random fields.
+#' Journal of Multivariate Analysis, 145, 117-131.
+#' @examples
+#' fieldCov <- Manifoldgstat::rCov
+#' coords <- ManifoldgstatrGrid
+#' Sigma <- matrix(c(2,1,1,1), 2,2)
+#' model = model_GLS(data_manifold = fieldCov, coords = coords, Sigma = Sigma, distance = "Eucldist", metric_manifold = "Frobenius",
+#'                    metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, max_it = 100, tolerance = 1e-7,
+#'                    plot = TRUE)
 #' @useDynLib Manifoldgstat
 #' @export
-#'
 
-model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold="Frobenius",
-                                 metric_ts = "Frobenius", model_ts="additive", vario_model="Gaussian",
-                                 n_h=15, distance="Geodist", max_it = 100, tolerance = 1e-6, weight_vario=NULL,
-                                 weight_intrinsic=NULL, tolerance_intrinsic = 1e-6, new_coords, X_new=NULL, plot = TRUE){
+model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold = "Frobenius",
+                                 metric_ts = "Frobenius", model_ts = "additive", vario_model = "Gaussian",
+                                 n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_vario = NULL,
+                                 weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, new_coords, X_new = NULL, plot = TRUE){
 
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist without two coordinates")
   }
+  coords = as.matrix(coords)
+  new_coords = as.matrix(new_coords)
 
-  if(!is.null(X)) {X = as.matrix(X)}
-  if(!is.null(X_new)) {X_new = as.matrix(X_new)}
+  if(!is.null(X)) {
+    X = as.matrix(X)
+    check = (dim(X)[1] == dim(coords)[1])
+    if(!check) stop("X and coords must have the same number of rows")
+  }
+
+  if(!is.null(X_new)) {
+    X_new = as.matrix(X_new)
+    check = (dim(X_new)[1] == dim(new_coords)[1])
+    if(!check) stop("X_new and new_coords must have the same number of rows")
+  }
 
   if( is.array(data_manifold_model)){
     data_manifold = alply(data_manifold,3)
@@ -22,9 +82,6 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold
   if(is.null(Sigma)){
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
-
-  coords = as.matrix(coords)
-  new_coords = as.matrix(new_coords)
 
   result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                 n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic, new_coords, X_new )
@@ -37,6 +94,6 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold
                  distance = distance)
   }
 
-  return (list(beta_opt = result$beta, gamma_matrix = result$gamma_matrix, residuals = result$residuals,
-               par = result$vario_parameters, iter = result$iterations, prediction = result$prediction))
+  result_list = result[-c(2,3)]
+  return (result_list)
 }

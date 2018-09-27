@@ -208,6 +208,8 @@ extern "C"{
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
     SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, SEXP s_X_new) {
 
+    BEGIN_RCPP
+
     Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
 
     // Punto tangente
@@ -304,6 +306,7 @@ extern "C"{
     Rcpp::List result = Rcpp::List::create(Rcpp::Named("prediction") = manifold_prediction);  // Solo questo?
 
     return Rcpp::wrap(result);
+    END_RCPP
   }
 
 
@@ -312,6 +315,8 @@ extern "C"{
      SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
      SEXP s_max_it, SEXP s_tolerance, SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
      SEXP s_new_coordinates, SEXP s_X_new) {
+
+    BEGIN_RCPP
 
     Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
     Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
@@ -502,7 +507,6 @@ extern "C"{
     solver.compute(gamma_matrix);
 
     unsigned int num_cov(beta_vec_matrices.size());
-    Rcpp::Rcout << num_cov << "\n";
     Eigen::MatrixXd tmp(n,n);
     auto weighted_sum_beta = [&beta_vec_matrices, &num_cov, &tmp, n] (const Vec& design_matrix_row) { tmp.setZero(n,n); for (size_t j=0; j<num_cov; j++) tmp = tmp + beta_vec_matrices[j]*design_matrix_row(j); return tmp;};
     auto weighted_sum_residuals = [&resVec, &N, &tmp, n] (const Vec& lambda_vec) { tmp.setZero(n,n); for (size_t j=0; j<N; j++) tmp = tmp + resVec[j]*lambda_vec(j); return tmp;};
@@ -532,6 +536,7 @@ extern "C"{
                              Rcpp::Named("prediction") = manifold_prediction);
 
     return Rcpp::wrap(result);
+    END_RCPP
     }
 
 }

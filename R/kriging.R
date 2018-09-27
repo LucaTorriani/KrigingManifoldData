@@ -1,4 +1,4 @@
-#' Kriging
+#' Kriging prediction given the model
 #' @useDynLib Manifoldgstat
 #' @export
 #'

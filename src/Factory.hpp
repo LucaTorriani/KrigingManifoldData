@@ -52,8 +52,6 @@ namespace generic_factory{
     if (f == _storage.end()) {
 	     std::string out="Identifier " + name + " is not stored in the factory";
 	      throw std::invalid_argument(out);
-        // Rcpp::stop(out);
-        // throw Rcpp::exception("ERROR");
     }
     else {
 	       return std::unique_ptr<AbstractProduct>(f->second());
@@ -66,7 +64,7 @@ namespace generic_factory{
 
     auto f =  _storage.insert(std::make_pair(name, func));
     if (f.second == false)
-      Rcpp::stop("Double registration in Factory");
+    throw std::invalid_argument("Double registration in Factory");
   }
 
 
