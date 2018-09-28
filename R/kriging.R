@@ -42,10 +42,9 @@
 #' y.max=max(coords_tot[,2])
 #' dimgrid=dim(coords_tot)[1]
 #' radius = 0.02
-#' library(fields)
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='', xlab='', ylab='', main = "Real Values")
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='', xlab='', ylab='', main = "Real Values")
 #' for(i in 1:dimgrid)
 #' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), data_manifold_tot[,,i], radius=radius, center.cex=.5, col='navyblue')}}
 #' rect(x.min, y.min, x.max, y.max)
@@ -55,7 +54,7 @@
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='', xlab='', ylab='',main = "Predicted values")
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='', xlab='', ylab='',main = "Predicted values")
 #' for(i in 1:dimgrid)
 #' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), (result_tot$prediction[[i]]), radius=radius, center.cex=.5, col='navyblue' )}}
 #' rect(x.min, y.min, x.max, y.max)

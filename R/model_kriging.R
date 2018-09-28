@@ -52,7 +52,7 @@
 #' Sigma <- matrix(c(2,1,1,1), 2,2)
 #'
 #' result = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
-#'                         metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist".
+#'                         metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
 #'                         max_it = 100, tolerance = 10e-7,new_coords = coords_model)
 #' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
 #'                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
@@ -64,10 +64,9 @@
 #' y.max=max(coords_tot[,2])
 #' dimgrid=dim(coords_tot)[1]
 #' radius = 0.02
-#' library(fields)
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='', xlab='', ylab='', main = "Real Values")
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='', xlab='', ylab='', main = "Real Values")
 #' for(i in 1:dimgrid)
 #' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , data_manifold_tot[,,i],radius=radius, center.cex=.5, col='navyblue')}}
 #' rect(x.min, y.min, x.max, y.max)
@@ -77,7 +76,7 @@
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='', xlab='', ylab='',main = "Predicted values")
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='', xlab='', ylab='',main = "Predicted values")
 #' for(i in 1:dimgrid)
 #' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , (result_tot$prediction[[i]]),radius=radius, center.cex=.5, col='navyblue' )}}
 #' rect(x.min, y.min, x.max, y.max)
