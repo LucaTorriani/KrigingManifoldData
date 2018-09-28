@@ -8,4 +8,4 @@ main
 *.Rhistory
 .idea
 cmake-build-debug
-*.RData
+*.pdf
