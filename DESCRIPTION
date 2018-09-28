@@ -2,17 +2,15 @@ Package: Manifoldgstat
 Type: Package
 Title: Kriging prediction for manifold-valued data.
 Version: 1.0.0
-Authors@R: c(person("Ilaria", "Sartori", role = c("aut", "cre"),
-	     				email = "ilaria.sartori@mail.polimi.it"),
-						 person("Luca", "Torriani", role = c("aut"),
-							email = "luca1.torriani@mail.polimi.it"))
-Description: Inference and prediction for manifold-valued data analysis. This package provides a C++ implementation of the functions to create a model, for spatial-dependent	manifold-valued data, in order to perform kriging. In each location, specified by a vector of coordinates ([lat,long], [x,y] or [x,y,z]), the datum is supposed to be a symmetric and positive definite matrix.The algorithm exploits a projection of these data on the tangent space of symmetric matrices, where the tangent point is either provided by the user or computed as intrinsic mean of the data in input.
-Depends: R (>= 3.2.0),
- 				 Rcpp (>= 0.12.16),
-         RcppEigen (>= 0.3.3.4.0),
- 			 	 plyr(>= 1.8.4)
-LinkingTo: Rcpp,
-	         RcppEigen
+Authors@R: c(person("Ilaria", "Sartori", role = c("aut", "cre"), email = "ilaria.sartori@mail.polimi.it"),
+						 person("Luca", "Torriani", role = c("aut"), email = "luca1.torriani@mail.polimi.it"))
+Description: Inference and prediction for manifold-valued data analysis. This package provides a C++ implementation of the functions
+		to create a model, for spatial dependent	manifold valued data, in order to perform kriging. In each location, specified by a
+		vector of coordinates ([lat,long], [x,y] or [x,y,z]), the datum is supposed to be a symmetric and positive definite matrix.
+		The algorithm exploits a projection of these data on the tangent space of symmetric matrices, where the tangent point is either
+		provided by the user or computed as intrinsic mean of the data in input.
+Depends: R (>= 3.2.0), Rcpp (>= 0.12.16), RcppEigen (>= 0.3.3.4.0), plyr(>= 1.8.4)
+LinkingTo: Rcpp, RcppEigen
 NeedsCompilation: yes
 SystemRequirements: C++11
 License: What license is it under?

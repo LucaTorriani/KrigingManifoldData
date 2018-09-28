@@ -22,24 +22,24 @@
 #' @param new_coords matrix of coordinates for the new locations where to perform kriging
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
-#' @return A \code{list} with the following fields:
-#' \item{\code{beta}}{vector of the beta matrices of the fitted model}
-#' \item{\code{gamma_matrix}}{\code{N*N} covariogram matrix}
-#' \item{\code{residuals}}{vector of the \code{N} residual matrices}
-#' \item{\code{emp_vario_values}}{vector of empircal variogram values in correspondence of \code{h_vec}}
-#' \item{\code{h_vec}}{vector of positions at which the empirical variogram is computed}
-#' \item{\code{fitted_par_vario}}{estimates of \code{nugget}, \code{sill-nugget} and \code{practical range}}
-#' \item{\code{iterations}}{number of iterations of the main loop}
-#' \item{\code{Sigma}}{tangent point}
-#' \item{\code{prediction}}{vector of matrices predicted at the new locations}
+#' @return list with the following fields:
+#' \item{\code{beta}}{ vector of the beta matrices of the fitted model}
+#' \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
+#' \item{\code{residuals}}{ vector of the \code{N} residual matrices}
+#' \item{\code{emp_vario_values}}{ vector of empircal variogram values in correspondence of \code{h_vec}}
+#' \item{\code{h_vec}}{ vector of positions at which the empirical variogram is computed}
+#' \item{\code{fitted_par_vario}}{ estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range}}
+#' \item{\code{iterations}}{ number of iterations of the main loop}
+#' \item{\code{Sigma}}{ tangent point}
+#' \item{\code{prediction}}{ vector of matrices predicted at the new locations}
 #' @description Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then
-#' it performs kriging on the new locations
-#' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients 
-#' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a 
-#' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)} 
-#' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are 
+#' it performs kriging on the new locations.
+#' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
+#' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
+#' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
+#' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 #' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem.
-#' Once the model is computed, simple/ordinary kriging on the tangent space is performed in correspondence of the new locations and eventually
+#' Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
 #' the estimates are mapped to the manifold.
 #' @references D. Pigoli, A. Menafoglio & P. Secchi (2016):
 #' Kriging prediction for manifold-valued random fields.
@@ -50,36 +50,38 @@
 #' coords_model <- Manifoldgstat::rGrid
 #' coords_tot <- Manifoldgstat::gridCov
 #' Sigma <- matrix(c(2,1,1,1), 2,2)
-#' result = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius", 
-#'                         model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist", max_it = 100, tolerance = 10e-7, 
-#'                         new_coords = coords_model)
-#' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius", 
-#'                             model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist", max_it = 100, tolerance = 10e-7, 
-#'                             new_coords = coords_tot)
+#'
+#' result = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
+#'                         metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist".
+#'                         max_it = 100, tolerance = 10e-7,new_coords = coords_model)
+#' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
+#'                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
+#'                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
+#'
 #' x.min=min(coords_tot[,1])
 #' x.max=max(coords_tot[,1])
 #' y.min=min(coords_tot[,2])
 #' y.max=max(coords_tot[,2])
 #' dimgrid=dim(coords_tot)[1]
-#' radius = 0.02  # 0.008
+#' radius = 0.02
 #' library(fields)
-#' 
+#'
 #' par(cex=1.25)
 #' plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='', xlab='', ylab='', main = "Real Values")
 #' for(i in 1:dimgrid)
 #' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , data_manifold_tot[,,i],radius=radius, center.cex=.5, col='navyblue')}}
 #' rect(x.min, y.min, x.max, y.max)
-#' 
+#'
 #' for(i in 1:250)
 #' { car::ellipse(c(coords_model[i,1],coords_model[i,2]) , data_manifold_model[,,i],radius=radius, center.cex=.5, col='green')}
 #' rect(x.min, y.min, x.max, y.max)
-#' 
+#'
 #' par(cex=1.25)
 #' plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='', xlab='', ylab='',main = "Predicted values")
 #' for(i in 1:dimgrid)
 #' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , (result_tot$prediction[[i]]),radius=radius, center.cex=.5, col='navyblue' )}}
 #' rect(x.min, y.min, x.max, y.max)
-#' 
+#'
 #' for(i in 1:250)
 #' { car::ellipse(c(rGrid[i,1],rGrid[i,2]) , (result$prediction[[i]]),radius=radius, center.cex=.5, col='red')}
 #' rect(x.min, y.min, x.max, y.max)
@@ -87,7 +89,7 @@
 #' @export
 
 model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold = "Frobenius",
-                                 metric_ts = "Frobenius", model_ts = "additive", vario_model = "Gaussian",
+                                 metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                                  n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_vario = NULL,
                                  weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, new_coords, X_new = NULL, plot = TRUE){
 
