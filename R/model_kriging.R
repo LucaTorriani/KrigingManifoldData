@@ -118,6 +118,10 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold
     data_manifold = alply(data_manifold,3)
   }
 
+  if(length(data_manifold) != dim(coords)[1]){
+    stop("Dimension of data_manifold and coords must agree")
+  }
+
   if(is.null(Sigma)){
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }

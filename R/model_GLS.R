@@ -61,6 +61,11 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
   if( is.array(data_manifold_model)){
     data_manifold = alply(data_manifold,3)
   }
+  coords = as.matrix(coords)
+
+  if(length(data_manifold) != dim(coords)[1]){
+    stop("Dimension of data_manifold and coords must agree")
+  }
 
   if(!is.null(X)) {
     X = as.matrix(X)
@@ -72,7 +77,6 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
 
-  coords = as.matrix(coords)
   result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                         n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic )
 
