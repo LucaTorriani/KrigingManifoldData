@@ -9,10 +9,10 @@ kriging(GLS_model, coords, new_coords, model_ts = "Additive",
   X_new = NULL, distance = "Geodist")
 }
 \arguments{
-\item{GLS_model}{the object returned by \code{model_GLS}, or a \code{list} containing the fields:
+\item{GLS_model}{the object returned by \code{model_GLS}, or a list containing the fields:
 \code{Sigma} (tangent point), \code{beta} (vector of the beta matrices of the fitted model),
 \code{gamma_matrix} (\code{N*N} covariogram matrix), \code{residuals} (vector of the \code{N} residual matrices)
-\code{fitted_par_vario} (estimates of \code{nugget}, \code{sill-nugget} and \code{practical range})}
+\code{fitted_par_vario} (estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range})}
 
 \item{coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 be provided in signed decimal degrees}
@@ -30,14 +30,14 @@ be provided in signed decimal degrees}
 \item{distance}{type of distance between coordinates. It must be either "Eucldist" or "Geodist"}
 }
 \value{
-A \code{list} with a single field:
+A list with a single field:
 \item{\code{prediction}}{vector of matrices predicted at the new locations}
 }
 \description{
-Given the GLS model kriging prediction on new location is performed
+Given the GLS model kriging prediction on new location is performed.
 }
 \details{
-The model provided is used to perform simple/ordinary kriging on the tangent space in correspondence of the new locations.
+The model provided is used to perform simple kriging on the tangent space in correspondence of the new locations.
 The estimates are then mapped to the manifold to produce the actual prediction.
 }
 \examples{
@@ -46,39 +46,42 @@ data_manifold_model <- Manifoldgstat::rCov
 coords_model <- Manifoldgstat::rGrid
 coords_tot <- Manifoldgstat::gridCov
 Sigma <- matrix(c(2,1,1,1), 2,2)
-model = model_GLS(data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
-                   metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15,
-                   distance = "Eucldist", max_it = 100, tolerance = 1e-7, plot = TRUE)
+
+model = model_GLS(data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma,
+                   metric_manifold = "Frobenius", metric_ts = "Frobenius", model_ts = "Coord1",
+                   vario_model = "Spherical", n_h = 15, distance = "Eucldist", max_it = 100,
+                   tolerance = 1e-7, plot = TRUE)
 result = kriging (GLS_model = model, coords = coords_model, new_coords = coords_model, model_ts="Coord1",
                   vario_model= "Spherical", metric_manifold = "Frobenius", distance="Eucldist")
 result_tot = kriging (GLS_model = model, coords = coords_model, new_coords = coords_tot, model_ts="Coord1",
                       vario_model= "Spherical", metric_manifold = "Frobenius", distance="Eucldist")
+
 x.min=min(coords_tot[,1])
 x.max=max(coords_tot[,1])
 y.min=min(coords_tot[,2])
 y.max=max(coords_tot[,2])
 dimgrid=dim(coords_tot)[1]
-radius = 0.02  # 0.008
+radius = 0.02
 library(fields)
 
 par(cex=1.25)
 plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='', xlab='', ylab='', main = "Real Values")
 for(i in 1:dimgrid)
-{ if(i \%\% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , data_manifold_tot[,,i],radius=radius, center.cex=.5, col='navyblue')}}
+{ if(i \%\% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), data_manifold_tot[,,i], radius=radius, center.cex=.5, col='navyblue')}}
 rect(x.min, y.min, x.max, y.max)
 
 for(i in 1:250)
-{ car::ellipse(c(coords_model[i,1],coords_model[i,2]) , data_manifold_model[,,i],radius=radius, center.cex=.5, col='green')}
+{ car::ellipse(c(coords_model[i,1],coords_model[i,2]), data_manifold_model[,,i], radius=radius, center.cex=.5, col='green')}
 rect(x.min, y.min, x.max, y.max)
 
 par(cex=1.25)
 plot(0,0, asp=1, col=tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='', xlab='', ylab='',main = "Predicted values")
 for(i in 1:dimgrid)
-{ if(i \%\% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , (result_tot$prediction[[i]]),radius=radius, center.cex=.5, col='navyblue' )}}
+{ if(i \%\% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), (result_tot$prediction[[i]]), radius=radius, center.cex=.5, col='navyblue' )}}
 rect(x.min, y.min, x.max, y.max)
 
 for(i in 1:250)
-{ car::ellipse(c(rGrid[i,1],rGrid[i,2]) , (result$prediction[[i]]),radius=radius, center.cex=.5, col='red')}
+{ car::ellipse(c(coords_model[i,1],coords_model[i,2]), (result$prediction[[i]]), radius=radius, center.cex=.5, col='red')}
 rect(x.min, y.min, x.max, y.max)
 }
 \references{

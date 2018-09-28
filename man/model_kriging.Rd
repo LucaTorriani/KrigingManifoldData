@@ -6,7 +6,7 @@
 \usage{
 model_kriging(data_manifold, coords, X = NULL, Sigma,
   metric_manifold = "Frobenius", metric_ts = "Frobenius",
-  model_ts = "additive", vario_model = "Gaussian", n_h = 15,
+  model_ts = "Additive", vario_model = "Gaussian", n_h = 15,
   distance = "Geodist", max_it = 100, tolerance = 1e-06,
   weight_vario = NULL, weight_intrinsic = NULL,
   tolerance_intrinsic = 1e-06, new_coords, X_new = NULL, plot = TRUE)
@@ -53,28 +53,28 @@ a vector of ones is used. Not needed if Sigma is provided}
 \item{plot}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted}
 }
 \value{
-A \code{list} with the following fields:
-\item{\code{beta}}{vector of the beta matrices of the fitted model}
-\item{\code{gamma_matrix}}{\code{N*N} covariogram matrix}
-\item{\code{residuals}}{vector of the \code{N} residual matrices}
-\item{\code{emp_vario_values}}{vector of empircal variogram values in correspondence of \code{h_vec}}
-\item{\code{h_vec}}{vector of positions at which the empirical variogram is computed}
-\item{\code{fitted_par_vario}}{estimates of \code{nugget}, \code{sill-nugget} and \code{practical range}}
-\item{\code{iterations}}{number of iterations of the main loop}
-\item{\code{Sigma}}{tangent point}
-\item{\code{prediction}}{vector of matrices predicted at the new locations}
+list with the following fields:
+\item{\code{beta}}{ vector of the beta matrices of the fitted model}
+\item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
+\item{\code{residuals}}{ vector of the \code{N} residual matrices}
+\item{\code{emp_vario_values}}{ vector of empircal variogram values in correspondence of \code{h_vec}}
+\item{\code{h_vec}}{ vector of positions at which the empirical variogram is computed}
+\item{\code{fitted_par_vario}}{ estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range}}
+\item{\code{iterations}}{ number of iterations of the main loop}
+\item{\code{Sigma}}{ tangent point}
+\item{\code{prediction}}{ vector of matrices predicted at the new locations}
 }
 \description{
 Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then
-it performs kriging on the new locations
+it performs kriging on the new locations.
 }
 \details{
-The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients 
-is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a 
-weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)} 
-are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are 
+The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
+is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
+weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
+are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem.
-Once the model is computed, simple/ordinary kriging on the tangent space is performed in correspondence of the new locations and eventually
+Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
 the estimates are mapped to the manifold.
 }
 \examples{
@@ -83,18 +83,20 @@ data_manifold_model <- Manifoldgstat::rCov
 coords_model <- Manifoldgstat::rGrid
 coords_tot <- Manifoldgstat::gridCov
 Sigma <- matrix(c(2,1,1,1), 2,2)
-result = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius", 
-                        model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist", max_it = 100, tolerance = 10e-7, 
-                        new_coords = coords_model)
-result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius", 
-                            model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist", max_it = 100, tolerance = 10e-7, 
-                            new_coords = coords_tot)
+
+result = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
+                        metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist".
+                        max_it = 100, tolerance = 10e-7,new_coords = coords_model)
+result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
+                            metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
+                            max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
+
 x.min=min(coords_tot[,1])
 x.max=max(coords_tot[,1])
 y.min=min(coords_tot[,2])
 y.max=max(coords_tot[,2])
 dimgrid=dim(coords_tot)[1]
-radius = 0.02  # 0.008
+radius = 0.02
 library(fields)
 
 par(cex=1.25)
