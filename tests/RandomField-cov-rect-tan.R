@@ -36,15 +36,15 @@ Sigma = matrix(c(2,1,1,1), 2,2)
 #coords_model = gridCov  # Total grid
 coords_model = rGrid    # Sample of the grid
 
-model = model_GLS(data_manifold = fieldCov, coords = coords_model, Sigma = Sigma,
+model = model_GLS(data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma,
                                        distance = distance, metric_manifold = metric_manifold,
                                        metric_ts = metric_ts, model_ts = model_ts,
                                        vario_model = vario_model, n_h = 15,
                                        max_it = 100, tolerance = 10^(-4))
-#print(model$beta)
-#print(model$fitted_par_vario)
-#print(model$iterations)
-#print(model$Sigma)
+print(model$beta)
+print(model$fitted_par_vario)
+print(model$iterations)
+print(model$Sigma)
 
 
 #model = list(beta = model$beta, gamma_matrix = model$gamma_matrix,

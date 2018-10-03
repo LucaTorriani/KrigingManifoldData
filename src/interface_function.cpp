@@ -29,16 +29,16 @@ extern "C"{
       Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
       Rcpp::Nullable<Eigen::MatrixXd> Sigma_n(s_Sigma);
 
+      std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
+      Coordinates coords(coords_ptr);
+      unsigned int N = coords.get_N_station();
+
       // Data manifold
-      Rcpp::List list_data_manifold(s_data_manifold);
-      size_t N = list_data_manifold.size();
       std::vector<Eigen::MatrixXd> data_manifold(N);
       for(size_t i=0; i<N; i++){
-        data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(list_data_manifold,i));
+        data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
       }
-
       unsigned int n = data_manifold[0].rows();
-
 
       // Distance tplane
       std::string distance_Tplane_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
@@ -47,8 +47,6 @@ extern "C"{
 
       // Distance manifold SERVE????
       std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
-      // manifold_factory::ManifoldFactory& manifold_fac (manifold_factory::ManifoldFactory::Instance());
-      // std::unique_ptr<distances_manifold::DistanceManifold> theManifoldDist = manifold_fac.create(distance_Manifold_name);
 
       // Map functions
       map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
@@ -69,7 +67,6 @@ extern "C"{
         Sigma = intrinsic_mean(data_manifold, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic);
       }
 
-
       // Data tangent space
       std::vector<Eigen::MatrixXd> data_tspace(N);
       for (size_t i=0; i<N; i++) {
@@ -78,11 +75,6 @@ extern "C"{
 
       std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace));
 
-      // Eigen::MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
-      // big_matrix_data_tspace = matrix_manipulation::VecMatrices2bigMatrix(data_tspace);
-      // std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_ptr = std::make_shared<const Eigen::MatrixXd>(big_matrix_data_tspace);
-      // big_matrix_data_tspace.resize(0,0);
-
       data_manifold.clear();
       data_tspace.clear();
 
@@ -90,15 +82,6 @@ extern "C"{
       distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
       std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
       std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
-
-      // Coordinates
-      // Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
-      // std::shared_ptr<const Eigen::MatrixXd> coords_ptr  = std::make_shared<const Eigen::MatrixXd>(coords_mat);
-      // coords_mat.resize(0,0);
-
-      std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
-      Coordinates coords(coords_ptr);
-
 
       // Distance Matrix
       std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
@@ -125,23 +108,13 @@ extern "C"{
       std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
       std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
-      // Eigen::MatrixXd design_matrix;
-      // if(X.isNotNull()) {
-      //   Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
-      //   design_matrix = theDesign_matrix->compute_design_matrix(coords, X);
-      // }
-      // else design_matrix = theDesign_matrix->compute_design_matrix(coords);
-      // unsigned int n_covariates(design_matrix.cols());
-      //
-      // std::shared_ptr<const Eigen::MatrixXd> design_matrix_ptr = std::make_shared<const Eigen::MatrixXd> (design_matrix);
-      // design_matrix.resize(0,0);
-
       std::shared_ptr<Eigen::MatrixXd> design_matrix_ptr;
       if(X.isNotNull()) {
         Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
-        *design_matrix_ptr = theDesign_matrix->compute_design_matrix(coords, X);
+        design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
       }
-      else *design_matrix_ptr = theDesign_matrix->compute_design_matrix(coords);
+      else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
+
       unsigned int n_covariates(design_matrix_ptr->cols());
 
       // Model
@@ -234,8 +207,6 @@ extern "C"{
 
     // Distance manifold SERVE???
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
-    // manifold_factory::ManifoldFactory& manifold_fac (manifold_factory::ManifoldFactory::Instance());
-    // std::unique_ptr<distances_manifold::DistanceManifold> theManifoldDist = manifold_fac.create(distance_Manifold_name);
 
     // Map functions
     map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
@@ -243,21 +214,11 @@ extern "C"{
     theExpMap->set_members(Sigma);
 
     // Old coordinates
-    // Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
-    // std::shared_ptr<const Eigen::MatrixXd> coords_ptr  = std::make_shared<const Eigen::MatrixXd>(coords_mat);
-    // unsigned int N = coords_mat.rows();
-    // coords_mat.resize(0,0);
-
     std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
     unsigned int N = coords_ptr->rows();
     Coordinates coords(coords_ptr);
 
     // New coordinates
-    // Eigen::Map<Eigen::MatrixXd> new_coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_new_coordinates));
-    // std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr  = std::make_shared<const Eigen::MatrixXd>(new_coords_mat);
-    // unsigned int M = new_coords_mat.rows();
-    // new_coords_mat.resize(0,0);
-
     std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
     unsigned int M = new_coords_ptr->rows();
     Coordinates new_coords(new_coords_ptr);
@@ -267,24 +228,15 @@ extern "C"{
     std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
     std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
-    // Eigen::MatrixXd new_design_matrix;
-    // if(X_new.isNotNull()) {
-    //   Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
-    //   new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords, X_new);
-    // }
-    // else new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords);
-
     std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
     if(X_new.isNotNull()) {
       Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
-      *new_design_matrix_ptr = theDesign_matrix->compute_design_matrix(new_coords, X_new);
+      new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords, X_new));
     }
-    else *new_design_matrix_ptr = theDesign_matrix->compute_design_matrix(new_coords);
+    else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
 
     // Fitted vario
     Eigen::Map<Eigen::VectorXd> parameters(Rcpp::as<Eigen::Map<Eigen::VectorXd>> (s_vario_parameters));
-    // Eigen::Map<Eigen::Vector3d> parameters(Rcpp::as<Eigen::Map<Eigen::Vector3d>> (s_vario_parameters));
-    // Andrebbe fatto Vector3d ma non funziona
 
     vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
     std::string variogram_type (Rcpp::as<std::string> (s_vario_model)); // (Gaussian, Exponential, Spherical) //IMPLEMENTAREEE
@@ -347,12 +299,15 @@ extern "C"{
     Rcpp::Nullable<Eigen::MatrixXd> Sigma_n(s_Sigma);
     Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
 
+    // Coordinates
+    std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
+    Coordinates coords(coords_ptr);
+    unsigned int N = coords.get_N_station();
+
     // Data manifold
-    Rcpp::List list_data_manifold(s_data_manifold);
-    size_t N = list_data_manifold.size();
     std::vector<Eigen::MatrixXd> data_manifold(N);
     for(size_t i=0; i<N; i++){
-      data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(list_data_manifold,i));
+      data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
     }
 
     unsigned int n = data_manifold[0].rows();
@@ -364,8 +319,6 @@ extern "C"{
 
     // Distance manifold SERVE??
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
-    // manifold_factory::ManifoldFactory& manifold_fac (manifold_factory::ManifoldFactory::Instance());
-    // std::unique_ptr<distances_manifold::DistanceManifold> theManifoldDist = manifold_fac.create(distance_Manifold_name);
 
     // Map functions
     map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
@@ -392,31 +345,14 @@ extern "C"{
       data_tspace[i] = theLogMap->map2tplane(data_manifold[i]);
     }
 
-    // Eigen::MatrixXd big_matrix_data_tspace(N, (n+1)*n/2);
-    // big_matrix_data_tspace = matrix_manipulation::VecMatrices2bigMatrix(data_tspace);
-    // std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_ptr = std::make_shared<const Eigen::MatrixXd>(big_matrix_data_tspace);
-    // data_manifold.clear();
-    // data_tspace.clear();
-    // big_matrix_data_tspace.resize(0,0);
-
     std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace));
     data_manifold.clear();
     data_tspace.clear();
-
 
     // Distance
     distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
     std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
     std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
-
-    // Coordinates
-    // Eigen::Map<Eigen::MatrixXd> coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_coordinates));
-    // std::shared_ptr<const Eigen::MatrixXd> coords_ptr  = std::make_shared<const Eigen::MatrixXd>(coords_mat);
-    // coords_mat.resize(0,0);
-    // Coordinates coords(coords_ptr);
-
-    std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
-    Coordinates coords(coords_ptr);
 
     // Distance Matrix
     std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
@@ -443,25 +379,14 @@ extern "C"{
     std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
     std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
 
-    // Eigen::MatrixXd design_matrix;
-    // if(X.isNotNull()) {
-    //   Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
-    //   design_matrix = theDesign_matrix->compute_design_matrix(coords, X);
-    // }
-    // else design_matrix = theDesign_matrix->compute_design_matrix(coords);
-    // unsigned int n_covariates(design_matrix.cols());
-    //
-    // std::shared_ptr<const Eigen::MatrixXd> design_matrix_ptr = std::make_shared<const Eigen::MatrixXd> (design_matrix);
-    // design_matrix.resize(0,0);
-
     std::shared_ptr<Eigen::MatrixXd> design_matrix_ptr;
     if(X.isNotNull()) {
       Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
-      *design_matrix_ptr = theDesign_matrix->compute_design_matrix(coords, X);
+      design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
     }
-    else *design_matrix_ptr = theDesign_matrix->compute_design_matrix(coords);
-    unsigned int n_covariates(design_matrix_ptr->cols());
+    else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
 
+    unsigned int n_covariates(design_matrix_ptr->cols());
 
     // Model
     model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, n);
@@ -524,30 +449,17 @@ extern "C"{
     theExpMap->set_members(Sigma);
 
     // New coordinates
-    // Eigen::Map<Eigen::MatrixXd> new_coords_mat(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_new_coordinates));
-    // std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr  = std::make_shared<const Eigen::MatrixXd>(new_coords_mat);
-    // unsigned int M = new_coords_mat.rows();
-    // new_coords_mat.resize(0,0);
-    // Coordinates new_coords(new_coords_ptr);
-
     std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
     unsigned int M = new_coords_ptr->rows();
     Coordinates new_coords(new_coords_ptr);
 
     // New Design matrix
-    // Eigen::MatrixXd new_design_matrix;
-    // if(X_new.isNotNull()) {
-    //   Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
-    //   new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords, X_new);
-    // }
-    // else new_design_matrix = theDesign_matrix->compute_design_matrix(new_coords);
-
     std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
     if(X_new.isNotNull()) {
-      Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
-      *new_design_matrix_ptr = theDesign_matrix->compute_design_matrix(new_coords, X_new);
+      Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
+      new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords, X_new));
     }
-    else *new_design_matrix_ptr = theDesign_matrix->compute_design_matrix(new_coords);
+    else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
 
     std::vector<double> distanceVector(N);
 
