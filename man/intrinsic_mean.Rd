@@ -28,4 +28,5 @@ Evaluate the intrinsic mean of a given set of symmetric positive definite matric
 \examples{
 data_manifold_tot <- Manifoldgstat::fieldCov
 Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius", metric_ts = "Frobenius")
+print(Sigma)
 }
