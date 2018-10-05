@@ -2,7 +2,7 @@
 #include <iostream>
 #include <Rcpp.h>
 
-MatrixXd intrinsic_mean(const std::vector<MatrixXd>& data_manifold,  map_functions::logarithmicMap& logMap,
+MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>& data_manifold,  map_functions::logarithmicMap& logMap,
    map_functions::exponentialMap& expMap,  distances_tplane::DistanceTplane& distanceTplane, double tolerance, const Vec& weight){
 
     // Weights

@@ -64,7 +64,7 @@ extern "C"{
         Eigen::Map<Vec> weights_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
         map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
         std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
-        Sigma = intrinsic_mean(data_manifold, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic);
+        Sigma = intrinsic_mean_C(data_manifold, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic);
       }
 
       // Data tangent space
@@ -336,7 +336,7 @@ extern "C"{
       Eigen::Map<Vec> weights_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
       map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
       std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
-      Sigma = intrinsic_mean(data_manifold, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic);
+      Sigma = intrinsic_mean_C(data_manifold, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic);
     }
 
     // Data tangent space
@@ -502,24 +502,86 @@ extern "C"{
     END_RCPP
     }
 
+// INTRINSIC MEAN
+RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
+  SEXP s_tolerance, SEXP s_weight) {
+    BEGIN_RCPP
+    // Data
+    unsigned int N(Rcpp::as<unsigned int> (s_N));
+    std::vector<Eigen::MatrixXd> data(N);
+    for(size_t i=0; i<N; i++){
+      data[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data,i));
+    }
+    unsigned int n = data[0].rows();
+
+    // Distance tplane
+    std::string distance_Tplane_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
+    tplane_factory::TplaneFactory& tplane_fac (tplane_factory::TplaneFactory::Instance());
+    std::unique_ptr<distances_tplane::DistanceTplane> theTplaneDist = tplane_fac.create(distance_Tplane_name);
+
+    // Map functions
+    std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
+    map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
+    std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
+    map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+    std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+
+    // Tolerance
+    double tolerance (Rcpp::as<double> (s_tolerance));
+
+    // Weights
+    Eigen::Map<Vec> weight(Rcpp::as<Eigen::Map<Vec>> (s_weight));
+    double sum_weight(weight.sum());
+
+    // CODE
+    Eigen::MatrixXd Result((data)[0]);
+
+    theLogMap->set_members(Result);
+    theExpMap->set_members(Result);
+    theTplaneDist->set_members(Result);
+
+    Eigen::MatrixXd Xk(n,n);
+    Eigen::MatrixXd Xk_prec(n,n);
+
+    Xk = data[0];
+
+    double tau(1.0);
+    double tmp;
+    double tolk;
+    double tolk_prec(tolerance + 1);
+
+    size_t num_iter(0);
+
+    while(tolk_prec > tolerance && num_iter < 100) {
+
+      Xk_prec = Xk;
+      tmp = theTplaneDist->norm(Xk_prec);
+      tolk_prec = tmp*tmp;
+
+      Xk.setZero();
+      for (size_t i=0; i<N; i++) {
+        Xk = Xk + weight(i)* theLogMap->map2tplane(data[i]);
+      }
+      Xk = Xk/sum_weight;
+      Result = theExpMap->map2manifold(tau*Xk);
+
+      theLogMap->set_members(Result);
+      theExpMap->set_members(Result);
+      theTplaneDist->set_members(Result);
+
+      tmp = theTplaneDist->norm(Xk);
+      tolk = tmp*tmp;
+      if (tolk > tolk_prec) {
+        tau = tau/2;
+        Xk = Xk_prec;
+      }
+      num_iter++;
+    }
+    if(num_iter == 100) Rcpp::warning("Reached max number of iterations in intrinsic_mean");
+
+    return Rcpp::wrap(Result);
+    END_RCPP
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-  // DISTANCE
-
-  // errore se GEODIST e più di 2 _coords
-
-  // COORDINATES
-  // latitudine prima coordinata
-  // lat e long in gradi
+}

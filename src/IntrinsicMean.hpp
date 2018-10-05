@@ -9,7 +9,7 @@
 
 using namespace Eigen;
 
-MatrixXd intrinsic_mean(const std::vector<MatrixXd>&,  map_functions::logarithmicMap&,
+MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>&,  map_functions::logarithmicMap&,
                          map_functions::exponentialMap&,   distances_tplane::DistanceTplane&, double, const Vec&);
 
 
