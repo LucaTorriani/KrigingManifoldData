@@ -16,7 +16,7 @@ intrinsic_mean(data, metric_manifold = "Frobenius",
 
 \item{tolerance}{tolerance for the computation of the intrinsic_mean}
 
-\item{weight}{vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
+\item{weight}{vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
 a vector of ones is used}
 }
 \description{
