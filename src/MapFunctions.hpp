@@ -9,9 +9,8 @@ namespace map_functions {
 // LOGARITHMIC MAP
   class logarithmicMap{
   public:
+    virtual ~logarithmicMap() = default;
     virtual MatrixXd map2tplane(const MatrixXd&) const = 0;
-    // virtual MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const = 0;
-    // virtual void initialize_members(const std::shared_ptr<const MatrixXd>) = 0;
     virtual void set_members(const MatrixXd&) = 0;
 
   };
@@ -20,34 +19,26 @@ namespace map_functions {
     MatrixXd  _sqrtSigma;
     MatrixXd  _sqrtSigmaInv;
   public:
+     ~logMapFrob() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
-    // MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
-    // void initialize_members(const std::shared_ptr<const MatrixXd>) override;
     void set_members(const MatrixXd&) override;
   };
 
   class logMapLogEucl : public logarithmicMap{
-    // std::shared_ptr<const MatrixXd> _Sigma;
     MatrixXd _Sigma;
-
   public:
+    ~logMapLogEucl() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
-    // MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
-    // void initialize_members(const std::shared_ptr<const MatrixXd>) override;
     void set_members(const MatrixXd&) override;
 
   };
 
   class logMapSqRoot : public logarithmicMap{
-    // std::shared_ptr<const MatrixXd> _Sigma;
     MatrixXd _Sigma;
-
   public:
+    ~logMapSqRoot() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
-    // MatrixXd map2tplane(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
-    // void initialize_members(const std::shared_ptr<const MatrixXd>) override;
     void set_members(const MatrixXd&) override;
-
   };
 
 
@@ -56,9 +47,8 @@ namespace map_functions {
 
   class exponentialMap{
   public:
+    virtual ~exponentialMap() = default;
     virtual MatrixXd map2manifold(const MatrixXd&) const = 0;
-    // virtual MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const = 0;
-
     virtual void set_members(const MatrixXd&) = 0;
 
   };
@@ -68,8 +58,8 @@ namespace map_functions {
     MatrixXd _sqrtSigma;
     MatrixXd _sqrtSigmaInv;
   public:
+    ~expMapFrob() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
-    // MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
 
   };
@@ -77,16 +67,16 @@ namespace map_functions {
   class expMapLogEucl : public exponentialMap{
     MatrixXd _Sigma;
   public:
+    ~expMapLogEucl() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
-    // MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
   };
 
   class expMapSqRoot : public exponentialMap{
     MatrixXd _Sigma;
   public:
+    ~expMapSqRoot() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
-    // MatrixXd map2manifold(const MatrixXd&, const MatrixXd&, const MatrixXd&, const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
   };
 

@@ -15,10 +15,12 @@ namespace distances_tplane{
     double compute_distance(const MatrixXd&, const MatrixXd&) const;
     virtual double norm(const MatrixXd&) const = 0;
     virtual void set_members(const MatrixXd&) = 0;
+    virtual ~DistanceTplane() = default;
   };
 
  class Frobenius : public DistanceTplane{
  public:
+   ~Frobenius() = default;
    double norm(const MatrixXd &) const override;
    void set_members(const MatrixXd&) override;
 
@@ -28,6 +30,7 @@ namespace distances_tplane{
    MatrixXd _SigmaInv;
    unsigned int _n;
  public:
+   ~FrobeniusScaled() = default;
    double norm(const MatrixXd &) const override;
    void set_members(const MatrixXd&) override;
 
