@@ -114,7 +114,7 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold
     if (!is.null(X_new)) stop("X and X_new must have the same number of columns")
   }
 
-  if( is.array(data_manifold_model)){
+  if( is.array(data_manifold)){
     data_manifold = alply(data_manifold,3)
   }
 

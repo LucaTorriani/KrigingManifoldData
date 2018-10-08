@@ -58,7 +58,7 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
     stop("Geodist requires two coordinates")
   }
 
-  if( is.array(data_manifold_model)){
+  if( is.array(data_manifold)){
     data_manifold = alply(data_manifold,3)
   }
   coords = as.matrix(coords)
