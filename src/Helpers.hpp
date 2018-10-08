@@ -18,7 +18,7 @@ namespace matrix_manipulation {
 
   MatrixXd expMat(const MatrixXd&);
   MatrixXd logMat(const MatrixXd&);
-  MatrixXd sqrtMat(const Eigen::MatrixXd&);
+  MatrixXd sqrtMat(const MatrixXd&);
 
   std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd&, unsigned int);
   MatrixXd VecMatrices2bigMatrix(const std::vector<MatrixXd>&);
