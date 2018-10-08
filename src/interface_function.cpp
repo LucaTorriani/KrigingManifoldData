@@ -445,7 +445,7 @@ extern "C"{
 
     // Map functions
     map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
-    std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Tplane_name);
+    std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
     theExpMap->set_members(Sigma);
 
     // New coordinates
