@@ -161,10 +161,10 @@ extern "C"{
 
       unsigned int n_hh(1000);
       Vec hh(n_hh);
-      std::vector<double> emp_vario_values(emp_vario.get_card_h());
-      emp_vario_values = emp_vario.get_hvec();
+      std::vector<double> h_vario_values(emp_vario.get_card_h());
+      h_vario_values = emp_vario.get_hvec();
 
-      hh.setLinSpaced(n_hh, 0, *std::max_element(emp_vario_values.begin(), emp_vario_values.end()));
+      hh.setLinSpaced(n_hh, 0, *std::max_element(h_vario_values.begin(), h_vario_values.end()));
 
       Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
 
@@ -177,7 +177,7 @@ extern "C"{
                            Rcpp::Named("gamma_matrix") = gamma_matrix,
                            Rcpp::Named("residuals") = resVec,
                            Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
-                           Rcpp::Named("h_vec") = emp_vario.get_hvec(),
+                           Rcpp::Named("h_vec") = h_vario_values,
                            Rcpp::Named("fitted_par_vario") = parameters,
                            Rcpp::Named("iterations") = num_iter,
                            Rcpp::Named("Sigma")= Sigma);
