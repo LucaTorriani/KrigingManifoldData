@@ -3,6 +3,7 @@
 
 #include "EmpiricalVariogram.hpp"
 #include <iostream>
+#include <Rcpp.h>
 
 namespace variogram_evaluation {
 class FittedVariogram{

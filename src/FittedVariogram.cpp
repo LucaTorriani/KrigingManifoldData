@@ -183,15 +183,14 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   unsigned int card_h(emp_vario.get_card_h());
 
   if (card_h == 0) {
-    _parameters(0) = 1e-6;  // ?
-    _parameters(1) = 1e-6;  // ?
-    _parameters(2) = 1e-6;  // ?
+    throw std::invalid_argument("No empirical variogram values in the cell");
   }
   else if (card_h==1) {
     _parameters(0)= emp_vario_values[0];
     if (_parameters(0) == 0) _parameters(0) = 1e-6;
     _parameters(1)= _parameters(0);
     _parameters(2) = 1.0/3*hvec[0];  // ?
+    Rcpp::warning("Only 1 empirical variogram value in the cell");
   }
   else if (card_h==2){
     double tmp = weighted_median(emp_vario_values, N_hvec);
@@ -199,6 +198,7 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     _parameters(0)= tmp;
     _parameters(1)= tmp;
     _parameters(2) = 1.0/3*hvec[0]; // ?
+    Rcpp::warning("Only 2 empirical variogram values in the cell");
   }
   else if (card_h==3) {
     std::vector<double> first_two(2);
@@ -219,6 +219,8 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
       i++;
     }
     _parameters(2) = 1.0/3*hvec[i];
+    Rcpp::warning("Only 3 empirical variogram values in the cell");
+
   }
   else {
     std::vector<double> first_two(2);
@@ -284,15 +286,14 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   unsigned int card_h(emp_vario.get_card_h());
 
   if (card_h == 0) {
-    _parameters(0) = 1e-6;  // ?
-    _parameters(1) = 1e-6;  // ?
-    _parameters(2) = 1e-6;  // ?
+    throw std::invalid_argument("No empirical variogram values in the cell");
   }
   else if (card_h==1) {
     _parameters(0)= emp_vario_values[0];
     if (_parameters(0) == 0) _parameters(0) = 1e-6;
     _parameters(1)= _parameters(0);
     _parameters(2) = 1.0/3*hvec[0];  // ?
+    Rcpp::warning("Only 1 empirical variogram value in the cell");
   }
   else if (card_h==2){
     double tmp = weighted_median(emp_vario_values, N_hvec);
@@ -300,6 +301,7 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     _parameters(0)= tmp;
     _parameters(1)= tmp;
     _parameters(2) = 1.0/3*hvec[0]; // ?
+    Rcpp::warning("Only 2 empirical variogram values in the cell");
   }
   else if (card_h==3) {
     std::vector<double> first_two(2);
@@ -320,6 +322,7 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
       i++;
     }
     _parameters(2) = 1.0/3*hvec[i];
+    Rcpp::warning("Only 3 empirical variogram values in the cell");
   }
   else {
     std::vector<double> first_two(2);
@@ -398,15 +401,14 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   unsigned int card_h(emp_vario.get_card_h());
 
   if (card_h == 0) {
-    _parameters(0) = 1e-6;  // ?
-    _parameters(1) = 1e-6;  // ?
-    _parameters(2) = 1e-6;  // ?
+    throw std::invalid_argument("No empirical variogram values in the cell");
   }
   else if (card_h==1) {
     _parameters(0)= emp_vario_values[0];
     if (_parameters(0) == 0) _parameters(0) = 1e-6;
     _parameters(1)= _parameters(0);
     _parameters(2) = 1.0/3*hvec[0];  // ?
+    Rcpp::warning("Only 1 empirical variogram value in the cell");
   }
   else if (card_h==2){
     double tmp = weighted_median(emp_vario_values, N_hvec);
@@ -414,6 +416,7 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     _parameters(0)= tmp;
     _parameters(1)= tmp;
     _parameters(2) = 1.0/3*hvec[0]; // ?
+    Rcpp::warning("Only 2 empirical variogram values in the cell");
   }
   else if (card_h==3) {
     std::vector<double> first_two(2);
@@ -434,6 +437,7 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
       i++;
     }
     _parameters(2) = 1.0/3*hvec[i];
+    Rcpp::warning("Only 3 empirical variogram values in the cell");
   }
   else {
     std::vector<double> first_two(2);
