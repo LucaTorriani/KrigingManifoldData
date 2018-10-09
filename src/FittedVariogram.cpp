@@ -281,38 +281,77 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   std::vector<double> emp_vario_values(emp_vario.get_emp_vario_values());
   std::vector<unsigned int> N_hvec(emp_vario.get_N_hvec());
   std::vector<double> hvec(emp_vario.get_hvec());
-
-  std::vector<double> first_two(2);
-  first_two[0] = emp_vario_values[0];
-  first_two[1] = emp_vario_values[1];
-
   unsigned int card_h(emp_vario.get_card_h());
-  std::vector<double> last_four(4);
-  last_four[0] = emp_vario_values[card_h-4];
-  last_four[1] = emp_vario_values[card_h-3];
-  last_four[2] = emp_vario_values[card_h-2];
-  last_four[3] = emp_vario_values[card_h-1];
 
-  std::vector<unsigned int> N_h_first_two(2);
-  N_h_first_two[0] = N_hvec[0];
-  N_h_first_two[1] = N_hvec[1];
-  std::vector<unsigned int> N_h_last_four(4);
-  N_h_last_four[0] = N_hvec[card_h-4];
-  N_h_last_four[1] = N_hvec[card_h-3];
-  N_h_last_four[2] = N_hvec[card_h-2];
-  N_h_last_four[3] = N_hvec[card_h-1];
-
-  double sill = weighted_median(last_four, N_h_last_four);
-  _parameters(0) = weighted_median(first_two, N_h_first_two);
-  if (_parameters(0) == 0) _parameters(0) = 1e-6;
-  _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
-
-  double tol = 0.0505*sill;
-  size_t i = 0;
-  while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
-    i++;
+  if (card_h == 0) {
+    _parameters(0) = 1e-6;  // ?
+    _parameters(1) = 1e-6;  // ?
+    _parameters(2) = 1e-6;  // ?
   }
-  _parameters(2) = 1.0/3*hvec[i];
+  else if (card_h==1) {
+    _parameters(0)= emp_vario_values[0];
+    if (_parameters(0) == 0) _parameters(0) = 1e-6;
+    _parameters(1)= _parameters(0);
+    _parameters(2) = 1.0/3*hvec[0];  // ?
+  }
+  else if (card_h==2){
+    double tmp = weighted_median(emp_vario_values, N_hvec);
+    if(tmp==0) tmp = 1e-6;
+    _parameters(0)= tmp;
+    _parameters(1)= tmp;
+    _parameters(2) = 1.0/3*hvec[0]; // ?
+  }
+  else if (card_h==3) {
+    std::vector<double> first_two(2);
+    first_two[0] = emp_vario_values[0];
+    first_two[1] = emp_vario_values[1];
+    std::vector<unsigned int> N_h_first_two(2);
+    N_h_first_two[0] = N_hvec[0];
+    N_h_first_two[1] = N_hvec[1];
+
+    double sill = weighted_median(emp_vario_values, N_hvec);
+    _parameters(0) = weighted_median(first_two, N_h_first_two);
+    if (_parameters(0) == 0) _parameters(0) = 1e-6;
+    _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
+
+    double tol = 0.0505*sill;
+    size_t i = 0;
+    while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
+      i++;
+    }
+    _parameters(2) = 1.0/3*hvec[i];
+  }
+  else {
+    std::vector<double> first_two(2);
+    first_two[0] = emp_vario_values[0];
+    first_two[1] = emp_vario_values[1];
+    std::vector<unsigned int> N_h_first_two(2);
+    N_h_first_two[0] = N_hvec[0];
+    N_h_first_two[1] = N_hvec[1];
+
+    std::vector<double> last_four(4);
+    last_four[0] = emp_vario_values[card_h-4];
+    last_four[1] = emp_vario_values[card_h-3];
+    last_four[2] = emp_vario_values[card_h-2];
+    last_four[3] = emp_vario_values[card_h-1];
+    std::vector<unsigned int> N_h_last_four(4);
+    N_h_last_four[0] = N_hvec[card_h-4];
+    N_h_last_four[1] = N_hvec[card_h-3];
+    N_h_last_four[2] = N_hvec[card_h-2];
+    N_h_last_four[3] = N_hvec[card_h-1];
+
+    double sill = weighted_median(last_four, N_h_last_four);
+    _parameters(0) = weighted_median(first_two, N_h_first_two);
+    if (_parameters(0) == 0) _parameters(0) = 1e-6;
+    _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
+
+    double tol = 0.0505*sill;
+    size_t i = 0;
+    while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
+      i++;
+    }
+    _parameters(2) = 1.0/3*hvec[i];
+  }
 }
 
 
@@ -356,39 +395,77 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
   std::vector<double> emp_vario_values(emp_vario.get_emp_vario_values());
   std::vector<unsigned int> N_hvec(emp_vario.get_N_hvec());
   std::vector<double> hvec(emp_vario.get_hvec());
-
-  std::vector<double> first_two(2);
-  first_two[0] = emp_vario_values[0];
-  first_two[1] = emp_vario_values[1];
-
   unsigned int card_h(emp_vario.get_card_h());
-  std::vector<double> last_four(4);
-  last_four[0] = emp_vario_values[card_h-4];
-  last_four[1] = emp_vario_values[card_h-3];
-  last_four[2] = emp_vario_values[card_h-2];
-  last_four[3] = emp_vario_values[card_h-1];
 
-  std::vector<unsigned int> N_h_first_two(2);
-  N_h_first_two[0] = N_hvec[0];
-  N_h_first_two[1] = N_hvec[1];
-  std::vector<unsigned int> N_h_last_four(4);
-  N_h_last_four[0] = N_hvec[card_h-4];
-  N_h_last_four[1] = N_hvec[card_h-3];
-  N_h_last_four[2] = N_hvec[card_h-2];
-  N_h_last_four[3] = N_hvec[card_h-1];
-
-  double sill(weighted_median(last_four, N_h_last_four));
-
-  _parameters(0) = weighted_median(first_two, N_h_first_two);
-  if (_parameters(0) == 0) _parameters(0) = 1e-6;
-  _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
-
-  double tol = 0.01*sill;
-  size_t i = 0;
-  while (std::abs(emp_vario_values[i]-sill) > tol) {
-    i++;
+  if (card_h == 0) {
+    _parameters(0) = 1e-6;  // ?
+    _parameters(1) = 1e-6;  // ?
+    _parameters(2) = 1e-6;  // ?
   }
-  _parameters(2) = hvec[i];
+  else if (card_h==1) {
+    _parameters(0)= emp_vario_values[0];
+    if (_parameters(0) == 0) _parameters(0) = 1e-6;
+    _parameters(1)= _parameters(0);
+    _parameters(2) = 1.0/3*hvec[0];  // ?
+  }
+  else if (card_h==2){
+    double tmp = weighted_median(emp_vario_values, N_hvec);
+    if(tmp==0) tmp = 1e-6;
+    _parameters(0)= tmp;
+    _parameters(1)= tmp;
+    _parameters(2) = 1.0/3*hvec[0]; // ?
+  }
+  else if (card_h==3) {
+    std::vector<double> first_two(2);
+    first_two[0] = emp_vario_values[0];
+    first_two[1] = emp_vario_values[1];
+    std::vector<unsigned int> N_h_first_two(2);
+    N_h_first_two[0] = N_hvec[0];
+    N_h_first_two[1] = N_hvec[1];
+
+    double sill = weighted_median(emp_vario_values, N_hvec);
+    _parameters(0) = weighted_median(first_two, N_h_first_two);
+    if (_parameters(0) == 0) _parameters(0) = 1e-6;
+    _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
+
+    double tol = 0.0505*sill;
+    size_t i = 0;
+    while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
+      i++;
+    }
+    _parameters(2) = 1.0/3*hvec[i];
+  }
+  else {
+    std::vector<double> first_two(2);
+    first_two[0] = emp_vario_values[0];
+    first_two[1] = emp_vario_values[1];
+    std::vector<unsigned int> N_h_first_two(2);
+    N_h_first_two[0] = N_hvec[0];
+    N_h_first_two[1] = N_hvec[1];
+
+    std::vector<double> last_four(4);
+    last_four[0] = emp_vario_values[card_h-4];
+    last_four[1] = emp_vario_values[card_h-3];
+    last_four[2] = emp_vario_values[card_h-2];
+    last_four[3] = emp_vario_values[card_h-1];
+    std::vector<unsigned int> N_h_last_four(4);
+    N_h_last_four[0] = N_hvec[card_h-4];
+    N_h_last_four[1] = N_hvec[card_h-3];
+    N_h_last_four[2] = N_hvec[card_h-2];
+    N_h_last_four[3] = N_hvec[card_h-1];
+
+    double sill = weighted_median(last_four, N_h_last_four);
+    _parameters(0) = weighted_median(first_two, N_h_first_two);
+    if (_parameters(0) == 0) _parameters(0) = 1e-6;
+    _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
+
+    double tol = 0.01*sill;
+    size_t i = 0;
+    while (std::abs(emp_vario_values[i]-sill) > tol) {
+      i++;
+    }
+    _parameters(2) = hvec[i];
+  }
 }
 
 Vector3d FittedVariogram::get_parameters() const{
