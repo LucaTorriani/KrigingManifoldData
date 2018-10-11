@@ -19,7 +19,7 @@
 
 extern "C"{
 
-// CREATE MODEL
+  // CREATE MODEL
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic) {
@@ -186,8 +186,7 @@ extern "C"{
       END_RCPP
   }
 
-
-// KRIGING
+  // KRIGING
   RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
     SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, SEXP s_X_new) {
@@ -284,7 +283,6 @@ extern "C"{
     return Rcpp::wrap(result);
     END_RCPP
   }
-
 
   // CREATE MODEL AND KRIGNG
   RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
@@ -502,8 +500,8 @@ extern "C"{
     END_RCPP
     }
 
-// INTRINSIC MEAN
-RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
+  // INTRINSIC MEAN
+  RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
   SEXP s_tolerance, SEXP s_weight) {
     BEGIN_RCPP
     // Data
@@ -583,5 +581,41 @@ RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, S
     END_RCPP
 }
 
+  // INTRINSIC MEAN
+  RcppExport SEXP distance_manifold (SEXP s_data1, SEXP s_data2, SEXP s_N1, SEXP s_N2, SEXP s_manifold_metric) {
+    BEGIN_RCPP
+    // Data1
+    unsigned int N1(Rcpp::as<unsigned int> (s_N1));
+    std::vector<Eigen::MatrixXd> data1(N1);
+    for(size_t i=0; i<N1; i++){
+      data1[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data1,i));
+    }
 
+    // Data2
+    unsigned int N2(Rcpp::as<unsigned int> (s_N2));
+    std::vector<Eigen::MatrixXd> data2(N1);
+    for(size_t i=0; i<N2; i++){
+      data2[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data2,i));
+    }
+
+    // Distance manifold
+    std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, FrobeniusScaled)
+    manifold_factory::ManifoldFactory& manifold_fac (manifold_factory::ManifoldFactory::Instance());
+    std::unique_ptr<distances_manifold::DistanceManifold> theManifoldDist = manifold_fac.create(distance_Manifold_name);
+
+    std::vector<double> dist_vec(N1);
+    if (N2==1) {
+      for(size_t i=0; i<N1; i++) {
+        dist_vec[i] = theManifoldDist->compute_distance(data1[i],data2[0]);
+      }
+    }
+    else {
+      for (size_t i=0; i<N1; i++) {
+        dist_vec[i] = theManifoldDist->compute_distance(data1[i],data2[i]);
+      }
+    }
+
+    return Rcpp::wrap(dist_vec);
+    END_RCPP
+}
 }
