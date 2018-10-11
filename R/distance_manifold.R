@@ -1,8 +1,8 @@
 #' Distance on the manifold
 #'
 #' @param data1 list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}
-#' @param data2 can be a list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}. 
-#' Or it can be a single \code{nxn} matrix.
+#' @param data2 a list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}. 
+#' Or a single \code{nxn} matrix.
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @description Compute the manifold distance between symmetric positive definite matrices
 #' @details If \code{B2}=\code{B1} then the result is a vector of length \code{B1=B2} containing in position \code{i} the manifold distance beetween \code{data1[,,i]} and \code{data2[,,i]}.
@@ -20,7 +20,7 @@ distance_manifold = function(data1, data2, metric_manifold = "Frobenius", metric
   }
   if(is.array(data2)){
     if(length(dim(data2))==3) data2 = alply(data2,3)
-    if(length(dim(data2))==2) data2 = list(A)
+    if(length(dim(data2))==2) data2 = list(data2)
   }
   
   N1=length(data1)
