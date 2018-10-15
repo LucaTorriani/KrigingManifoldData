@@ -8,18 +8,18 @@ model_kriging(data_manifold, coords, X = NULL, Sigma,
   metric_manifold = "Frobenius", metric_ts = "Frobenius",
   model_ts = "Additive", vario_model = "Gaussian", n_h = 15,
   distance = "Geodist", max_it = 100, tolerance = 1e-06,
-  weight_vario = NULL, weight_intrinsic = NULL,
-  tolerance_intrinsic = 1e-06, new_coords, X_new = NULL, plot = TRUE)
+  weight_intrinsic = NULL, tolerance_intrinsic = 1e-06,
+  param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE)
 }
 \arguments{
-\item{data_manifold}{list or array [\code{n,n,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}}
+\item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
 
 \item{coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 be provided in signed decimal degrees}
 
 \item{X}{matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL}
 
-\item{Sigma}{\code{n*n} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
+\item{Sigma}{\code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
 of \code{data_manifold}}
 
 \item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
@@ -38,13 +38,20 @@ of \code{data_manifold}}
 
 \item{tolerance}{tolerance for the main loop}
 
-\item{weight_vario}{vector of length \code{N} to weight the locations in the computation of the empirical variogram. If NULL
-a vector of ones is used}
-
 \item{weight_intrinsic}{vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
 a vector of ones is used. Not needed if Sigma is provided}
 
 \item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided}
+
+\item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram: 
+\code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram), 
+\code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), 
+\code{data_tspace_tot} (\code{N_tot*((p*(p+1))/2)} matrix where the i-th row represents projection on the tangent space of the i-th manifold data. It can be computed using .Call("map2_tangent_space")), 
+\code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
+be provided in signed decimal degrees), 
+\code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 
+\code{h_max} (maximum value of distance for which the variogram is computed)
+\code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot})}
 
 \item{new_coords}{matrix of coordinates for the new locations where to perform kriging}
 
@@ -90,7 +97,6 @@ result = model_kriging (data_manifold = data_manifold_model, coords = coords_mod
 result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
-
 x.min=min(coords_tot[,1])
 x.max=max(coords_tot[,1])
 y.min=min(coords_tot[,2])

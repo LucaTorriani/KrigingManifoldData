@@ -1,10 +1,10 @@
 #' Create a GLS model
 #'
-#' @param data_manifold list or array [\code{n,n,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}
+#' @param data_manifold list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
 #' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
-#' @param Sigma \code{n*n} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
+#' @param Sigma \code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
 #' of \code{data_manifold}
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
@@ -50,42 +50,70 @@
 #' @export
 
 model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manifold = "Frobenius",
-                                 metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
-                                 n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_vario = NULL,
-                                 weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, plot = FALSE){
-
+                     metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
+                     n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6,
+                     weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, param_weighted_vario = NULL, plot = FALSE){
+  
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
   }
-
-  if( is.array(data_manifold)){
+  coords = as.matrix(coords)
+  
+  if(is.array(data_manifold)) {
     data_manifold = alply(data_manifold,3)
   }
-  coords = as.matrix(coords)
-
   if(length(data_manifold) != dim(coords)[1]){
     stop("Dimension of data_manifold and coords must agree")
   }
-
+  
   if(!is.null(X)) {
     X = as.matrix(X)
     check = (dim(X)[1] == dim(coords)[1])
     if(!check) stop("X and coords must have the same number of rows")
   }
-
+  
   if(is.null(Sigma)){
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
-
-  result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                        n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic )
-
+  
+  if(!is.null(param_weighted_vario)){
+    param_weighted_vario$coords_tot = as.matrix(param_weighted_vario$coords_tot)
+    N_tot = length(param_weighted_vario$weight_vario)
+    
+    if ( (dim(param_weighted_vario$coords_tot)[1] != N_tot) || 
+         dim(param_weighted_vario$data_tspace_tot)[1] != N_tot ||
+         dim(param_weighted_vario$distance_matrix_tot)[1] != N_tot ||
+         dim(param_weighted_vario$distance_matrix_tot)[2] != N_tot){
+      stop("Dimensions of weight_vario, coords_tot, data_tspace_tot and distance_matrix_tot must agree")
+    } 
+    
+    if(!is.null(param_weighted_vario$X_tot)) {
+      param_weighted_vario$X_tot = as.matrix(param_weighted_vario$X_tot)
+      check = (dim(param_weighted_vario$X_tot)[1] == N_tot && dim(param_weighted_vario$X_tot)[2]==dim(X)[2])
+      if(!check) stop("X_tot must have the same number of rows of coords_tot and the same number of columns of X")
+    }
+    
+    if(length(param_weighted_vario) != 6) stop("Param_weighter_vario must be a list with length 6")
+    
+    result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+                  n_h, max_it, tolerance, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot, 
+                  param_weighted_vario$data_tspace_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
+                  param_weighted_vario$h_max, weight_intrinsic, tolerance_intrinsic)
+  }
+  
+  else {
+    result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+                  n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_tspace_tot = NULL, 
+                  coords_tot = NULL, X_tot = NULL, h_max = NULL, weight_intrinsic, tolerance_intrinsic)
+    
+  }
+  
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
-
+  
   if(plot){
-  plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
-                distance = distance)
+    plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
+                   distance = distance)
   }
   result_list = result[-c(2,3)]
   return (result_list)

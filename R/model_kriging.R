@@ -1,10 +1,10 @@
 #' Create a GLS model and directly perform kriging
-#'
-#' @param data_manifold list or array [\code{n,n,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}
+#' 
+#' @param data_manifold list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
 #' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
-#' @param Sigma \code{n*n} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
+#' @param Sigma \code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
 #' of \code{data_manifold}
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
@@ -14,11 +14,18 @@
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
 #' @param max_it max number of iterations for the main loop
 #' @param tolerance tolerance for the main loop
-#' @param weight_vario vector of length \code{N} to weight the locations in the computation of the empirical variogram. If NULL
-#' a vector of ones is used
 #' @param weight_intrinsic vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
 #' a vector of ones is used. Not needed if Sigma is provided
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
+#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram: 
+#' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram), 
+#' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), 
+#' \code{data_tspace_tot} (\code{N_tot*((p*(p+1))/2)} matrix where the i-th row represents projection on the tangent space of the i-th manifold data. It can be computed using .Call("map2_tangent_space")), 
+#' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
+#' be provided in signed decimal degrees), 
+#' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 
+#' \code{h_max} (maximum value of distance for which the variogram is computed)
+#' \code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot})
 #' @param new_coords matrix of coordinates for the new locations where to perform kriging
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
@@ -57,7 +64,6 @@
 #' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
 #'                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
 #'                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
-#'
 #' x.min=min(coords_tot[,1])
 #' x.max=max(coords_tot[,1])
 #' y.min=min(coords_tot[,2])
@@ -86,18 +92,19 @@
 #' rect(x.min, y.min, x.max, y.max)
 #' @useDynLib Manifoldgstat
 #' @export
-
-model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold = "Frobenius",
-                                 metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
-                                 n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_vario = NULL,
-                                 weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, new_coords, X_new = NULL, plot = TRUE){
-
+#' 
+model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifold = "Frobenius",
+                             metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
+                             n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL, 
+                             tolerance_intrinsic = 1e-6, param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE){
+  
+  
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
   }
   coords = as.matrix(coords)
   new_coords = as.matrix(new_coords)
-
+  
   if(!is.null(X)) {
     X = as.matrix(X)
     check = (dim(X)[1] == dim(coords)[1])
@@ -113,30 +120,62 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold
   else {
     if (!is.null(X_new)) stop("X and X_new must have the same number of columns")
   }
-
+  
   if( is.array(data_manifold)){
     data_manifold = alply(data_manifold,3)
   }
-
+  
   if(length(data_manifold) != dim(coords)[1]){
     stop("Dimension of data_manifold and coords must agree")
   }
-
+  
   if(is.null(Sigma)){
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
-
-  result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic, new_coords, X_new )
-
+  
+  # controllare che else faccia riferimento a if precedente
+  
+  if(!is.null(param_weighted_vario)){
+    param_weighted_vario$coords_tot = as.matrix(param_weighted_vario$coords_tot)
+    N_tot = length(param_weighted_vario$weight_vario)
+    
+    if ( (dim(param_weighted_vario$coords_tot)[1] != N_tot) || 
+         dim(param_weighted_vario$data_tspace_tot)[1] != N_tot ||
+         dim(param_weighted_vario$distance_matrix_tot)[1] != N_tot ||
+         dim(param_weighted_vario$distance_matrix_tot)[2] != N_tot){
+      stop("Dimensions of weight_vario, coords_tot, data_tspace_tot and distance_matrix_tot must agree")
+    } 
+    
+    if(!is.null(param_weighted_vario$X_tot)) {
+      param_weighted_vario$X_tot = as.matrix(param_weighted_vario$X_tot)
+      check = (dim(param_weighted_vario$X_tot)[1] == N_tot && dim(param_weighted_vario$X_tot)[2]==dim(X)[2])
+      if(!check) stop("X_tot must have the same number of rows of coords_tot and the same number of columns of X")
+    }
+    
+    if(length(param_weighted_vario) != 7) stop("Param_weighter_vario must be a list with length 7")
+    
+    result =.Call("model_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+                  n_h, max_it, tolerance, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot, 
+                  param_weighted_vario$data_tspace_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
+                  param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, new_coords, X_new )
+  }
+  
+  else {
+    result =.Call("model_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+                  n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_tspace_tot = NULL, 
+                  coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model = NULL, weight_intrinsic, tolerance_intrinsic, new_coords, X_new)
+    
+  }
+  
+  
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
-
+  
   if(plot){
     plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
-                 distance = distance)
+                   distance = distance)
   }
-
+  
   result_list = result[-c(2,3)]
   return (result_list)
 }
