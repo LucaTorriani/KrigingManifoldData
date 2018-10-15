@@ -4,22 +4,26 @@
 using namespace variogram_evaluation;
 
 // EmpiricalVariogram
-EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const std::shared_ptr<const SpMat> distanceMatrix):
-  _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceMatrix(distanceMatrix), _n_h(n_h) {
-    compute_hmax(coords, distance);
-    _d.resize(n_h +1);
-    _d.setLinSpaced(n_h+1, 0, _hmax);
-    _weights.resize(_N);
-    _weights.setOnes(_N);
+EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h, unsigned int N, unsigned int p,
+                                        const Coordinates& coords, const distances::Distance& distance)  :
+   _N(coords.get_N_station()), _p(coords.get_n_coords()), _distanceMatrix(distanceMatrix), _n_h(n_h), _hvec(n_h),
+   _emp_vario_values(_n_h), _N_hvec(_n_h), _d(_n_h+1), _weights(_N) {
+      compute_hmax(coords, distance);
+      // _d.resize(n_h +1);
+      _d.setLinSpaced(n_h+1, 0, _hmax);
+      // _weights.resize(_N);
+      _weights.setOnes(_N);
+}
+
+EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h, unsigned int N, unsigned int p,  // KERNEL
+                                        const Vec& weights, double hmax):
+    _n_h(n_h), _N(N), _p(p), _distanceMatrix(distanceMatrix), _weights(weights), _hmax(hmax), _hvec(n_h),_emp_vario_values(_n_h), _N_hvec(_n_h), _d(_n_h+1)  {
+      // _d.resize(n_h +1);
+      _d.setLinSpaced(n_h+1, 0, _hmax);
 }
 
 unsigned int EmpiricalVariogram::get_N() const {
   return _N;
-}
-
-
-void EmpiricalVariogram::set_weight(const Vec& weights){
-  _weights = weights;
 }
 
 void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res, const distances_tplane::DistanceTplane & distanceTplane) {
@@ -38,7 +42,7 @@ void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res, cons
     for (size_t i =0; i<(_N-1); i++) {
 
       for (size_t j=(i+1); j<_N; j++) {
-        if (_distanceMatrix->coeff(i,j) >= _d(l-1) && _distanceMatrix->coeff(i,j) <= _d(l)) {
+        if ((*_distanceMatrix)(i,j) >= _d(l-1) && (*_distanceMatrix)(i,j) <= _d(l)) {
           double tmp(distanceTplane.compute_distance(res[i], res[j]));
           tplanedist2_ij.push_back( tmp*tmp );
           w_ij.push_back(_weights(i)*_weights(j));
