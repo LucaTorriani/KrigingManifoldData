@@ -154,14 +154,14 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
     
     if(length(param_weighted_vario) != 7) stop("Param_weighter_vario must be a list with length 7")
     
-    result =.Call("model_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+    result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot, 
                   param_weighted_vario$data_tspace_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
                   param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, new_coords, X_new )
   }
   
   else {
-    result =.Call("model_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+    result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_tspace_tot = NULL, 
                   coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model = NULL, weight_intrinsic, tolerance_intrinsic, new_coords, X_new)
     
