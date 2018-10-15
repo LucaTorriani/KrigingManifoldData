@@ -50,12 +50,11 @@ std::shared_ptr<const MatrixXd> Distance::create_distance_matrix(const Coordinat
 
   MatrixXd distance_matrix(N, N);
 
-  std::vector<TripType> tripletList;
-  tripletList.reserve((N*(N-1))/2);
   for (size_t i=0; i<(N-1); i++ ) {
     distance_matrix(i,i) = 0;
     for (size_t j=(i+1); j<N; j++ ) {
       distance_matrix(i,j)=compute_distance(coords->row(i), coords->row(j));
+      distance_matrix(j,i)=distance_matrix(i,j);
     }
   }
 
