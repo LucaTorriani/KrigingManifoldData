@@ -12,7 +12,7 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
   inv_gamma_matrix= gamma_matrix.llt().solve(Id);
 
   MatrixXd A(_num_cov, _num_cov);
-  A.triangularView<Lower>() = (_design_matrix->transpose()) *inv_gamma_matrix* (*(_design_matrix));
+  A.triangularView<Lower>() = (_design_matrix_model->transpose()) *inv_gamma_matrix* (*(_design_matrix_model));
   A.triangularView<StrictlyUpper>() = A.transpose();
 
   LDLT<MatrixXd> solver(_num_cov);
@@ -22,7 +22,7 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
   Vec y(_N);
 
   MatrixXd tmp(_num_cov, _N);
-  tmp = (_design_matrix->transpose())*inv_gamma_matrix;
+  tmp = (_design_matrix_model->transpose())*inv_gamma_matrix;
 
   for(size_t l=0; l< _num_coeff; l++){
     y = _data_tspace->col(l);
@@ -30,7 +30,7 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
     _beta_matrix.col(l) = solver.solve(b);
   }
 
-  _fitted_values = (*(_design_matrix))*_beta_matrix;
+  _fitted_values = (*(_design_matrix_tot))*_beta_matrix;
   _residuals = *(_data_tspace) - _fitted_values;
 }
 
