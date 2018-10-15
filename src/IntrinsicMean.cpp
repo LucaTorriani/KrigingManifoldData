@@ -10,7 +10,7 @@ MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>& data_manifold,  map_funct
 
     // Punto tangente
     Eigen::MatrixXd Sigma((data_manifold)[0]);
-    unsigned int p = Sigma.rows();
+    unsigned int n = Sigma.rows();
 
 
     logMap.set_members(Sigma);
@@ -18,8 +18,8 @@ MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>& data_manifold,  map_funct
     distanceTplane.set_members(Sigma);
 
     // CODE
-    Eigen::MatrixXd Xk(p,p);
-    Eigen::MatrixXd Xk_prec(p,p);
+    Eigen::MatrixXd Xk(n,n);
+    Eigen::MatrixXd Xk_prec(n,n);
 
     Xk = data_manifold[0];
 

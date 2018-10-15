@@ -45,21 +45,21 @@ double GeoDist::compute_distance(const Vec& P1, const Vec& P2) const{
 
 }
 
-std::shared_ptr<const MatrixXd> Distance::create_distance_matrix(const Coordinates & coordinates, unsigned int N) const{
+std::shared_ptr<const SpMat> Distance::create_distance_matrix(const Coordinates & coordinates, unsigned int N) const{
   const std::shared_ptr<const MatrixXd> coords = coordinates.get_coords();
-
-  MatrixXd distance_matrix(N, N);
 
   std::vector<TripType> tripletList;
   tripletList.reserve((N*(N-1))/2);
   for (size_t i=0; i<(N-1); i++ ) {
-    distance_matrix(i,i) = 0;
     for (size_t j=(i+1); j<N; j++ ) {
-      distance_matrix(i,j)=compute_distance(coords->row(i), coords->row(j));
+      tripletList.push_back( TripType(i,j,compute_distance(coords->row(i), coords->row(j))) );
     }
   }
 
-  return (std::make_shared<const MatrixXd> (distance_matrix+distance_matrix.transpose()));
+  SpMat distance_matrix(N, N);
+  distance_matrix.setFromTriplets(tripletList.begin(), tripletList.end());
+
+  return (std::make_shared<const SpMat> (distance_matrix));
 }
 
 std::vector<double> Distance::create_distance_vector(const Coordinates & coordinates, const Vec & new_coord) const{

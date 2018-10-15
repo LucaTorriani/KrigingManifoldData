@@ -124,14 +124,14 @@ double FittedVariogram::get_covario_univ(const double & h) const {
   return _parameters(0) + _parameters(1) - get_vario_univ(h);
 }
 
-MatrixXd FittedVariogram::compute_gamma_matrix(const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int N) const{
+MatrixXd FittedVariogram::compute_gamma_matrix(const std::shared_ptr<const SpMat> distanceMatrix, unsigned int N) const{
   MatrixXd gamma_matrix(N,N);
   double c0 = get_covario_univ(0);
 
   for (size_t i=0; i<(N-1); i++ ) {
     gamma_matrix(i,i) = c0;
     for (size_t j=(i+1); j<N; j++ ) {
-      gamma_matrix(i,j) = get_covario_univ((*distanceMatrix)(i,j));
+      gamma_matrix(i,j) = get_covario_univ(distanceMatrix->coeff(i,j));
       gamma_matrix(j,i) = gamma_matrix(i,j);
     }
   }

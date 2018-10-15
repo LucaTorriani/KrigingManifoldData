@@ -6,10 +6,10 @@ using namespace distances_manifold;
 
 // FROBENIUS
 double Frobenius::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const{
-  unsigned int p(M1.cols());
-  Eigen::LDLT<MatrixXd> solver(p);
+  unsigned int n(M1.cols());
+  Eigen::LDLT<MatrixXd> solver(n);
   solver.compute(M1);
-  MatrixXd matrix_result(p,p);
+  MatrixXd matrix_result(n,n);
   matrix_result = solver.solve(M2);
 
   VectorXcd eigenvalues =  matrix_result.eigenvalues();
@@ -21,15 +21,15 @@ double Frobenius::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const
 
 // LOGEUCLIDEAN
 double LogEuclidean::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const {
-  unsigned int p = M1.cols();
-  MatrixXd tmp(p,p);
+  unsigned int n = M1.cols();
+  MatrixXd tmp(n,n);
   tmp =  (matrix_manipulation::logMat(M1)-matrix_manipulation::logMat(M2));
   return ( tmp.norm());}
 
 // SQROOT
 double SqRoot::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const {
-  unsigned int p = M1.cols();
-  MatrixXd tmp(p,p);
+  unsigned int n = M1.cols();
+  MatrixXd tmp(n,n);
   tmp = matrix_manipulation::sqrtMat(M1)-matrix_manipulation::sqrtMat(M2);
   return ( tmp.norm());
 }
