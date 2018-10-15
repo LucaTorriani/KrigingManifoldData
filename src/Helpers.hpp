@@ -8,7 +8,6 @@
 #include <Eigen/SparseCholesky>
 #include <cmath>
 
-typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::VectorXd Vec;
 typedef Eigen::Triplet<double> TripType;
 

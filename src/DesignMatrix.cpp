@@ -12,11 +12,11 @@ MatrixXd InterceptDM::compute_design_matrix(const Coordinates& coords) const {
 
 MatrixXd InterceptDM::compute_design_matrix(const Coordinates& coords, const MatrixXd& X) const{
   const unsigned int N(coords.get_N_station());
-  const unsigned int n(X.cols());
+  const unsigned int p(X.cols());
 
-  MatrixXd Z(N,n+1);
+  MatrixXd Z(N,p+1);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
-  Z.block(0,1, N,n) = X;
+  Z.block(0,1, N,p) = X;
 
   return(Z);
 }
@@ -32,12 +32,12 @@ MatrixXd Coord1DM::compute_design_matrix(const Coordinates& coords) const{
 
 MatrixXd Coord1DM::compute_design_matrix(const Coordinates& coords, const MatrixXd& X) const {
   const unsigned int N(coords.get_N_station());
-  const unsigned int n(X.cols());
+  const unsigned int p(X.cols());
 
-  MatrixXd Z(N,n+2);
+  MatrixXd Z(N,p+2);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
   Z.block(0,1,N,1) = (coords.get_coords())->col(0);
-  Z.block(0,2, N,n) = X;
+  Z.block(0,2, N,p) = X;
 
   return(Z);
 }
@@ -53,12 +53,12 @@ MatrixXd Coord2DM::compute_design_matrix(const Coordinates& coords) const{
 
 MatrixXd Coord2DM::compute_design_matrix(const Coordinates& coords, const MatrixXd& X) const {
   const unsigned int N(coords.get_N_station());
-  const unsigned int n(X.cols());
+  const unsigned int p(X.cols());
 
-  MatrixXd Z(N,n+2);
+  MatrixXd Z(N,p+2);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
   Z.block(0,1,N,1) = (coords.get_coords())->col(1);
-  Z.block(0,2, N,n) = X;
+  Z.block(0,2, N,p) = X;
 
   return(Z);
 }
@@ -74,12 +74,12 @@ MatrixXd AdditiveDM::compute_design_matrix(const Coordinates& coords) const{
 
 MatrixXd AdditiveDM::compute_design_matrix(const Coordinates& coords, const MatrixXd& X) const {
   const unsigned int N(coords.get_N_station());
-  const unsigned int n(X.cols());
+  const unsigned int p(X.cols());
 
-  MatrixXd Z(N,n+3);
+  MatrixXd Z(N,p+3);
   Z.block(0,0,N,1) = MatrixXd::Ones(N,1);
   Z.block(0,1,N,2) = *(coords.get_coords());
-  Z.block(0,3, N,n) = X;
+  Z.block(0,3, N,p) = X;
 
   return(Z);
 }
