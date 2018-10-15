@@ -12,7 +12,7 @@ class EmpiricalVariogram {
   // Costanti
   const unsigned int _n_h;
   const unsigned int _N;
-  const unsigned int _p;
+  const unsigned int _n;
   const std::shared_ptr<const MatrixXd> _distanceMatrix;
 
   // Variano
