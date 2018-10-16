@@ -12,7 +12,6 @@ class EmpiricalVariogram {
   // Costanti
   const unsigned int _n_h;
   const unsigned int _N;
-  const unsigned int _n;
   const std::shared_ptr<const MatrixXd> _distanceMatrix;
 
   // Variano
@@ -30,9 +29,9 @@ class EmpiricalVariogram {
 
 public:
   // EmpiricalVariogram()= default;
-  EmpiricalVariogram (const std::shared_ptr<const MatrixXd>, unsigned int, unsigned int, unsigned int,  // EQUAL WEIGHTS
+  EmpiricalVariogram (const std::shared_ptr<const MatrixXd>, unsigned int,  // EQUAL WEIGHTS
                       const Coordinates&, const distances::Distance&);
-  EmpiricalVariogram (const std::shared_ptr<const MatrixXd>, unsigned int, unsigned int, unsigned int,  // KERNEL
+  EmpiricalVariogram (const std::shared_ptr<const MatrixXd>, unsigned int, unsigned int,  // KERNEL
                       const Vec&, double);
   void update_emp_vario(const std::vector<MatrixXd>&, const distances_tplane::DistanceTplane &);
   std::vector<double> get_emp_vario_values () const;

@@ -4,9 +4,9 @@
 using namespace variogram_evaluation;
 
 // EmpiricalVariogram
-EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h, unsigned int N, unsigned int n,
+EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h, 
                                         const Coordinates& coords, const distances::Distance& distance)  :
-    _n_h(n_h), _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceMatrix(distanceMatrix),
+    _n_h(n_h), _N(coords.get_N_station()), _distanceMatrix(distanceMatrix),
    _emp_vario_values(_n_h), _hvec(n_h), _N_hvec(_n_h), _d(_n_h+1), _weights(_N) {
       compute_hmax(coords, distance);
       // _d.resize(n_h +1);
@@ -15,9 +15,9 @@ EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> di
       _weights.setOnes(_N);
 }
 
-EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h, unsigned int N, unsigned int n,  // KERNEL
+EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h, unsigned int N,  // KERNEL
                                         const Vec& weights, double hmax):
-    _n_h(n_h), _N(N), _n(n), _distanceMatrix(distanceMatrix), _emp_vario_values(_n_h),_hvec(n_h), _N_hvec(_n_h), _d(_n_h+1), _hmax(hmax), _weights(weights)  {
+    _n_h(n_h), _N(N), _distanceMatrix(distanceMatrix), _emp_vario_values(_n_h),_hvec(n_h), _N_hvec(_n_h), _d(_n_h+1), _hmax(hmax), _weights(weights)  {
       // _d.resize(n_h +1);
       _d.setLinSpaced(n_h+1, 0, _hmax);
 }

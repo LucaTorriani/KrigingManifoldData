@@ -119,7 +119,7 @@ extern "C"{
         // Emp vario
         unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
         double hmax (Rcpp::as<double>(s_hmax));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_tot_ptr, n_h, N_tot, p, weight_vario, hmax);
+        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_tot_ptr, n_h, N_tot, weight_vario, hmax);
 
         // Design matrix tot
         std::shared_ptr<Eigen::MatrixXd> design_matrix_tot_ptr;
@@ -232,7 +232,7 @@ extern "C"{
 
         // Emp vario
         unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, N, p, coords, *(theDistance));
+        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
 
         // Model
         model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p);
@@ -506,7 +506,7 @@ extern "C"{
         // Emp vario
         unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
         double hmax (Rcpp::as<double>(s_hmax));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_tot_ptr, n_h, N_tot, p, weight_vario, hmax);
+        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_tot_ptr, n_h, N_tot, weight_vario, hmax);
 
         // Design matrix tot
         std::shared_ptr<Eigen::MatrixXd> design_matrix_tot_ptr;
@@ -674,7 +674,7 @@ extern "C"{
 
         // Emp vario
         unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, N, p, coords, *(theDistance));
+        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
 
         // Model
         model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p);
