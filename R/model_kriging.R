@@ -1,5 +1,5 @@
 #' Create a GLS model and directly perform kriging
-#' 
+#'
 #' @param data_manifold list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
@@ -18,12 +18,12 @@
 #' a vector of ones is used. Not needed if Sigma is provided
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
 #' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram: 
-#' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram), 
-#' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), 
-#' \code{data_tspace_tot} (\code{N_tot*((p*(p+1))/2)} matrix where the i-th row represents projection on the tangent space of the i-th manifold data. It can be computed using .Call("map2_tangent_space")), 
+#' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
+#' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
+#' \code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
 #' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
-#' be provided in signed decimal degrees), 
-#' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 
+#' be provided in signed decimal degrees),
+#' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL),
 #' \code{h_max} (maximum value of distance for which the variogram is computed)
 #' \code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot})
 #' @param new_coords matrix of coordinates for the new locations where to perform kriging
@@ -92,19 +92,19 @@
 #' rect(x.min, y.min, x.max, y.max)
 #' @useDynLib Manifoldgstat
 #' @export
-#' 
+#'
 model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifold = "Frobenius",
                              metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
-                             n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL, 
+                             n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
                              tolerance_intrinsic = 1e-6, param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE){
-  
-  
+
+
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
   }
   coords = as.matrix(coords)
   new_coords = as.matrix(new_coords)
-  
+
   if(!is.null(X)) {
     X = as.matrix(X)
     check = (dim(X)[1] == dim(coords)[1])
@@ -120,62 +120,65 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
   else {
     if (!is.null(X_new)) stop("X and X_new must have the same number of columns")
   }
-  
+
   if( is.array(data_manifold)){
     data_manifold = alply(data_manifold,3)
   }
-  
+
   if(length(data_manifold) != dim(coords)[1]){
     stop("Dimension of data_manifold and coords must agree")
   }
-  
+
   if(is.null(Sigma)){
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
-  
+
   # controllare che else faccia riferimento a if precedente
-  
+
   if(!is.null(param_weighted_vario)){
     param_weighted_vario$coords_tot = as.matrix(param_weighted_vario$coords_tot)
     N_tot = length(param_weighted_vario$weight_vario)
-    
-    if ( (dim(param_weighted_vario$coords_tot)[1] != N_tot) || 
-         dim(param_weighted_vario$data_tspace_tot)[1] != N_tot ||
+    if(is.array(param_weighted_vario$data_manifold_tot)){
+      param_weighted_vario$data_manifold_tot = alply(param_weighted_vario$data_manifold_tot,3)
+    }
+
+    if ( (dim(param_weighted_vario$coords_tot)[1] != N_tot) ||
+         length(param_weighted_vario$data_manifold_tot) != N_tot ||
          dim(param_weighted_vario$distance_matrix_tot)[1] != N_tot ||
          dim(param_weighted_vario$distance_matrix_tot)[2] != N_tot){
-      stop("Dimensions of weight_vario, coords_tot, data_tspace_tot and distance_matrix_tot must agree")
-    } 
-    
+      stop("Dimensions of weight_vario, coords_tot, data_manifold_tot and distance_matrix_tot must agree")
+    }
+
     if(!is.null(param_weighted_vario$X_tot)) {
       param_weighted_vario$X_tot = as.matrix(param_weighted_vario$X_tot)
       check = (dim(param_weighted_vario$X_tot)[1] == N_tot && dim(param_weighted_vario$X_tot)[2]==dim(X)[2])
       if(!check) stop("X_tot must have the same number of rows of coords_tot and the same number of columns of X")
     }
-    
+
     if(length(param_weighted_vario) != 7) stop("Param_weighter_vario must be a list with length 7")
-    
+
     result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                  n_h, max_it, tolerance, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot, 
-                  param_weighted_vario$data_tspace_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
+                  n_h, max_it, tolerance, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot,
+                  param_weighted_vario$data_manifold_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot,
                   param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, new_coords, X_new )
   }
-  
+
   else {
     result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                  n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_tspace_tot = NULL, 
+                  n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL,
                   coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model = NULL, weight_intrinsic, tolerance_intrinsic, new_coords, X_new)
-    
+
   }
-  
-  
+
+
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
-  
+
   if(plot){
     plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
                    distance = distance)
   }
-  
+
   result_list = result[-c(2,3)]
   return (result_list)
 }
