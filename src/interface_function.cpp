@@ -101,7 +101,7 @@ extern "C"{
 
       // KERNEL
       if(weight_vario.isNotNull()) {
-        Rcpp::Rcout<<"Using kernel weights for variogram"<<"\n";
+        // Rcpp::Rcout<<"Using kernel weights for variogram"<<"\n";
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
 
@@ -217,7 +217,7 @@ extern "C"{
         // return Rcpp::wrap(1);
       }
       else {  // EQUAL WEIGHTS
-        Rcpp::Rcout<<"Using equal weights for variogram"<<"\n";
+        // Rcpp::Rcout<<"Using equal weights for variogram"<<"\n";
 
         // Data tangent space
         std::vector<Eigen::MatrixXd> data_tspace(N);
@@ -488,7 +488,7 @@ extern "C"{
 
       // KERNEL
       if(weight_vario.isNotNull()) {
-        Rcpp::Rcout<<"Using kernel weights for variogram"<<"\n";
+        // Rcpp::Rcout<<"Using kernel weights for variogram"<<"\n";
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
 
@@ -623,9 +623,9 @@ extern "C"{
         // Select residuals in the k-th cell
         std::vector<unsigned int> indexes_model(Rcpp::as<std::vector<unsigned int>> (s_indexes_model));
 
-        std::vector<Eigen::MatrixXd> resVec_k;
-        for (auto index : indexes_model) {
-            resVec_k.push_back(resVec[index-1]);
+        std::vector<Eigen::MatrixXd> resVec_k(N);
+        for (size_t ii=0; ii<N; ii++ ) {
+            resVec_k[ii]=resVec[indexes_model[ii]-1];
         }
         //
 
@@ -660,7 +660,7 @@ extern "C"{
 
       }
       else {  // EQUAL WEIGHTS
-        Rcpp::Rcout<<"Using equal weights for variogram"<<"\n";
+        // Rcpp::Rcout<<"Using equal weights for variogram"<<"\n";
 
         // Data tangent space
         std::vector<Eigen::MatrixXd> data_tspace(N);
