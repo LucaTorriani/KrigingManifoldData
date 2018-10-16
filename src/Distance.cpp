@@ -58,7 +58,7 @@ std::shared_ptr<const MatrixXd> Distance::create_distance_matrix(const Coordinat
     }
   }
 
-  return (std::make_shared<const MatrixXd> (distance_matrix+distance_matrix.transpose()));
+  return (std::make_shared<const MatrixXd> (distance_matrix));
 }
 
 std::vector<double> Distance::create_distance_vector(const Coordinates & coordinates, const Vec & new_coord) const{
