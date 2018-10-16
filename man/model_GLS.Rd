@@ -46,7 +46,7 @@ a vector of ones is used. Not needed if Sigma is provided}
 \item{param_weighted_vario}{List of 6 elements to be provided to consider Kernel weights for the variogram: 
 \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram), 
 \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), 
-\code{data_tspace_tot} (\code{N_tot*((p*(p+1))/2)} matrix where the i-th row represents projection on the tangent space of the i-th manifold data. It can be computed using .Call("map2_tangent_space")), 
+\code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}), 
 \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 be provided in signed decimal degrees), 
 \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 

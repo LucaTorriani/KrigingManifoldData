@@ -20,7 +20,7 @@
 #' @param param_weighted_vario List of 6 elements to be provided to consider Kernel weights for the variogram: 
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram), 
 #' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), 
-#' \code{data_tspace_tot} (\code{N_tot*((p*(p+1))/2)} matrix where the i-th row represents projection on the tangent space of the i-th manifold data. It can be computed using .Call("map2_tangent_space")), 
+#' \code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}), 
 #' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees), 
 #' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 
@@ -83,14 +83,17 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
   }
   
   if(!is.null(param_weighted_vario)){
+    if(is.array(param_weighted_vario$data_manifold_tot)) {
+      param_weighted_vario$data_manifold_tot = alply(param_weighted_vario$data_manifold_tot,3)
+    }
     param_weighted_vario$coords_tot = as.matrix(param_weighted_vario$coords_tot)
     N_tot = length(param_weighted_vario$weight_vario)
     
     if ( (dim(param_weighted_vario$coords_tot)[1] != N_tot) || 
-         dim(param_weighted_vario$data_tspace_tot)[1] != N_tot ||
+         length(param_weighted_vario$data_manifold_tot) != N_tot ||
          dim(param_weighted_vario$distance_matrix_tot)[1] != N_tot ||
          dim(param_weighted_vario$distance_matrix_tot)[2] != N_tot){
-      stop("Dimensions of weight_vario, coords_tot, data_tspace_tot and distance_matrix_tot must agree")
+      stop("Dimensions of weight_vario, coords_tot, data_manifold_tot and distance_matrix_tot must agree")
     } 
     
     if(!is.null(param_weighted_vario$X_tot)) {
@@ -103,13 +106,13 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
     
     result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot, 
-                  param_weighted_vario$data_tspace_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
+                  param_weighted_vario$data_manifold_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
                   param_weighted_vario$h_max, weight_intrinsic, tolerance_intrinsic)
   }
   
   else {
     result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                  n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_tspace_tot = NULL, 
+                  n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL, 
                   coords_tot = NULL, X_tot = NULL, h_max = NULL, weight_intrinsic, tolerance_intrinsic)
     
   }

@@ -23,7 +23,7 @@ extern "C"{
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance,
-    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_matrix_data_tspace_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, // RDD
+    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic) {  // Tangent point
 
       BEGIN_RCPP
@@ -101,7 +101,8 @@ extern "C"{
 
       // KERNEL
       if(weight_vario.isNotNull()) {
-        // Rcpp::Rcout<<"Using kernel weights for variogram"<<"\n";
+        data_manifold.clear();
+
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
 
@@ -113,8 +114,21 @@ extern "C"{
         Coordinates coords_tot(coords_tot_ptr);
         unsigned int N_tot = coords_tot.get_N_station();
 
+        // Data manifold tot
+        std::vector<Eigen::MatrixXd> data_manifold_tot(N_tot);
+        for(size_t i=0; i<N_tot; i++){
+          data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+        }
+        // Data tangent space tot
+        std::vector<Eigen::MatrixXd> data_tspace_tot(N);
+        for (size_t i=0; i<N_tot; i++) {
+          data_tspace_tot[i] = theLogMap->map2tplane(data_manifold_tot[i]);
+        }
+
         // Data tspace tot
-        std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_matrix_data_tspace_tot));
+        std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_tot_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace_tot));
+        data_manifold_tot.clear();
+        data_tspace_tot.clear();
 
         // Emp vario
         unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
@@ -195,10 +209,8 @@ extern "C"{
                              Rcpp::Named("Sigma")= Sigma);
 
         return Rcpp::wrap(result);
-        // return Rcpp::wrap(1);
       }
       else {  // EQUAL WEIGHTS
-        // Rcpp::Rcout<<"Using equal weights for variogram"<<"\n";
 
         // Data tangent space
         std::vector<Eigen::MatrixXd> data_tspace(N);
@@ -495,7 +507,6 @@ extern "C"{
         std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_tot_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace_tot));
         data_manifold_tot.clear();
         data_tspace_tot.clear();
-
 
         // Emp vario
         unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
@@ -847,35 +858,6 @@ RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, S
     END_RCPP
 }
 
-
-// MAP TO TANGENT SPACE
-// RcppExport SEXP map2_tangent_space (SEXP s_data_manifold, SEXP s_N, SEXP s_manifold_metric, SEXP s_Sigma) {
-//      BEGIN_RCPP
-//
-//      // Data manifold model
-//      unsigned int N(Rcpp::as<unsigned int>(s_N));
-//
-//      std::vector<Eigen::MatrixXd> data_manifold(N);
-//      for(size_t i=0; i<N; i++){
-//        data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
-//      }
-//
-//      // Map functions
-//      std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
-//      map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
-//      std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
-//      Eigen::Map<Eigen::MatrixXd> Sigma(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma));
-//      theLogMap->set_members(Sigma);
-//
-//      // Data tangent space
-//      std::vector<Eigen::MatrixXd> data_tspace(N);
-//      for (size_t i=0; i<N; i++) {
-//        data_tspace[i] = theLogMap->map2tplane(data_manifold[i]);
-//      }
-//      return Rcpp::wrap(matrix_manipulation::VecMatrices2bigMatrix(data_tspace));
-//
-//      END_RCPP
-//   }
 
   RcppExport SEXP distance_manifold (SEXP s_data1, SEXP s_data2, SEXP s_N1, SEXP s_N2, SEXP s_manifold_metric) {
       BEGIN_RCPP
