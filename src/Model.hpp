@@ -25,10 +25,10 @@ private:
   MatrixXd _fitted_values;
   MatrixXd _residuals;
 public:
-  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model, unsigned int p):
+  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model, unsigned int p):  // EQUAL WEIGHTS
         _data_tspace(data_tspace), _design_matrix_model(design_matrix_model), _design_matrix_tot(design_matrix_model),
        _N(design_matrix_model->rows()), _p(p), _num_cov(_design_matrix_model->cols()), _num_coeff((_p*(_p+1))/2), _beta_matrix(_num_cov, _num_coeff){};
-  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model,  const std::shared_ptr<const MatrixXd> design_matrix_tot, unsigned int p):
+  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model,  const std::shared_ptr<const MatrixXd> design_matrix_tot, unsigned int p): // KERNEL
         _data_tspace(data_tspace), _design_matrix_model(design_matrix_model), _design_matrix_tot(design_matrix_tot),
         _N(design_matrix_model->rows()), _p(p), _num_cov(_design_matrix_model->cols()), _num_coeff((_p*(_p+1))/2), _beta_matrix(_num_cov, _num_coeff){};
 
