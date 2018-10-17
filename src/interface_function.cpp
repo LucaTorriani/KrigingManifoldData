@@ -549,7 +549,11 @@ extern "C"{
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
+          Rcpp::Rcout << "Emp vario" << "\n";
+          for (auto el: emp_vario.get_emp_vario_values()) Rcpp::Rcout << el << "\n";
+          Rcpp::Rcout << "\n";
           the_variogram -> evaluate_par_fitted(emp_vario);
+          Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
@@ -563,6 +567,7 @@ extern "C"{
           tol=0.0;
           for (size_t i=0; i<n_covariates; i++) {
             tol += theTplaneDist->compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
+            Rcpp::Rcout << "Tol " << tol << "\n";
           }
           num_iter++;
         }
