@@ -4,7 +4,7 @@
 using namespace variogram_evaluation;
 
 // EmpiricalVariogram
-EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h, 
+EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int n_h,
                                         const Coordinates& coords, const distances::Distance& distance)  :
     _n_h(n_h), _N(coords.get_N_station()), _distanceMatrix(distanceMatrix),
    _emp_vario_values(_n_h), _hvec(n_h), _N_hvec(_n_h), _d(_n_h+1), _weights(_N) {

@@ -555,7 +555,9 @@ extern "C"{
           beta_old_vec_matrices = beta_vec_matrices;
 
           model.update_model(gamma_matrix);
+          Rcpp::Rcout << "Beta inside" << beta << "\n";
           beta = model.get_beta();
+
           beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p);
 
           tol=0.0;
@@ -565,6 +567,9 @@ extern "C"{
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+
+        Rcpp::Rcout << "Outside" << "\n";
+        for (auto el : beta_vec_matrices) {Rcpp::Rcout << el << "\n"; Rcpp::Rcout  << "\n";};
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -628,7 +633,6 @@ extern "C"{
           tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
           manifold_prediction[i] = theExpMap->map2manifold(tplane_prediction);
         }
-
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                                  Rcpp::Named("fit_vario_values") = fit_vario_values,
