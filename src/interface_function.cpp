@@ -544,7 +544,7 @@ extern "C"{
 
         double tol = tolerance+1;
 
-        while (num_iter < 1 && tol > tolerance) {
+        while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
