@@ -26,7 +26,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   unsigned int max_iter = 100;
 
   get_init_par(emp_vario);
-  std::cout << "Init param " << _parameters << "\n";
+  // std::cout << "Init param " << _parameters << "\n";
   unsigned int card_h(emp_vario.get_card_h());
   std::vector<double> h_vec(card_h);
   h_vec = emp_vario.get_hvec();
@@ -36,12 +36,12 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   // TRASFORMAZIONE STD::VECTOR<DOUBLE> --> VEC: https://stackoverflow.com/questions/17036818/initialise-eigenvector-with-stdvector
 
   Vec vario_residuals = get_vario_vec(h_vec, card_h)  - emp_vario_values;
-  Rcpp::Rcout << "Vario residuals " << vario_residuals << "\n";
+  // Rcpp::Rcout << "Vario residuals " << vario_residuals << "\n";
   Vec new_vario_residuals = vario_residuals;
 
   MatrixXd J (card_h, 3);
   J = compute_jacobian(h_vec, card_h);
-  Rcpp::Rcout << "Jacobian " <<"\n"<<J <<"\n";
+  // Rcpp::Rcout << "Jacobian " <<"\n"<<J <<"\n";
 
   // GaussNewton
   Vector3d gk(J.transpose()*vario_residuals);
@@ -51,14 +51,22 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   Vector3d dir;
 
   while((!converged) && iter < max_iter){
-
     JJ = J.transpose()*J;
     solver.compute(JJ);
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
 
     vario_residuals = new_vario_residuals;
+    if (iter==0) {
+      Rcpp::Rcout << "Before backtrack " << "\n";
+      Rcpp::Rcout <<"dir "<< dir << "\n";
+    }
     backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values);
+    if (iter==0) {
+      Rcpp::Rcout << "After backtrack " << "\n";
+      Rcpp::Rcout <<"parameters "<< _parameters << "\n";
+      Rcpp::Rcout << "Vario residuals " << new_vario_residuals << "\n";
+    }
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
     converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
