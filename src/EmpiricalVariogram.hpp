@@ -39,6 +39,7 @@ public:
   std::vector<double> get_hvec() const;
   unsigned int get_card_h() const;
   unsigned int get_N() const;
+  double get_hmax() const;
 };
 
 }

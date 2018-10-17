@@ -22,6 +22,10 @@ EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const MatrixXd> di
       _d.setLinSpaced(n_h+1, 0, _hmax);
 }
 
+double EmpiricalVariogram::get_hmax() const {
+  return _hmax;
+}
+
 unsigned int EmpiricalVariogram::get_N() const {
   return _N;
 }
