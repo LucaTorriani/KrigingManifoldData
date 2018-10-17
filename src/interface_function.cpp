@@ -486,7 +486,7 @@ extern "C"{
 
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
-        Rcpp::Rcout << "Distance mat row 4 " distanceMatrix_tot_ptr->row(4) << "\n";
+        Rcpp::Rcout << "Distance mat row 4 " << distanceMatrix_tot_ptr->row(4) << "\n";
 
         // Coordinates tot
         std::shared_ptr<const Eigen::MatrixXd> coords_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates_tot));
