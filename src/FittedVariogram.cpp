@@ -50,6 +50,8 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
+  Rcpp::Rcout << "\n";
+
   while((!converged) && iter < max_iter){
     JJ = J.transpose()*J;
     solver.compute(JJ);
@@ -57,16 +59,14 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
     dir = solver.solve(bb);
 
     vario_residuals = new_vario_residuals;
-    if (iter==0) {
       Rcpp::Rcout << "Before backtrack " << "\n";
       Rcpp::Rcout <<"dir "<< dir << "\n";
-    }
+
     backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values);
-    if (iter==0) {
       Rcpp::Rcout << "After backtrack " << "\n";
       Rcpp::Rcout <<"parameters "<< _parameters << "\n";
       Rcpp::Rcout << "Vario residuals " << new_vario_residuals << "\n";
-    }
+
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
     converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
