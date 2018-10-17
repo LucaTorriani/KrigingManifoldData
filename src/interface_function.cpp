@@ -486,6 +486,7 @@ extern "C"{
 
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
+        Rcpp::Rcout << "Distance mat row 4 " distanceMatrix_tot_ptr->row(4) << "\n";
 
         // Coordinates tot
         std::shared_ptr<const Eigen::MatrixXd> coords_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates_tot));
@@ -549,8 +550,14 @@ extern "C"{
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
-          Rcpp::Rcout << "Emp vario" << "\n";
-          for (auto el: emp_vario.get_emp_vario_values()) Rcpp::Rcout << el << "\n";
+          // Rcpp::Rcout << "Emp vario" << "\n";
+          // for (auto el: emp_vario.get_emp_vario_values()) Rcpp::Rcout << el << "\n";
+          // Rcpp::Rcout << "\n";
+          Rcpp::Rcout << "H vec" << "\n";
+          for (auto el: emp_vario.get_hvec()) Rcpp::Rcout << el << "\n";
+          Rcpp::Rcout << "\n";
+          Rcpp::Rcout << "N h vec" << "\n";
+          for (auto el: emp_vario.get_N_hvec()) Rcpp::Rcout << el << "\n";
           Rcpp::Rcout << "\n";
           the_variogram -> evaluate_par_fitted(emp_vario);
           Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
