@@ -85,6 +85,9 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
   Vector3d parameters_k = _parameters;
   _parameters = parameters_k + alpha*dir;
   if (_parameters(0) < 0) _parameters(0) = 1e-7;
+  if (_parameters(1) < 0) _parameters(1) = 1e-7;
+  if (_parameters(2) < 0) _parameters(2) = 1e-7;
+
   res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
 
   while(res.squaredNorm() > fk + alpha*c*gk.transpose()*dir && alpha > alphamin){
@@ -92,6 +95,8 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
     alpha = alpha*s;
     _parameters = parameters_k + alpha*dir;
     if (_parameters(0) < 0) _parameters(0) = 1e-7;
+    if (_parameters(1) < 0) _parameters(1) = 1e-7;
+    if (_parameters(2) < 0) _parameters(2) = 1e-7;
 
     res = get_vario_vec(h_vec, card_h) - emp_vario_values;
 
