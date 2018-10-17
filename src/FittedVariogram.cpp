@@ -26,6 +26,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   unsigned int max_iter = 100;
 
   get_init_par(emp_vario);
+  Rcpp::Rcout << "Init param " << _parameters << "\n";
   unsigned int card_h(emp_vario.get_card_h());
   std::vector<double> h_vec(card_h);
   h_vec = emp_vario.get_hvec();
