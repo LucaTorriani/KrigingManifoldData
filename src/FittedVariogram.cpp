@@ -60,6 +60,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
 
     vario_residuals = new_vario_residuals;
       Rcpp::Rcout << "Before backtrack " << "\n";
+      Rcpp::Rcout <<"bb "<< bb << "\n";
       Rcpp::Rcout <<"dir "<< dir << "\n";
 
     backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values);
