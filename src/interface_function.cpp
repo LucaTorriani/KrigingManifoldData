@@ -486,7 +486,6 @@ extern "C"{
 
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
-        Rcpp::Rcout << "Distance mat row 4 " << distanceMatrix_tot_ptr->row(4) << "\n";
 
         // Coordinates tot
         std::shared_ptr<const Eigen::MatrixXd> coords_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates_tot));
@@ -553,12 +552,12 @@ extern "C"{
           // Rcpp::Rcout << "Emp vario" << "\n";
           // for (auto el: emp_vario.get_emp_vario_values()) Rcpp::Rcout << el << "\n";
           // Rcpp::Rcout << "\n";
-          Rcpp::Rcout << "H vec" << "\n";
-          for (auto el: emp_vario.get_hvec()) Rcpp::Rcout << el << "\n";
-          Rcpp::Rcout << "\n";
-          Rcpp::Rcout << "N h vec" << "\n";
-          for (auto el: emp_vario.get_N_hvec()) Rcpp::Rcout << el << "\n";
-          Rcpp::Rcout << "\n";
+          // Rcpp::Rcout << "H vec" << "\n";
+          // for (auto el: emp_vario.get_hvec()) Rcpp::Rcout << el << "\n";
+          // Rcpp::Rcout << "\n";
+          // Rcpp::Rcout << "N h vec" << "\n";
+          // for (auto el: emp_vario.get_N_hvec()) Rcpp::Rcout << el << "\n";
+          // Rcpp::Rcout << "\n";
           the_variogram -> evaluate_par_fitted(emp_vario);
           Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
 
@@ -566,7 +565,7 @@ extern "C"{
           beta_old_vec_matrices = beta_vec_matrices;
 
           model.update_model(gamma_matrix);
-          Rcpp::Rcout << "Beta inside" << beta << "\n";
+          // Rcpp::Rcout << "Beta inside" << beta << "\n";
           beta = model.get_beta();
 
           beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p);
@@ -574,14 +573,14 @@ extern "C"{
           tol=0.0;
           for (size_t i=0; i<n_covariates; i++) {
             tol += theTplaneDist->compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
-            Rcpp::Rcout << "Tol " << tol << "\n";
+            // Rcpp::Rcout << "Tol " << tol << "\n";
           }
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
 
-        Rcpp::Rcout << "Outside" << "\n";
-        for (auto el : beta_vec_matrices) {Rcpp::Rcout << el << "\n"; Rcpp::Rcout  << "\n";};
+        // Rcpp::Rcout << "Outside" << "\n";
+        // for (auto el : beta_vec_matrices) {Rcpp::Rcout << el << "\n"; Rcpp::Rcout  << "\n";};
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);

@@ -26,7 +26,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   unsigned int max_iter = 100;
 
   get_init_par(emp_vario);
-  Rcpp::Rcout << "Init param " << _parameters << "\n";
+  std::cout << "Init param " << _parameters << "\n";
   unsigned int card_h(emp_vario.get_card_h());
   std::vector<double> h_vec(card_h);
   h_vec = emp_vario.get_hvec();
@@ -36,10 +36,12 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   // TRASFORMAZIONE STD::VECTOR<DOUBLE> --> VEC: https://stackoverflow.com/questions/17036818/initialise-eigenvector-with-stdvector
 
   Vec vario_residuals = get_vario_vec(h_vec, card_h)  - emp_vario_values;
+  Rcpp::Rcout << "Vario residuals " << vario_residuals << "\n";
   Vec new_vario_residuals = vario_residuals;
 
   MatrixXd J (card_h, 3);
   J = compute_jacobian(h_vec, card_h);
+  Rcpp::Rcout << "Jacobian " <<"\n"<<J <<"\n";
 
   // GaussNewton
   Vector3d gk(J.transpose()*vario_residuals);
