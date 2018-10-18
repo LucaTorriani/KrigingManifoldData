@@ -27,10 +27,6 @@ unsigned int EmpiricalVariogram::get_N() const {
   return _N;
 }
 
-double EmpiricalVariogram::get_hmax() const {
-  return _hmax;
-}
-
 void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res, const distances_tplane::DistanceTplane & distanceTplane) {
   _emp_vario_values.clear();
   _hvec.clear();
