@@ -22,7 +22,7 @@ extern "C"{
 // CREATE MODEL
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
-    SEXP s_max_it, SEXP s_tolerance,
+    SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
     SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic) {  // Tangent point
 
@@ -31,6 +31,8 @@ extern "C"{
       Rcpp::Nullable<Eigen::MatrixXd> X_tot(s_X_tot);
       Rcpp::Nullable<Eigen::MatrixXd> Sigma_n(s_Sigma);
       Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
+      Rcpp::Nullable<double> max_sill (s_max_sill);
+      Rcpp::Nullable<double> max_a (s_max_a);
 
       // Coordinates model
       std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -77,6 +79,12 @@ extern "C"{
       // Distance Matrix
       std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
 
+      // Fitted vario parameters
+      if(max_a.isNotNull())  double max_a(Rcpp::as<double> (s_max_a));
+      else max_a = -1;
+      if(max_sill.isNotNull())  double max_sill(Rcpp::as<double> (s_max_sill));
+      else max_sill = -1;
+
       // Fitted vario
       vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
       std::string variogram_type (Rcpp::as<std::string> (s_vario_model));
@@ -119,7 +127,7 @@ extern "C"{
           data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
         }
         // Data tangent space tot
-        std::vector<Eigen::MatrixXd> data_tspace_tot(N);
+        std::vector<Eigen::MatrixXd> data_tspace_tot(N_tot);
         for (size_t i=0; i<N_tot; i++) {
           data_tspace_tot[i] = theLogMap->map2tplane(data_manifold_tot[i]);
         }
@@ -170,7 +178,7 @@ extern "C"{
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
-          the_variogram -> evaluate_par_fitted(emp_vario);
+          the_variogram -> evaluate_par_fitted_W(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
@@ -253,7 +261,7 @@ extern "C"{
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
-          the_variogram -> evaluate_par_fitted(emp_vario);
+          the_variogram -> evaluate_par_fitted_E(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
@@ -398,7 +406,7 @@ extern "C"{
   // CREATE MODEL AND KRIGNG
   RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
-    SEXP s_max_it, SEXP s_tolerance,
+    SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
     SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, SEXP s_indexes_model, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
     SEXP s_new_coordinates, SEXP s_X_new) {  // KRIGING
@@ -454,6 +462,12 @@ extern "C"{
 
       // Distance Matrix
       std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+
+      // Fitted vario parameters
+      if(max_a.isNotNull())  double max_a(Rcpp::as<double> (s_max_a));
+      else max_a = -1;
+      if(max_sill.isNotNull())  double max_sill(Rcpp::as<double> (s_max_sill));
+      else max_sill = -1;
 
       // Fitted vario
       vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
@@ -550,7 +564,7 @@ extern "C"{
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
-          the_variogram -> evaluate_par_fitted(emp_vario);
+          the_variogram -> evaluate_par_fitted_W(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
@@ -690,7 +704,7 @@ extern "C"{
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
-          the_variogram -> evaluate_par_fitted(emp_vario);
+          the_variogram -> evaluate_par_fitted_E(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
