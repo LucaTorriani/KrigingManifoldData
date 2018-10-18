@@ -96,7 +96,7 @@
 model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifold = "Frobenius",
                              metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                              n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
-                             tolerance_intrinsic = 1e-6, param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE){
+                             tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE){
 
 
   if ( distance == "Geodist" & dim(coords)[2] != 2){
@@ -158,14 +158,14 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
     if(length(param_weighted_vario) != 7) stop("Param_weighter_vario must be a list with length 7")
 
     result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                  n_h, max_it, tolerance, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot,
+                  n_h, max_it, tolerance, max_sill, max_a, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot,
                   param_weighted_vario$data_manifold_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot,
                   param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, new_coords, X_new )
   }
 
   else {
     result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                  n_h, max_it, tolerance, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL,
+                  n_h, max_it, tolerance, max_sill, max_a, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL,
                   coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model = NULL, weight_intrinsic, tolerance_intrinsic, new_coords, X_new)
 
   }
