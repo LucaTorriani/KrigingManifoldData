@@ -210,7 +210,6 @@ extern "C"{
         return Rcpp::wrap(result);
       }
       else {  // EQUAL WEIGHTS
-        // Rcpp::Rcout << "qui" << "\n";
 
         // Data tangent space
         std::vector<Eigen::MatrixXd> data_tspace(N);
@@ -568,7 +567,6 @@ extern "C"{
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
-        Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -649,9 +647,8 @@ extern "C"{
 
       }
       else {  // EQUAL WEIGHTS
-        // Data tangent space
-        // std::cout << "qui senza pesi" << "\n";
 
+        // Data tangent space
         std::vector<Eigen::MatrixXd> data_tspace(N);
         for (size_t i=0; i<N; i++) {
           data_tspace[i] = theLogMap->map2tplane(data_manifold[i]);
@@ -718,7 +715,6 @@ extern "C"{
         hh.setLinSpaced(n_hh, 0, *std::max_element(h_vario_values.begin(), h_vario_values.end()));
 
         Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
-        Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
 
         // KRIGING
 
