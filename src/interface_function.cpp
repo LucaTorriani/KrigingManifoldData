@@ -480,12 +480,10 @@ extern "C"{
 
       // KERNEL
       if(weight_vario.isNotNull()) {
-        // std::cout << "qui con pesi" << "\n";
 
         data_manifold.clear();
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
-        // std::cout << weight_vario << "\n";
 
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
@@ -538,8 +536,6 @@ extern "C"{
 
         beta = model.get_beta();
 
-        // std::cout << "beta" << "\n";
-        // std::cout << beta << std::endl;
         std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
         beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p);
         std::vector<Eigen::MatrixXd> beta_old_vec_matrices(n_covariates);
@@ -555,22 +551,12 @@ extern "C"{
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
-          // Rcpp::Rcout << "Emp vario" << "\n";
-          // for (auto el: emp_vario.get_emp_vario_values()) Rcpp::Rcout << el << "\n";
-          // Rcpp::Rcout << "\n";
-          // Rcpp::Rcout << "H vec" << "\n";
-          // for (auto el: emp_vario.get_hvec()) Rcpp::Rcout << el << "\n";
-          // Rcpp::Rcout << "\n";
-          // Rcpp::Rcout << "N h vec" << "\n";
-          // for (auto el: emp_vario.get_N_hvec()) Rcpp::Rcout << el << "\n";
-          // Rcpp::Rcout << "\n";
           the_variogram -> evaluate_par_fitted(emp_vario);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
 
           model.update_model(gamma_matrix);
-          // Rcpp::Rcout << "Beta inside" << beta << "\n";
           beta = model.get_beta();
 
           beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p);
@@ -578,15 +564,11 @@ extern "C"{
           tol=0.0;
           for (size_t i=0; i<n_covariates; i++) {
             tol += theTplaneDist->compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
-            // Rcpp::Rcout << "Tol " << tol << "\n";
           }
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
         Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
-
-        // Rcpp::Rcout << "Outside" << "\n";
-        // for (auto el : beta_vec_matrices) {Rcpp::Rcout << el << "\n"; Rcpp::Rcout  << "\n";};
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
