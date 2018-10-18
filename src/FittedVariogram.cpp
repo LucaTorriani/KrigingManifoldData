@@ -26,7 +26,6 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   unsigned int max_iter = 100;
 
   get_init_par(emp_vario);
-  // std::cout << "Init param " << _parameters << "\n";
   unsigned int card_h(emp_vario.get_card_h());
   std::vector<double> h_vec(card_h);
   h_vec = emp_vario.get_hvec();
@@ -36,12 +35,10 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   // TRASFORMAZIONE STD::VECTOR<DOUBLE> --> VEC: https://stackoverflow.com/questions/17036818/initialise-eigenvector-with-stdvector
 
   Vec vario_residuals = get_vario_vec(h_vec, card_h)  - emp_vario_values;
-  // Rcpp::Rcout << "Vario residuals " << vario_residuals << "\n";
   Vec new_vario_residuals = vario_residuals;
 
   MatrixXd J (card_h, 3);
   J = compute_jacobian(h_vec, card_h);
-  // Rcpp::Rcout << "Jacobian " <<"\n"<<J <<"\n";
 
   // GaussNewton
   Vector3d gk(J.transpose()*vario_residuals);
@@ -50,31 +47,31 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
-  Rcpp::Rcout << "\n";
 
+  // NEW
+  double err_old = 10000.0;
+  double err_new;
   while((!converged) && iter < max_iter){
+
     JJ = J.transpose()*J;
     solver.compute(JJ);
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
 
     vario_residuals = new_vario_residuals;
-      Rcpp::Rcout << "Before backtrack " << "\n";
-      // Rcpp::Rcout <<"bb "<< bb << "\n";
-      Rcpp::Rcout << "JJ " << JJ << "\n";
-      Rcpp::Rcout <<"dir "<< dir << "\n";
 
     backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, emp_vario.get_hmax());
-      Rcpp::Rcout << "After backtrack " << "\n";
-      Rcpp::Rcout <<"parameters "<< _parameters << "\n";
-      // Rcpp::Rcout << "Vario residuals " << new_vario_residuals << "\n";
 
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
-    converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
+    err_new = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()));
+    converged = std::abs(err_new-err_old) < tol;
+
+    err_old = err_new;
+
     iter++;
   }
-  if (iter==max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton");
+  if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
 }
 
 void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double hmax){
@@ -85,15 +82,15 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
 
   Vector3d parameters_k = _parameters;
   _parameters = parameters_k + alpha*dir;
+
   if (_parameters(0) < 0) _parameters(0) = 1e-7;
   if (_parameters(1) < 0) _parameters(1) = 1e-7;
   if (_parameters(2) < 0) _parameters(2) = 1e-7;
 
   double max_sill(1.15*emp_vario_values.maxCoeff());
-  double max_a(hmax);
+  double max_a(1.15*hmax);
   if (_parameters(1) > max_sill) _parameters(1) = max_sill;
   if (_parameters(2) > max_a) _parameters(2) = max_a;
-
   res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
 
   while(res.squaredNorm() > fk + alpha*c*gk.transpose()*dir && alpha > alphamin){
@@ -108,7 +105,6 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
     if (_parameters(2) > max_a) _parameters(2) = max_a;
 
     res = get_vario_vec(h_vec, card_h) - emp_vario_values;
-
   }
 }
 
