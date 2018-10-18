@@ -16,7 +16,7 @@ double FittedVariogram::get_a() const{
   return _parameters(2);
 }
 
-void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
+void FittedVariogram::evaluate_par_fitted_W (const EmpiricalVariogram & emp_vario, double max_sill, double max_a){
 
   double c = 1e-4; //Valori presi da libro quarteroni
   double s = 0.25;
@@ -47,9 +47,11 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
+  if(max_sill== -1) max_sill(1.15*emp_vario_values.maxCoeff());
+  if(max_a==-1) max_a(1.15*emp_vario.get_hmax());
 
   // NEW
-  double err_old = 10000.0;
+  double err_old;
   double err_new;
   while((!converged) && iter < max_iter){
 
@@ -60,21 +62,80 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
 
     vario_residuals = new_vario_residuals;
 
-    backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, emp_vario.get_hmax());
+    backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, max_sill, max_a);
 
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
     err_new = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()));
+    if (iter==1) err_old = err_new + 2*tol;
     converged = std::abs(err_new-err_old) < tol;
 
     err_old = err_new;
 
     iter++;
   }
+  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::warning("Parameter sill bounded from above");
+  if(_parameters(2)==max_a) Rcpp::warning("Parameter a bounded from above");
   if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
 }
 
-void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double hmax){
+void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vario, double max_sill, double max_a){
+
+  double c = 1e-4; //Valori presi da libro quarteroni
+  double s = 0.25;
+  double tol = 1e-4;
+  bool converged = false;
+  unsigned int iter = 0;
+  unsigned int max_iter = 100;
+
+  get_init_par(emp_vario);
+  unsigned int card_h(emp_vario.get_card_h());
+  std::vector<double> h_vec(card_h);
+  h_vec = emp_vario.get_hvec();
+
+  std::vector<double> emp_vario_val(emp_vario.get_emp_vario_values());
+  Vec emp_vario_values = Eigen::Map<Vec, Eigen::Unaligned>(emp_vario_val.data(), emp_vario_val.size());
+  // TRASFORMAZIONE STD::VECTOR<DOUBLE> --> VEC: https://stackoverflow.com/questions/17036818/initialise-eigenvector-with-stdvector
+
+  Vec vario_residuals = get_vario_vec(h_vec, card_h)  - emp_vario_values;
+  Vec new_vario_residuals = vario_residuals;
+
+  MatrixXd J (card_h, 3);
+  J = compute_jacobian(h_vec, card_h);
+
+  // GaussNewton
+  Vector3d gk(J.transpose()*vario_residuals);
+  Matrix3d JJ;
+  Vector3d bb;
+  LDLT<Matrix3d> solver(3);
+  Vector3d dir;
+
+  if(max_sill== -1) max_sill(1.15*emp_vario_values.maxCoeff());
+  if(max_a==-1) max_a(1.15*emp_vario.get_hmax());
+
+  while((!converged) && iter < max_iter){
+
+    JJ = J.transpose()*J;
+    solver.compute(JJ);
+    bb = - J.transpose()*(vario_residuals);
+    dir = solver.solve(bb);
+
+    vario_residuals = new_vario_residuals;
+
+    backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, max_sill, max_a);
+
+    J = compute_jacobian(h_vec, card_h);
+    gk =  J.transpose()*new_vario_residuals;
+    converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm())) < tol;
+
+    iter++;
+  }
+  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::warning("Parameter sill bounded from above");
+  if(_parameters(2)==max_a) Rcpp::warning("Parameter a bounded from above");
+  if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
+}
+
+void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double max_sill, double max_a){
 
   double alpha = 1;
   const double alphamin = 1.e-5;
@@ -87,9 +148,7 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
   if (_parameters(1) < 0) _parameters(1) = 1e-7;
   if (_parameters(2) < 0) _parameters(2) = 1e-7;
 
-  double max_sill(1.15*emp_vario_values.maxCoeff());
-  double max_a(1.15*hmax);
-  if (_parameters(1) > max_sill) _parameters(1) = max_sill;
+  if (_parameters(1)+_parameters(0) > max_sill) _parameters(1) = max_sill-_parameters(0);
   if (_parameters(2) > max_a) _parameters(2) = max_a;
   res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
 
@@ -101,7 +160,7 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
     if (_parameters(1) < 0) _parameters(1) = 1e-7;
     if (_parameters(2) < 0) _parameters(2) = 1e-7;
 
-    if (_parameters(1) > max_sill) _parameters(1) = max_sill;
+    if (_parameters(1)+_parameters(0) > max_sill) _parameters(1) = max_sill-_parameters(0);
     if (_parameters(2) > max_a) _parameters(2) = max_a;
 
     res = get_vario_vec(h_vec, card_h) - emp_vario_values;
