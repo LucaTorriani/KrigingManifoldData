@@ -50,33 +50,45 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
-  Rcpp::Rcout << "\n";
-
+  // Rcpp::Rcout << "\n";
+  // std::cout << "**********************New call to update_emp_vario" << std::endl;
+  // NEW
+  double err_old = 1000.0;
+  double err_new;
   while((!converged) && iter < max_iter){
+    // std::cout << "wjile update emp vario" << std::endl;
+
     JJ = J.transpose()*J;
     solver.compute(JJ);
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
 
     vario_residuals = new_vario_residuals;
-      Rcpp::Rcout << "Before backtrack " << "\n";
-      Rcpp::Rcout <<"bb "<< bb << "\n";
-      Rcpp::Rcout << "JJ " << JJ << "\n";
-      Rcpp::Rcout <<"dir "<< dir << "\n";
+      // Rcpp::Rcout << "Before backtrack " << "\n";
+      // Rcpp::Rcout <<"bb "<< bb << "\n";
+      // Rcpp::Rcout << "JJ " << JJ << "\n";
+      // Rcpp::Rcout <<"dir "<< dir << "\n";
 
-    backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values);
-      Rcpp::Rcout << "After backtrack " << "\n";
-      Rcpp::Rcout <<"parameters "<< _parameters << "\n";
-      // Rcpp::Rcout << "Vario residuals " << new_vario_residuals << "\n";
+      backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, emp_vario.get_hmax());
+      // Rcpp::Rcout << "After backtrack " << "\n";
+      // Rcpp::Rcout <<"parameters "<< _parameters << "\n";
+      // // Rcpp::Rcout << "Vario residuals " << new_vario_residuals << "\n";
 
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
-    converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
+    // converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()) < tol);
+    err_new = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm()));
+    converged = std::abs(err_new-err_old) < tol;
+    // std::cout << std::abs(err_new-err_old)  << std::endl;
+
+    err_old = err_new;
+
     iter++;
   }
+  if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion")
 }
 
-void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values){
+void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double hmax){
 
   double alpha = 1;
   const double alphamin = 1.e-5;
@@ -84,18 +96,37 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
 
   Vector3d parameters_k = _parameters;
   _parameters = parameters_k + alpha*dir;
-  if (_parameters(0) < 0) _parameters(0) = 1e-7;
-  res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
 
+  if (_parameters(0) < 0) {_parameters(0) = 1e-7; Rcpp::Rcout <<("Nugget bounded from below") << "\n"; };
+  if (_parameters(1) < 0) {_parameters(1) = 1e-7; Rcpp::Rcout <<("Sill bounded from below") << "\n"; };
+  if (_parameters(2) < 0) {_parameters(2) = 1e-7; Rcpp::Rcout <<("a bounded from below") << "\n"; };
+
+  double max_sill(1.15*emp_vario_values.maxCoeff());
+  double max_a(hmax);
+  if (_parameters(1) > max_sill) {_parameters(1) = max_sill;  Rcpp::Rcout << "Sill bounded from above out of while" <<  "\n";};
+  if (_parameters(2) > max_a) {_parameters(2) = max_a;  Rcpp::Rcout << "a bounded from above" <<  "\n";};
+  res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
+  // std::cout << "*****************New call to backtrack" << std::endl;
   while(res.squaredNorm() > fk + alpha*c*gk.transpose()*dir && alpha > alphamin){
+    // std::cout << "while backtrack" << std::endl;
 
     alpha = alpha*s;
     _parameters = parameters_k + alpha*dir;
     if (_parameters(0) < 0) _parameters(0) = 1e-7;
+    if (_parameters(1) < 0) _parameters(1) = 1e-7;
+    if (_parameters(2) < 0) _parameters(2) = 1e-7;
+
+    if (_parameters(1) > max_sill) {_parameters(1) = max_sill;  Rcpp::Rcout << "Sill bounded from above in while" <<  "\n";};
+    if (_parameters(2) > max_a) {_parameters(2) = max_a;  Rcpp::Rcout << "a bounded from above in while" <<  "\n";};
 
     res = get_vario_vec(h_vec, card_h) - emp_vario_values;
+    // std::cout << "RES" << std::endl;
+
+    // std::cout << res.squaredNorm() << std::endl;;
+    // std::cout << "FINE RES" << std::endl;
 
   }
+
 }
 
 double FittedVariogram::weighted_median (const std::vector<double> & values, const std::vector<unsigned int> & card) {

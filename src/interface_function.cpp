@@ -105,7 +105,6 @@ extern "C"{
 
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
-
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
 
@@ -211,6 +210,7 @@ extern "C"{
         return Rcpp::wrap(result);
       }
       else {  // EQUAL WEIGHTS
+        // Rcpp::Rcout << "qui" << "\n";
 
         // Data tangent space
         std::vector<Eigen::MatrixXd> data_tspace(N);
@@ -480,9 +480,12 @@ extern "C"{
 
       // KERNEL
       if(weight_vario.isNotNull()) {
+        // std::cout << "qui con pesi" << "\n";
+
         data_manifold.clear();
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
+        // std::cout << weight_vario << "\n";
 
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
@@ -534,6 +537,9 @@ extern "C"{
         Eigen::MatrixXd beta_old(n_covariates, ((p+1)*p)/2);
 
         beta = model.get_beta();
+
+        // std::cout << "beta" << "\n";
+        // std::cout << beta << std::endl;
         std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
         beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p);
         std::vector<Eigen::MatrixXd> beta_old_vec_matrices(n_covariates);
@@ -559,7 +565,6 @@ extern "C"{
           // for (auto el: emp_vario.get_N_hvec()) Rcpp::Rcout << el << "\n";
           // Rcpp::Rcout << "\n";
           the_variogram -> evaluate_par_fitted(emp_vario);
-          Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
@@ -578,6 +583,7 @@ extern "C"{
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+        Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
 
         // Rcpp::Rcout << "Outside" << "\n";
         // for (auto el : beta_vec_matrices) {Rcpp::Rcout << el << "\n"; Rcpp::Rcout  << "\n";};
@@ -662,6 +668,8 @@ extern "C"{
       }
       else {  // EQUAL WEIGHTS
         // Data tangent space
+        // std::cout << "qui senza pesi" << "\n";
+
         std::vector<Eigen::MatrixXd> data_tspace(N);
         for (size_t i=0; i<N; i++) {
           data_tspace[i] = theLogMap->map2tplane(data_manifold[i]);
@@ -728,6 +736,7 @@ extern "C"{
         hh.setLinSpaced(n_hh, 0, *std::max_element(h_vario_values.begin(), h_vario_values.end()));
 
         Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
+        Rcpp::Rcout<< "Fit parameters " << the_variogram->get_parameters() << "\n";
 
         // KRIGING
 

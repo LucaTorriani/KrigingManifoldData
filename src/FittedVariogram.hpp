@@ -11,7 +11,7 @@ protected:
   Vector3d _parameters; // tau2, sigma2, a
   double weighted_median (const std::vector<double> &, const std::vector<unsigned int> &);
   virtual void get_init_par(const EmpiricalVariogram &) = 0;
-  void backtrack(const Vector3d &,Vector3d &,Vec &,const std::vector<double> &, unsigned int, double, double, const Vec&);
+  void backtrack(const Vector3d &,Vector3d &,Vec &,const std::vector<double> &, unsigned int, double, double, const Vec&, double);
   virtual MatrixXd compute_jacobian(const std::vector<double> &, unsigned int) const = 0;
 
 public:
