@@ -7,7 +7,6 @@
 #' @param weight vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
 #' a vector of ones is used
 #' @description Evaluate the intrinsic mean of a given set of symmetric positive definite matrices
-#' @details ...
 #' @examples
 #' data_manifold_tot <- Manifoldgstat::fieldCov
 #' Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius", metric_ts = "Frobenius")
