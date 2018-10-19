@@ -31,8 +31,8 @@ extern "C"{
       Rcpp::Nullable<Eigen::MatrixXd> X_tot(s_X_tot);
       Rcpp::Nullable<Eigen::MatrixXd> Sigma_n(s_Sigma);
       Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
-      Rcpp::Nullable<double> max_sill (s_max_sill);
-      Rcpp::Nullable<double> max_a (s_max_a);
+      Rcpp::Nullable<double> max_sill_n (s_max_sill);
+      Rcpp::Nullable<double> max_a_n (s_max_a);
 
       // Coordinates model
       std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -80,10 +80,11 @@ extern "C"{
       std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
 
       // Fitted vario parameters
-      if(max_a.isNotNull())  double max_a(Rcpp::as<double> (s_max_a));
-      else max_a = -1;
-      if(max_sill.isNotNull())  double max_sill(Rcpp::as<double> (s_max_sill));
-      else max_sill = -1;
+      double max_a = -1.0;
+      if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
+      double max_sill = -1;
+      if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
+
 
       // Fitted vario
       vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
@@ -417,6 +418,8 @@ extern "C"{
       Rcpp::Nullable<Eigen::MatrixXd> Sigma_n(s_Sigma);
       Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
       Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
+      Rcpp::Nullable<double> max_sill_n (s_max_sill);
+      Rcpp::Nullable<double> max_a_n (s_max_a);
 
       // Coordinates model
       std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -464,10 +467,10 @@ extern "C"{
       std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
 
       // Fitted vario parameters
-      if(max_a.isNotNull())  double max_a(Rcpp::as<double> (s_max_a));
-      else max_a = -1;
-      if(max_sill.isNotNull())  double max_sill(Rcpp::as<double> (s_max_sill));
-      else max_sill = -1;
+      double max_a = -1.0;
+      if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
+      double max_sill = -1;
+      if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
 
       // Fitted vario
       vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());

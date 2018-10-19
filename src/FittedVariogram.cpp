@@ -47,8 +47,8 @@ void FittedVariogram::evaluate_par_fitted_W (const EmpiricalVariogram & emp_vari
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
-  if(max_sill== -1) max_sill(1.15*emp_vario_values.maxCoeff());
-  if(max_a==-1) max_a(1.15*emp_vario.get_hmax());
+  if(max_sill== -1) max_sill= 1.15*emp_vario_values.maxCoeff();
+  if(max_a==-1) max_a=1.15*emp_vario.get_hmax();
 
   // NEW
   double err_old;
@@ -110,8 +110,8 @@ void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vari
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
-  if(max_sill== -1) max_sill(1.15*emp_vario_values.maxCoeff());
-  if(max_a==-1) max_a(1.15*emp_vario.get_hmax());
+  if(max_sill== -1) max_sill=1.15*emp_vario_values.maxCoeff();
+  if(max_a==-1) max_a=1.15*emp_vario.get_hmax();
 
   while((!converged) && iter < max_iter){
 
