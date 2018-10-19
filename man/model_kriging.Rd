@@ -9,7 +9,8 @@ model_kriging(data_manifold, coords, X = NULL, Sigma,
   model_ts = "Additive", vario_model = "Gaussian", n_h = 15,
   distance = "Geodist", max_it = 100, tolerance = 1e-06,
   weight_intrinsic = NULL, tolerance_intrinsic = 1e-06,
-  param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE)
+  max_sill = NULL, max_a = NULL, param_weighted_vario = NULL,
+  new_coords, X_new = NULL, plot = TRUE)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
@@ -42,6 +43,10 @@ of \code{data_manifold}}
 a vector of ones is used. Not needed if Sigma is provided}
 
 \item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided}
+
+\item{max_sill}{maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}}
+
+\item{max_a}{maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}}
 
 \item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram: 
 \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
@@ -80,7 +85,8 @@ The manifold values are mapped on the tangent space and then a GLS model is fitt
 is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
-computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem.
+computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the 
+absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.
 Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
 the estimates are mapped to the manifold.
 }

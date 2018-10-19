@@ -17,6 +17,8 @@
 #' @param weight_intrinsic vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
 #' a vector of ones is used. Not needed if Sigma is provided
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
+#' @param max_sill maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
+#' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
 #' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram: 
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
 #' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
@@ -45,7 +47,8 @@
 #' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 #' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 #' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
-#' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem.
+#' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the 
+#' absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.
 #' Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
 #' the estimates are mapped to the manifold.
 #' @references D. Pigoli, A. Menafoglio & P. Secchi (2016):
