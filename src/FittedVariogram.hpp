@@ -28,6 +28,7 @@ public:
   Vector3d get_parameters() const;
   void set_parameters(const Vector3d&);
   Vec get_covario_vec(const std::vector<double> &, unsigned int) const;
+  virtual ~FittedVariogram() = default;
 
 };
 
@@ -38,6 +39,7 @@ class GaussVariogram : public FittedVariogram {
 
 public:
   double get_vario_univ(const double &) const override;
+  ~GaussVariogram() = default;
 };
 
 
@@ -47,6 +49,7 @@ class ExpVariogram : public FittedVariogram {
 
 public:
   double get_vario_univ(const double &) const override;
+  ~ExpVariogram() = default;
 };
 
 class SphVariogram : public FittedVariogram {
@@ -55,6 +58,7 @@ class SphVariogram : public FittedVariogram {
 
 public:
   double get_vario_univ(const double &) const override;
+  ~SphVariogram() = default;
 };
 
 

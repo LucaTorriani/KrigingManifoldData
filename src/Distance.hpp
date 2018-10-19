@@ -16,12 +16,13 @@ namespace distances{
     virtual double compute_distance(const Vec&, const Vec&) const = 0;
     std::shared_ptr<const MatrixXd> create_distance_matrix(const Coordinates &, unsigned int) const;
     std::vector<double> create_distance_vector(const Coordinates &, const Vec &) const;
-
+    virtual ~Distance() = default;
   };
 
   class EuclDist : public Distance{
   public:
     double compute_distance(const Vec&, const Vec&) const override;
+    ~EuclDist() = default;
   };
 
   class GeoDist : public Distance{
@@ -30,6 +31,7 @@ namespace distances{
 
   public:
     double compute_distance(const Vec&, const Vec&) const override;
+    ~GeoDist() = default;
 };
 
 

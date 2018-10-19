@@ -18,22 +18,26 @@ namespace distances_manifold{
     // std::map<std::string,std::function<double(const MatrixXd&, const MatrixXd&)>> distances;
   public:
     virtual double compute_distance(const MatrixXd&, const MatrixXd&) const = 0;
+    virtual ~DistanceManifold() = default;
   };
 
 
   class Frobenius : public DistanceManifold{
   public:
     double compute_distance(const MatrixXd&, const MatrixXd& ) const override;
+    ~Frobenius() = default;
     };
 
   class LogEuclidean : public DistanceManifold{
   public:
     double compute_distance(const MatrixXd&, const MatrixXd& ) const override;
+    ~LogEuclidean() = default;
   };
 
   class SqRoot : public DistanceManifold{
   public:
     double compute_distance(const MatrixXd&, const MatrixXd& ) const override;
+    ~SqRoot() = default;
   };
 
 
