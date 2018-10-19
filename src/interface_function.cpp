@@ -80,9 +80,9 @@ extern "C"{
       std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
 
       // Fitted vario parameters
-      double max_a = -1.0;
+      double max_a;
+      double max_sill;
       if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
-      double max_sill = -1;
       if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
 
 
@@ -173,12 +173,17 @@ extern "C"{
         double tolerance(Rcpp::as<double> (s_tolerance));
 
         double tol = tolerance+1;
+        std::vector<double> emp_vario_values;
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
+
+          emp_vario_values = emp_vario.get_emp_vario_values();
+          if(!max_sill_n.isNotNull()) max_sill = 1.15 * (*std::max_element(emp_vario_values.begin(), emp_vario_values.end()));
+          if(!max_a_n.isNotNull()) max_a = 1.15 * emp_vario.get_hmax();
           the_variogram -> evaluate_par_fitted_W(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
@@ -195,6 +200,10 @@ extern "C"{
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+        Vec fit_parameters (the_variogram->get_parameters());
+
+        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -210,9 +219,9 @@ extern "C"{
                              Rcpp::Named("hh") = hh,
                              Rcpp::Named("gamma_matrix") = gamma_matrix,
                              Rcpp::Named("residuals") = resVec,
-                             Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
+                             Rcpp::Named("emp_vario_values") = emp_vario_values,
                              Rcpp::Named("h_vec") = h_vario_values,
-                             Rcpp::Named("fitted_par_vario") = the_variogram->get_parameters(),
+                             Rcpp::Named("fitted_par_vario") = fit_parameters,
                              Rcpp::Named("iterations") = num_iter,
                              Rcpp::Named("Sigma")= Sigma);
 
@@ -256,12 +265,17 @@ extern "C"{
         double tolerance(Rcpp::as<double> (s_tolerance));
 
         double tol = tolerance+1;
+        std::vector<double> emp_vario_values;
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
+
+          emp_vario_values = emp_vario.get_emp_vario_values();
+          if(!max_sill_n.isNotNull()) max_sill = 1.15 * (*std::max_element(emp_vario_values.begin(), emp_vario_values.end()));
+          if(!max_a_n.isNotNull()) max_a = 1.15 * emp_vario.get_hmax();
           the_variogram -> evaluate_par_fitted_E(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
@@ -279,6 +293,11 @@ extern "C"{
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
 
+        Vec fit_parameters (the_variogram->get_parameters());
+
+        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+
         unsigned int n_hh(1000);
         Vec hh(n_hh);
         std::vector<double> h_vario_values(emp_vario.get_card_h());
@@ -293,9 +312,9 @@ extern "C"{
                              Rcpp::Named("hh") = hh,
                              Rcpp::Named("gamma_matrix") = gamma_matrix,
                              Rcpp::Named("residuals") = resVec,
-                             Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
+                             Rcpp::Named("emp_vario_values") = emp_vario_values,
                              Rcpp::Named("h_vec") = h_vario_values,
-                             Rcpp::Named("fitted_par_vario") = the_variogram->get_parameters(),
+                             Rcpp::Named("fitted_par_vario") = fit_parameters,
                              Rcpp::Named("iterations") = num_iter,
                              Rcpp::Named("Sigma")= Sigma);
 
@@ -467,9 +486,9 @@ extern "C"{
       std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
 
       // Fitted vario parameters
-      double max_a = -1.0;
+      double max_a;
+      double max_sill;
       if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
-      double max_sill = -1;
       if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
 
       // Fitted vario
@@ -561,12 +580,17 @@ extern "C"{
         double tolerance(Rcpp::as<double> (s_tolerance));
 
         double tol = tolerance+1;
+        std::vector<double> emp_vario_values;
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
+
+          emp_vario_values = emp_vario.get_emp_vario_values();
+          if(!max_sill_n.isNotNull()) max_sill = 1.15 * (*std::max_element(emp_vario_values.begin(), emp_vario_values.end()));
+          if(!max_a_n.isNotNull()) max_a = 1.15 * emp_vario.get_hmax();
           the_variogram -> evaluate_par_fitted_W(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
@@ -584,6 +608,11 @@ extern "C"{
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+
+        Vec fit_parameters (the_variogram->get_parameters());
+
+        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -653,9 +682,9 @@ extern "C"{
                                  Rcpp::Named("hh") = hh,
                                  Rcpp::Named("gamma_matrix") = gamma_matrix,
                                  Rcpp::Named("residuals") = resVec,
-                                 Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
-                                 Rcpp::Named("h_vec") = emp_vario.get_hvec(),
-                                 Rcpp::Named("fitted_par_vario") = the_variogram->get_parameters(),
+                                 Rcpp::Named("emp_vario_values") = emp_vario_values,
+                                 Rcpp::Named("h_vec") = h_vario_values,
+                                 Rcpp::Named("fitted_par_vario") = fit_parameters,
                                  Rcpp::Named("iterations") = num_iter,
                                  Rcpp::Named("Sigma") = Sigma,
                                  Rcpp::Named("prediction") = manifold_prediction);
@@ -701,12 +730,17 @@ extern "C"{
         double tolerance(Rcpp::as<double> (s_tolerance));
 
         double tol = tolerance+1;
+        std::vector<double> emp_vario_values;
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
           resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
+
+          emp_vario_values = emp_vario.get_emp_vario_values();
+          if(!max_sill_n.isNotNull()) max_sill = 1.15 * (*std::max_element(emp_vario_values.begin(), emp_vario_values.end()));
+          if(!max_a_n.isNotNull()) max_a = 1.15 * emp_vario.get_hmax();
           the_variogram -> evaluate_par_fitted_E(emp_vario, max_sill, max_a);
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
@@ -723,6 +757,11 @@ extern "C"{
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+
+        Vec fit_parameters (the_variogram->get_parameters());
+
+        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -783,9 +822,9 @@ extern "C"{
                                  Rcpp::Named("hh") = hh,
                                  Rcpp::Named("gamma_matrix") = gamma_matrix,
                                  Rcpp::Named("residuals") = resVec,
-                                 Rcpp::Named("emp_vario_values") = emp_vario.get_emp_vario_values(),
-                                 Rcpp::Named("h_vec") = emp_vario.get_hvec(),
-                                 Rcpp::Named("fitted_par_vario") = the_variogram->get_parameters(),
+                                 Rcpp::Named("emp_vario_values") = emp_vario_values,
+                                 Rcpp::Named("h_vec") = h_vario_values,
+                                 Rcpp::Named("fitted_par_vario") = fit_parameters,
                                  Rcpp::Named("iterations") = num_iter,
                                  Rcpp::Named("Sigma") = Sigma,
                                  Rcpp::Named("prediction") = manifold_prediction);

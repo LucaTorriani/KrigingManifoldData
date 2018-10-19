@@ -74,8 +74,6 @@ void FittedVariogram::evaluate_par_fitted_W (const EmpiricalVariogram & emp_vari
 
     iter++;
   }
-  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-  if(_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
   if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
 }
 
@@ -110,9 +108,6 @@ void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vari
   LDLT<Matrix3d> solver(3);
   Vector3d dir;
 
-  if(max_sill== -1) max_sill=1.15*emp_vario_values.maxCoeff();
-  if(max_a==-1) max_a=1.15*emp_vario.get_hmax();
-
   while((!converged) && iter < max_iter){
 
     JJ = J.transpose()*J;
@@ -130,8 +125,6 @@ void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vari
 
     iter++;
   }
-  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-  if(_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
   if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
 }
 
