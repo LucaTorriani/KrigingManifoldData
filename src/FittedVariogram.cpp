@@ -74,8 +74,8 @@ void FittedVariogram::evaluate_par_fitted_W (const EmpiricalVariogram & emp_vari
 
     iter++;
   }
-  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::warning("Parameter sill bounded from above");
-  if(_parameters(2)==max_a) Rcpp::warning("Parameter a bounded from above");
+  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+  if(_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
   if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
 }
 
@@ -130,8 +130,8 @@ void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vari
 
     iter++;
   }
-  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::warning("Parameter sill bounded from above");
-  if(_parameters(2)==max_a) Rcpp::warning("Parameter a bounded from above");
+  if(_parameters(1)==max_sill-_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+  if(_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
   if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
 }
 
