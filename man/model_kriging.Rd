@@ -10,7 +10,7 @@ model_kriging(data_manifold, coords, X = NULL, Sigma,
   distance = "Geodist", max_it = 100, tolerance = 1e-06,
   weight_intrinsic = NULL, tolerance_intrinsic = 1e-06,
   max_sill = NULL, max_a = NULL, param_weighted_vario = NULL,
-  new_coords, X_new = NULL, plot = TRUE)
+  new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
@@ -63,6 +63,8 @@ be provided in signed decimal degrees),
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
 
 \item{plot}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted}
+
+\item{suppressMes}{boolean. If \code{TRUE} warning messagges are not printed}
 }
 \value{
 list with the following fields:
