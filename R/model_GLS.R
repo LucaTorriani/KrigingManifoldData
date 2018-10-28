@@ -28,6 +28,7 @@
 #' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 
 #' \code{h_max} (maximum value of distance for which the variogram is computed)
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
+#' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
 #' @return A list with the following fields:
 #' \item{\code{beta}}{ vector of the beta matrices of the fitted model}
 #' \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
@@ -61,7 +62,7 @@
 model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manifold = "Frobenius",
                      metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                      n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6,
-                     weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL, plot = FALSE){
+                     weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL, plot = FALSE, suppressMes = FALSE){
   
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
@@ -110,13 +111,13 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
     result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot, 
                   param_weighted_vario$data_manifold_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
-                  param_weighted_vario$h_max, weight_intrinsic, tolerance_intrinsic)
+                  param_weighted_vario$h_max, weight_intrinsic, tolerance_intrinsic, suppressMes)
   }
   
   else {
     result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL, 
-                  coords_tot = NULL, X_tot = NULL, h_max = NULL, weight_intrinsic, tolerance_intrinsic)
+                  coords_tot = NULL, X_tot = NULL, h_max = NULL, weight_intrinsic, tolerance_intrinsic, suppressMes)
     
   }
   

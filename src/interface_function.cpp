@@ -24,7 +24,8 @@ extern "C"{
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
     SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, // RDD
-    SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic) {  // Tangent point
+    SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,  // Tangent point
+    SEXP s_suppressMes) {
 
       BEGIN_RCPP
       Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
@@ -202,8 +203,11 @@ extern "C"{
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
         Vec fit_parameters (the_variogram->get_parameters());
 
-        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+        bool suppressMes(Rcpp::as<bool> (s_suppressMes));
+        if (!suppressMes) {
+          if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+          if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+        }
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -295,8 +299,11 @@ extern "C"{
 
         Vec fit_parameters (the_variogram->get_parameters());
 
-        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+        bool suppressMes(Rcpp::as<bool> (s_suppressMes));
+        if (!suppressMes) {
+          if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+          if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+        }
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -429,7 +436,8 @@ extern "C"{
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
     SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, SEXP s_indexes_model, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
-    SEXP s_new_coordinates, SEXP s_X_new) {  // KRIGING
+    SEXP s_new_coordinates, SEXP s_X_new,  // KRIGING
+    SEXP s_suppressMes) {
 
       BEGIN_RCPP
       Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
@@ -611,8 +619,11 @@ extern "C"{
 
         Vec fit_parameters (the_variogram->get_parameters());
 
-        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+        bool suppressMes(Rcpp::as<bool> (s_suppressMes));
+        if (!suppressMes) {
+          if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+          if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+        }
 
         unsigned int n_hh(1000);
         Vec hh(n_hh);
@@ -760,9 +771,12 @@ extern "C"{
 
         Vec fit_parameters (the_variogram->get_parameters());
 
-        if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-        if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
-
+        bool suppressMes(Rcpp::as<bool> (s_suppressMes));
+        if (!suppressMes) {
+          if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+          if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+        }
+        
         unsigned int n_hh(1000);
         Vec hh(n_hh);
         std::vector<double> h_vario_values(emp_vario.get_card_h());
