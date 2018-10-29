@@ -9,9 +9,10 @@
 
 using namespace Eigen;
 
-MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>&,  map_functions::logarithmicMap&,
-                         map_functions::exponentialMap&,   distances_tplane::DistanceTplane&, double, const Vec&);
+MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>&, std::string, map_functions::logarithmicMap&,
+                         map_functions::exponentialMap&,   distances_tplane::DistanceTplane&, double, const Vec&, const Vec&);
 
+MatrixXd extrinsic_mean (const std::vector<MatrixXd>&, const Vec&);
 
 
 #endif

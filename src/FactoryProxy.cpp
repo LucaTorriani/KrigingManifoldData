@@ -27,19 +27,20 @@ namespace {
   LogMapProxy<map_functions::logMapFrob> logfrob("Frobenius");
   LogMapProxy<map_functions::logMapLogEucl> loglogeucl("LogEuclidean");
   LogMapProxy<map_functions::logMapSqRoot> logsqroot("SquareRoot");
+  LogMapProxy<map_functions::logMapChol> logchol("Correlation");
+
 
   ExpMapProxy<map_functions::expMapFrob> expfrob("Frobenius");
   ExpMapProxy<map_functions::expMapLogEucl> explogeucl("LogEuclidean");
   ExpMapProxy<map_functions::expMapSqRoot> expsqroot("SquareRoot");
+  ExpMapProxy<map_functions::expMapChol> expchol("Correlation");
 
   ManifoldProxy<distances_manifold::Frobenius> manfrob("Frobenius");
   ManifoldProxy<distances_manifold::LogEuclidean> manlogeucl("LogEuclidean");
   ManifoldProxy<distances_manifold::SqRoot> mansqroot("SquareRoot");
+  ManifoldProxy<distances_manifold::Chol> manchol("Correlation");
 
   TplaneProxy<distances_tplane::Frobenius> tplanfrob("Frobenius");
   TplaneProxy<distances_tplane::FrobeniusScaled> tplanfrobscal("FrobeniusScaled");
-
-
-
-
+  TplaneProxy<distances_tplane::Chol> tplanchol("Correlation");
 }

@@ -50,6 +50,32 @@ void logMapSqRoot::set_members(const MatrixXd& Sigma) {
   _Sigma = Sigma;
 }
 
+// CORRELATION
+MatrixXd logMapChol::map2tplane (const MatrixXd& H) const{
+  unsigned int p(H.rows());
+  MatrixXd result(p,p);
+  result.setZero(p,p);
+  result(0,0)=0;
+  Vec H_vec;
+  Vec Sigma_vec;
+  Vec proj_diff;
+  for (size_t i=1; i<p; i++) {
+    H_vec = H.col(i);
+    Sigma_vec = _Sigma.col(i);
+    proj_diff = proj2tspace(H_vec-Sigma_vec, Sigma_vec);
+    result.col(i) = acos((H_vec.transpose()*Sigma_vec).value()) * proj_diff/proj_diff.norm();
+  }
+  return result;
+}
+
+Vec logMapChol::proj2tspace(const Vec& x_vec, const Vec& sigma_vec) const {
+  return (x_vec - ((x_vec.transpose()*sigma_vec).value())*sigma_vec);
+}
+
+void logMapChol::set_members(const MatrixXd& Sigma) {
+  _Sigma = Sigma;
+}
+
 // *** Exponential Map ***
 
 //EXPMAPFROB
@@ -107,5 +133,22 @@ MatrixXd expMapSqRoot::map2manifold(const MatrixXd& M) const{
 }
 
 void expMapSqRoot::set_members(const MatrixXd& Sigma){
+  _Sigma = Sigma;
+}
+
+// CORRELATION
+MatrixXd expMapChol::map2manifold (const MatrixXd& V) const{
+  unsigned int p(V.rows());
+  MatrixXd result(p,p);
+  result.setZero(p,p);
+  result(0,0)=1;
+  for (size_t i=1; i<p; i++) {
+    double col_norm (V.col(i).norm());
+    result.col(i) = cos(col_norm)* _Sigma.col(i) + sin(col_norm)*V.col(i)/col_norm;
+  }
+  return result;
+}
+
+void expMapChol::set_members(const MatrixXd& Sigma){
   _Sigma = Sigma;
 }

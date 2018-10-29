@@ -4,8 +4,10 @@
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
 #' @param tolerance tolerance for the computation of the intrinsic_mean
-#' @param weight vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
+#' @param weight_intrinsic vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
 #' a vector of ones is used
+#' @param weight_extrinsic vector of length \code{B} to weight the matrices in the computation of the extrinsic mean. If NULL
+#' weight_intrinsic are used
 #' @description Evaluate the intrinsic mean of a given set of symmetric positive definite matrices
 #' @examples
 #' data_manifold_tot <- Manifoldgstat::fieldCov
@@ -15,14 +17,17 @@
 #' @export
 
 intrinsic_mean = function(data, metric_manifold = "Frobenius", metric_ts = "Frobenius",
-                     tolerance = 1e-6, weight= NULL){
+                     tolerance = 1e-6, weight_intrinsic= NULL, weight_extrinsic= weight_intrinsic){
   if( is.array(data)){
     data = alply(data,3)
   }
 
-  if(is.null(weight)) weight = rep(1, length(data))
-
-  result =.Call("intrinsic_mean",data, N=length(data), metric_manifold, metric_ts, tolerance, weight)
+  if(is.null(weight_intrinsic)) {
+    weight_intrinsic = rep(1, length(data))
+    weight_extrinsic = weight_intrinsic 
+  }
+  
+  result =.Call("intrinsic_mean",data, N=length(data), metric_manifold, metric_ts, tolerance, weight_intrinsic, weight_extrinsic)
 
   return (result)
 }

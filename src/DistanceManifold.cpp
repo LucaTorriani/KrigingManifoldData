@@ -24,7 +24,8 @@ double LogEuclidean::compute_distance(const MatrixXd& M1, const MatrixXd& M2) co
   unsigned int p = M1.cols();
   MatrixXd tmp(p,p);
   tmp =  (matrix_manipulation::logMat(M1)-matrix_manipulation::logMat(M2));
-  return ( tmp.norm());}
+  return ( tmp.norm());
+}
 
 // SQROOT
 double SqRoot::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const {
@@ -32,4 +33,21 @@ double SqRoot::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const {
   MatrixXd tmp(p,p);
   tmp = matrix_manipulation::sqrtMat(M1)-matrix_manipulation::sqrtMat(M2);
   return ( tmp.norm());
+}
+
+// CORRELATION
+double Chol::compute_distance(const MatrixXd& M1, const MatrixXd& M2) const {
+  unsigned int p(M1.rows());
+  // MatrixXd H1(p,p);    // Assuming data_manifold are already Chol
+  // MatrixXd H2(p,p);
+  // H1 = Chol_decomposition(M1);
+  // H2 = Chol_decomposition(M2);
+  double result(0);
+  double tmp;
+  for (size_t i=1; i<p; i++) {
+    tmp = ((M1.col(i)).transpose() * (M2.col(i))).value();  // .value() casts a matrix(1,1) to a double
+    tmp = acos(std::max( std::min(tmp, 1.0), -1.0));
+    result += tmp*tmp;
+  }
+  return (sqrt(result));
 }

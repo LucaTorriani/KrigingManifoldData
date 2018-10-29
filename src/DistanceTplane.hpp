@@ -36,6 +36,13 @@ namespace distances_tplane{
 
 };
 
+class Chol : public DistanceTplane{
+public:
+  ~Chol() = default;
+  double norm(const MatrixXd &) const override;
+  void set_members(const MatrixXd&) override;
+};
+
 
 
 }

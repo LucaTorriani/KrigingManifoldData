@@ -1,4 +1,5 @@
 #include "DistanceTplane.hpp"
+#include "Helpers.hpp"
 
 #include <cmath>
 
@@ -30,3 +31,17 @@ void FrobeniusScaled::set_members(const MatrixXd& Sigma) {
   Id.setIdentity();
   _SigmaInv = solver.solve(Id);
 }
+
+// CORRELATION
+double Chol::norm(const MatrixXd& M1) const{
+  unsigned int p(M1.rows());
+  double result(0);
+  Vec tmp;
+  for (size_t i=0; i<p; i++) {
+    // tmp = first_i_col_i(M1, i);
+    result += (M1.col(i).transpose() * M1.col(i)).value();
+  }
+  return (sqrt(result));
+}
+
+void Chol::set_members(const MatrixXd& Sigma) {}

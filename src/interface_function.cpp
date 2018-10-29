@@ -23,8 +23,8 @@ extern "C"{
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
-    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, // RDD
-    SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,  // Tangent point
+    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax,  SEXP s_indexes_model, // RDD
+    SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic, SEXP s_weight_extrinsic,  // Tangent point
     SEXP s_suppressMes) {
 
       BEGIN_RCPP
@@ -40,10 +40,24 @@ extern "C"{
       Coordinates coords(coords_ptr);
       unsigned int N = coords.get_N_station();
 
+      // Map functions
+      std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
+      map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
+      std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
+
       // Data manifold model
       std::vector<Eigen::MatrixXd> data_manifold(N);
-      for(size_t i=0; i<N; i++){
-        data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
+      if (distance_Manifold_name == "Correlation") {
+        MatrixXd tmp;
+        for(size_t i=0; i<N; i++){
+          tmp = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
+          data_manifold[i] = matrix_manipulation::Chol_decomposition(tmp);
+        }
+      }
+      else {
+        for(size_t i=0; i<N; i++){
+          data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
+        }
       }
       unsigned int p = data_manifold[0].rows();
 
@@ -52,24 +66,21 @@ extern "C"{
       tplane_factory::TplaneFactory& tplane_fac (tplane_factory::TplaneFactory::Instance());
       std::unique_ptr<distances_tplane::DistanceTplane> theTplaneDist = tplane_fac.create(distance_Tplane_name);
 
-      // Map functions
-      std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
-      map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
-      std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
-
       // Punto tangente
       Eigen::MatrixXd Sigma(p,p);
       if(Sigma_n.isNotNull()) {
         Sigma = Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma);
+        if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
         theTplaneDist->set_members(Sigma);
         theLogMap->set_members(Sigma);
       }
       else {
         double tolerance_intrinsic(Rcpp::as<double> (s_tolerance_intrinsic));
         Eigen::Map<Vec> weights_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
+        Eigen::Map<Vec> weights_extrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_extrinsic)); // Suppongo che la intermediate me li passi sempre (anche nel caso non correlation, magari un rep(1,...))
         map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
         std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
-        Sigma = intrinsic_mean_C(data_manifold, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic);
+        Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
       }
 
       // Distance
@@ -85,7 +96,6 @@ extern "C"{
       double max_sill;
       if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
       if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
-
 
       // Fitted vario
       vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
@@ -111,8 +121,6 @@ extern "C"{
 
       // KERNEL
       if(weight_vario.isNotNull()) {
-        data_manifold.clear();
-
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
         // Distance Matrix tot
@@ -124,10 +132,29 @@ extern "C"{
         unsigned int N_tot = coords_tot.get_N_station();
 
         // Data manifold tot
+        std::vector<unsigned int> indexes_model(Rcpp::as<std::vector<unsigned int>> (s_indexes_model));
+
         std::vector<Eigen::MatrixXd> data_manifold_tot(N_tot);
-        for(size_t i=0; i<N_tot; i++){
-          data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+        size_t ii(0);
+        if (distance_Manifold_name == "Correlation") {
+          for(size_t i=0; i<N_tot; i++){
+            if (i == indexes_model[ii]) {
+              data_manifold_tot[i] = data_manifold[ii];
+              ii++;
+            }
+            else {
+              data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+              data_manifold_tot[i] = matrix_manipulation::Chol_decomposition(data_manifold_tot[i]);
+            }
+          }
         }
+        else {
+          for(size_t i=0; i<N_tot; i++) { // Penso sia più veloce rileggerli tutti piuttosto che fare i vari if
+             data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+          }
+        }
+
+
         // Data tangent space tot
         std::vector<Eigen::MatrixXd> data_tspace_tot(N_tot);
         for (size_t i=0; i<N_tot; i++) {
@@ -136,6 +163,7 @@ extern "C"{
 
         // Data tspace tot
         std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_tot_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace_tot));
+        data_manifold.clear();
         data_manifold_tot.clear();
         data_tspace_tot.clear();
 
@@ -205,8 +233,8 @@ extern "C"{
 
         bool suppressMes(Rcpp::as<bool> (s_suppressMes));
         if (!suppressMes) {
-          if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-          if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+            if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+            if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
         }
 
         unsigned int n_hh(1000);
@@ -218,7 +246,9 @@ extern "C"{
 
         Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
 
-        Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
+        if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
+
+        Rcpp::List result = Rcpp::List::create( Rcpp::Named("beta") = beta_vec_matrices,
                              Rcpp::Named("fit_vario_values") = fit_vario_values,
                              Rcpp::Named("hh") = hh,
                              Rcpp::Named("gamma_matrix") = gamma_matrix,
@@ -227,7 +257,7 @@ extern "C"{
                              Rcpp::Named("h_vec") = h_vario_values,
                              Rcpp::Named("fitted_par_vario") = fit_parameters,
                              Rcpp::Named("iterations") = num_iter,
-                             Rcpp::Named("Sigma")= Sigma);
+                             Rcpp::Named("Sigma")= Sigma );
 
         return Rcpp::wrap(result);
       }
@@ -301,8 +331,8 @@ extern "C"{
 
         bool suppressMes(Rcpp::as<bool> (s_suppressMes));
         if (!suppressMes) {
-          if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-          if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+            if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+            if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
         }
 
         unsigned int n_hh(1000);
@@ -313,6 +343,8 @@ extern "C"{
         hh.setLinSpaced(n_hh, 0, *std::max_element(h_vario_values.begin(), h_vario_values.end()));
 
         Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
+
+        if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                              Rcpp::Named("fit_vario_values") = fit_vario_values,
@@ -339,18 +371,17 @@ extern "C"{
     BEGIN_RCPP
 
     Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
+    std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
 
     // Punto tangente
     Eigen::Map<Eigen::MatrixXd> Sigma(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma));
+    if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
     unsigned int p = Sigma.rows();
 
     // Distance
     distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
     std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
     std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
-
-    // Distance manifold SERVE???
-    std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
 
     // Map functions
     map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
@@ -421,6 +452,7 @@ extern "C"{
       lambda_vec = solver.solve(ci);
       tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
       manifold_prediction[i] = theExpMap->map2manifold(tplane_prediction);
+      if (distance_Manifold_name == "Correlation") { manifold_prediction[i] = manifold_prediction[i].transpose() * manifold_prediction[i]; }
     }
 
     Rcpp::List result = Rcpp::List::create(Rcpp::Named("prediction") = manifold_prediction);  // Solo questo?
@@ -435,7 +467,7 @@ extern "C"{
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
     SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, SEXP s_indexes_model, // RDD
-    SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
+    SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic, SEXP s_weight_extrinsic,
     SEXP s_new_coordinates, SEXP s_X_new,  // KRIGING
     SEXP s_suppressMes) {
 
@@ -453,10 +485,21 @@ extern "C"{
       Coordinates coords(coords_ptr);
       unsigned int N = coords.get_N_station();
 
+      std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
+
       // Data manifold model
       std::vector<Eigen::MatrixXd> data_manifold(N);
-      for(size_t i=0; i<N; i++){
-        data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
+      if (distance_Manifold_name == "Correlation") {
+        MatrixXd tmp;
+        for(size_t i=0; i<N; i++){
+          tmp = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
+          data_manifold[i] = matrix_manipulation::Chol_decomposition(tmp);
+        }
+      }
+      else {
+        for(size_t i=0; i<N; i++){
+          data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
+        }
       }
       unsigned int p = data_manifold[0].rows();
 
@@ -466,7 +509,6 @@ extern "C"{
       std::unique_ptr<distances_tplane::DistanceTplane> theTplaneDist = tplane_fac.create(distance_Tplane_name);
 
       // Map functions
-      std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
       map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
       std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
 
@@ -474,15 +516,17 @@ extern "C"{
       Eigen::MatrixXd Sigma(p,p);
       if(Sigma_n.isNotNull()) {
         Sigma = Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma);
+        if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
         theTplaneDist->set_members(Sigma);
         theLogMap->set_members(Sigma);
       }
       else {
         double tolerance_intrinsic(Rcpp::as<double> (s_tolerance_intrinsic));
         Eigen::Map<Vec> weights_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
+        Eigen::Map<Vec> weights_extrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_extrinsic));
         map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
         std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
-        Sigma = intrinsic_mean_C(data_manifold, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic);
+        Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
       }
 
       // Distance
@@ -523,8 +567,6 @@ extern "C"{
 
       // KERNEL
       if(weight_vario.isNotNull()) {
-
-        data_manifold.clear();
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
 
@@ -537,9 +579,18 @@ extern "C"{
         unsigned int N_tot = coords_tot.get_N_station();
 
         // Data manifold tot
+        std::vector<unsigned int> indexes_model(Rcpp::as<std::vector<unsigned int>> (s_indexes_model));
+
         std::vector<Eigen::MatrixXd> data_manifold_tot(N_tot);
+        size_t ii(0);
         for(size_t i=0; i<N_tot; i++){
-          data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+          if (i == indexes_model[ii]) {
+            data_manifold_tot[i] = data_manifold[ii];
+            ii++;
+          }
+          else {
+            data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+          }
         }
 
         // Data tangent space tot
@@ -549,6 +600,7 @@ extern "C"{
         }
 
         std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_tot_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace_tot));
+        data_manifold.clear();
         data_manifold_tot.clear();
         data_tspace_tot.clear();
 
@@ -621,8 +673,8 @@ extern "C"{
 
         bool suppressMes(Rcpp::as<bool> (s_suppressMes));
         if (!suppressMes) {
-          if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
-          if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+            if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+            if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
         }
 
         unsigned int n_hh(1000);
@@ -666,8 +718,6 @@ extern "C"{
         Eigen::MatrixXd tmp(p,p);
 
         // Select residuals in the k-th cell
-        std::vector<unsigned int> indexes_model(Rcpp::as<std::vector<unsigned int>> (s_indexes_model));
-
         std::vector<Eigen::MatrixXd> resVec_k(N);
         for (size_t ii=0; ii<N; ii++ ) {
             resVec_k[ii]=resVec[indexes_model[ii]-1];
@@ -686,7 +736,10 @@ extern "C"{
           lambda_vec = solver.solve(ci);
           tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
           manifold_prediction[i] = theExpMap->map2manifold(tplane_prediction);
+          if (distance_Manifold_name == "Correlation") { manifold_prediction[i] = manifold_prediction[i].transpose() * manifold_prediction[i]; }
         }
+
+        if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                                  Rcpp::Named("fit_vario_values") = fit_vario_values,
@@ -776,7 +829,7 @@ extern "C"{
           if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
           if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
         }
-        
+
         unsigned int n_hh(1000);
         Vec hh(n_hh);
         std::vector<double> h_vario_values(emp_vario.get_card_h());
@@ -828,8 +881,10 @@ extern "C"{
           lambda_vec = solver.solve(ci);
           tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
           manifold_prediction[i] = theExpMap->map2manifold(tplane_prediction);
+          if (distance_Manifold_name == "Correlation") { manifold_prediction[i] = manifold_prediction[i].transpose() * manifold_prediction[i]; }
         }
 
+        if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                                  Rcpp::Named("fit_vario_values") = fit_vario_values,
@@ -851,13 +906,23 @@ extern "C"{
 
 // INTRINSIC MEAN
 RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
-  SEXP s_tolerance, SEXP s_weight) {
+  SEXP s_tolerance, SEXP s_weight_intrinsic, SEXP s_weight_extrinsic) {
     BEGIN_RCPP
+    std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
     // Data
     unsigned int N(Rcpp::as<unsigned int> (s_N));
     std::vector<Eigen::MatrixXd> data(N);
-    for(size_t i=0; i<N; i++){
-      data[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data,i));
+
+    if (distance_Manifold_name == "Correlation") {
+      for(size_t i=0; i<N; i++){
+        data[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data,i));
+        data[i] = matrix_manipulation::Chol_decomposition(data[i]);
+      }
+    }
+    else {
+      for(size_t i=0; i<N; i++){
+        data[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data,i));
+      }
     }
     unsigned int p = data[0].rows();
 
@@ -867,7 +932,6 @@ RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, S
     std::unique_ptr<distances_tplane::DistanceTplane> theTplaneDist = tplane_fac.create(distance_Tplane_name);
 
     // Map functions
-    std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
     map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
     std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
     map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
@@ -877,78 +941,149 @@ RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, S
     double tolerance (Rcpp::as<double> (s_tolerance));
 
     // Weights
-    Eigen::Map<Vec> weight(Rcpp::as<Eigen::Map<Vec>> (s_weight));
-    double sum_weight(weight.sum());
+    Eigen::Map<Vec> weight_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
+    Eigen::Map<Vec> weight_extrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_extrinsic));
+    double sum_weight_intrinsic(weight_intrinsic.sum());
 
-    // CODE
-    Eigen::MatrixXd Result((data)[0]);
-
-    theLogMap->set_members(Result);
-    theExpMap->set_members(Result);
-    theTplaneDist->set_members(Result);
-
-    Eigen::MatrixXd Xk(p,p);
-    Eigen::MatrixXd Xk_prec(p,p);
-
-    Xk = data[0];
-
-    double tau(1.0);
-    double tmp;
-    double tolk;
-    double tolk_prec(tolerance + 1);
-
-    size_t num_iter(0);
-
-    while(tolk_prec > tolerance && num_iter < 100) {
-
-      Xk_prec = Xk;
-      tmp = theTplaneDist->norm(Xk_prec);
-      tolk_prec = tmp*tmp;
-
-      Xk.setZero();
-      for (size_t i=0; i<N; i++) {
-        Xk = Xk + weight(i)* theLogMap->map2tplane(data[i]);
-      }
-      Xk = Xk/sum_weight;
-      Result = theExpMap->map2manifold(tau*Xk);
+    if (distance_Manifold_name == "Correlation") {
+      Eigen::MatrixXd Result = matrix_manipulation::Chol_decomposition(extrinsic_mean(data, weight_extrinsic));
 
       theLogMap->set_members(Result);
       theExpMap->set_members(Result);
       theTplaneDist->set_members(Result);
 
-      tmp = theTplaneDist->norm(Xk);
-      tolk = tmp*tmp;
-      if (tolk > tolk_prec) {
-        tau = tau/2;
-        Xk = Xk_prec;
-      }
-      num_iter++;
-    }
-    if(num_iter == 100) Rcpp::warning("Reached max number of iterations in intrinsic_mean");
+      Eigen::MatrixXd Xk(p,p);
+      Eigen::MatrixXd Xk_prec(p,p);
 
-    return Rcpp::wrap(Result);
+      Xk = theLogMap->map2tplane(data[0]);
+
+      double tau(1.0);
+      double tmp;
+      double tolk;
+      double tolk_prec(tolerance + 1);
+
+      size_t num_iter(0);
+
+      while(tolk_prec > tolerance && num_iter < 100) {
+        Xk_prec = Xk;
+        tmp = theTplaneDist->norm(Xk_prec);
+        tolk_prec = tmp*tmp;
+
+        Xk.setZero();
+        for (size_t i=0; i<N; i++) {
+          Xk = Xk + weight_intrinsic(i)* theLogMap->map2tplane(data[i]);
+        }
+        Xk = Xk/sum_weight_intrinsic;
+        Result = theExpMap->map2manifold(tau*Xk);
+
+        theLogMap->set_members(Result);
+        theExpMap->set_members(Result);
+        theTplaneDist->set_members(Result);
+
+        tmp = theTplaneDist->norm(Xk);
+        tolk = tmp*tmp;
+        if (tolk > tolk_prec) {
+          tau = tau/2;
+          Xk = Xk_prec;
+        }
+        num_iter++;
+      }
+      if(num_iter == 100) Rcpp::warning("Reached max number of iterations in intrinsic_mean");
+
+      return Rcpp::wrap(Result.transpose() * Result);
+    }
+    else {
+      Eigen::MatrixXd Result((data)[0]);
+
+      theLogMap->set_members(Result);
+      theExpMap->set_members(Result);
+      theTplaneDist->set_members(Result);
+
+      Eigen::MatrixXd Xk(p,p);
+      Eigen::MatrixXd Xk_prec(p,p);
+
+      Xk = data[0];
+
+      double tau(1.0);
+      double tmp;
+      double tolk;
+      double tolk_prec(tolerance + 1);
+
+      size_t num_iter(0);
+
+      while(tolk_prec > tolerance && num_iter < 100) {
+
+        Xk_prec = Xk;
+        tmp = theTplaneDist->norm(Xk_prec);
+        tolk_prec = tmp*tmp;
+
+        Xk.setZero();
+        for (size_t i=0; i<N; i++) {
+          Xk = Xk + weight_intrinsic(i)* theLogMap->map2tplane(data[i]);
+        }
+        Xk = Xk/sum_weight_intrinsic;
+        Result = theExpMap->map2manifold(tau*Xk);
+
+        theLogMap->set_members(Result);
+        theExpMap->set_members(Result);
+        theTplaneDist->set_members(Result);
+
+        tmp = theTplaneDist->norm(Xk);
+        tolk = tmp*tmp;
+        if (tolk > tolk_prec) {
+          tau = tau/2;
+          Xk = Xk_prec;
+        }
+        num_iter++;
+      }
+      if(num_iter == 100) Rcpp::warning("Reached max number of iterations in intrinsic_mean");
+
+      return Rcpp::wrap(Result);
+    }
+
     END_RCPP
 }
 
 
   RcppExport SEXP distance_manifold (SEXP s_data1, SEXP s_data2, SEXP s_N1, SEXP s_N2, SEXP s_manifold_metric) {
       BEGIN_RCPP
+
+      std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, FrobeniusScaled)
+
       // Data1
       unsigned int N1(Rcpp::as<unsigned int> (s_N1));
       std::vector<Eigen::MatrixXd> data1(N1);
-      for(size_t i=0; i<N1; i++){
-        data1[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data1,i));
+      if (distance_Manifold_name == "Correlation") {
+        MatrixXd tmp;
+        for(size_t i=0; i<N1; i++){
+          tmp = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data1,i));
+          data1[i] = matrix_manipulation::Chol_decomposition(tmp);
+        }
+      }
+      else {
+        for(size_t i=0; i<N1; i++){
+          data1[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data1,i));
+        }
       }
 
       // Data2
       unsigned int N2(Rcpp::as<unsigned int> (s_N2));
       std::vector<Eigen::MatrixXd> data2(N1);
-      for(size_t i=0; i<N2; i++){
-        data2[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data2,i));
+      if (distance_Manifold_name == "Correlation") {
+        MatrixXd tmp;
+        for(size_t i=0; i<N2; i++){
+          tmp = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data2,i));
+          data2[i] = matrix_manipulation::Chol_decomposition(tmp);
+        }
+
+      }
+      else {
+        for(size_t i=0; i<N2; i++){
+          data2[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data2,i));
+        }
       }
 
       // Distance manifold
-      std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, FrobeniusScaled)
       manifold_factory::ManifoldFactory& manifold_fac (manifold_factory::ManifoldFactory::Instance());
       std::unique_ptr<distances_manifold::DistanceManifold> theManifoldDist = manifold_fac.create(distance_Manifold_name);
 

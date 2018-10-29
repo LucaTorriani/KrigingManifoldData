@@ -10,7 +10,7 @@ model_GLS(data_manifold, coords, X = NULL, Sigma = NULL,
   distance = "Geodist", max_it = 100, tolerance = 1e-06,
   weight_intrinsic = NULL, tolerance_intrinsic = 1e-06,
   max_sill = NULL, max_a = NULL, param_weighted_vario = NULL,
-  plot = FALSE, suppressMes = FALSE)
+  plot = FALSE, suppressMes = FALSE, weight_extrinsic = NULL)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
@@ -48,18 +48,22 @@ a vector of ones is used. Not needed if Sigma is provided}
 
 \item{max_a}{maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}}
 
-\item{param_weighted_vario}{List of 6 elements to be provided to consider Kernel weights for the variogram: 
+\item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram: 
 \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram), 
 \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), 
 \code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}), 
 \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 be provided in signed decimal degrees), 
 \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 
-\code{h_max} (maximum value of distance for which the variogram is computed)}
+\code{h_max} (maximum value of distance for which the variogram is computed)
+\code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot}). Required only in the case \code{metric_manifold = "Correlation"}}
 
 \item{plot}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted}
 
 \item{suppressMes}{boolean. If \code{TRUE} warning messagges are not printed}
+
+\item{weight_extrinsic}{vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
+weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}}
 }
 \value{
 A list with the following fields:

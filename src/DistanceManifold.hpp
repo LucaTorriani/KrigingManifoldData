@@ -40,9 +40,11 @@ namespace distances_manifold{
     ~SqRoot() = default;
   };
 
-
-
-
+  class Chol : public DistanceManifold{
+  public:
+    double compute_distance(const MatrixXd&, const MatrixXd&) const override;
+    ~Chol() = default;
+  };
 
 }
 

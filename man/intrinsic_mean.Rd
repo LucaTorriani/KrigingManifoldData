@@ -5,7 +5,8 @@
 \title{Intrinsic mean}
 \usage{
 intrinsic_mean(data, metric_manifold = "Frobenius",
-  metric_ts = "Frobenius", tolerance = 1e-06, weight = NULL)
+  metric_ts = "Frobenius", tolerance = 1e-06,
+  weight_intrinsic = NULL, weight_extrinsic = weight_intrinsic)
 }
 \arguments{
 \item{data}{list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}}
@@ -16,8 +17,11 @@ intrinsic_mean(data, metric_manifold = "Frobenius",
 
 \item{tolerance}{tolerance for the computation of the intrinsic_mean}
 
-\item{weight}{vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
+\item{weight_intrinsic}{vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
 a vector of ones is used}
+
+\item{weight_extrinsic}{vector of length \code{B} to weight the matrices in the computation of the extrinsic mean. If NULL
+weight_intrinsic are used}
 }
 \description{
 Evaluate the intrinsic mean of a given set of symmetric positive definite matrices

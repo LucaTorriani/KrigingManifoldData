@@ -19,7 +19,7 @@
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
 #' @param max_sill maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
 #' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
-#' @param param_weighted_vario List of 6 elements to be provided to consider Kernel weights for the variogram: 
+#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram: 
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram), 
 #' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), 
 #' \code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}), 
@@ -27,8 +27,11 @@
 #' be provided in signed decimal degrees), 
 #' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL), 
 #' \code{h_max} (maximum value of distance for which the variogram is computed)
+#' \code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot}). Required only in the case \code{metric_manifold = "Correlation"} 
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
 #' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
+#' @param weight_extrinsic vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
+#' weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}
 #' @return A list with the following fields:
 #' \item{\code{beta}}{ vector of the beta matrices of the fitted model}
 #' \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
@@ -62,8 +65,11 @@
 model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manifold = "Frobenius",
                      metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                      n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6,
-                     weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL, plot = FALSE, suppressMes = FALSE){
-  
+                     weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, 
+                     param_weighted_vario = NULL, plot = FALSE, suppressMes = FALSE, weight_extrinsic=NULL){
+  if ((metric_manifold=="Correlation" && metric_ts !="Correlation")
+      || (metric_manifold!="Correlation" && metric_ts =="Correlation")) 
+    stop("Either metric_manifold and metric_ts are both Correlation, or none of them")
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
   }
@@ -86,6 +92,8 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
   
+  if(metric_manifold=="Correlation" && is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
+  
   if(!is.null(param_weighted_vario)){
     if(is.array(param_weighted_vario$data_manifold_tot)) {
       param_weighted_vario$data_manifold_tot = alply(param_weighted_vario$data_manifold_tot,3)
@@ -106,18 +114,18 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
       if(!check) stop("X_tot must have the same number of rows of coords_tot and the same number of columns of X")
     }
     
-    if(length(param_weighted_vario) != 6) stop("Param_weighter_vario must be a list with length 6")
+    if(length(param_weighted_vario) != 7) stop("Param_weight_vario must be a list with length 7")
     
     result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot, 
                   param_weighted_vario$data_manifold_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot, 
-                  param_weighted_vario$h_max, weight_intrinsic, tolerance_intrinsic, suppressMes)
+                  param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, suppressMes)
   }
   
   else {
     result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL, 
-                  coords_tot = NULL, X_tot = NULL, h_max = NULL, weight_intrinsic, tolerance_intrinsic, suppressMes)
+                  coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model=NULL, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, suppressMes)
     
   }
   

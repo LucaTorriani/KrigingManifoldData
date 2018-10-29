@@ -5,11 +5,12 @@ using namespace model_fit;
 
 
 void Model::update_model(const MatrixXd &gamma_matrix) {
-
   MatrixXd inv_gamma_matrix(_N, _N);
   MatrixXd Id(_N,_N);
   Id.setIdentity(_N,_N);
-  inv_gamma_matrix= gamma_matrix.llt().solve(Id);
+  LDLT<MatrixXd> ldlt(_N);
+  ldlt.compute(gamma_matrix);
+  inv_gamma_matrix= ldlt.solve(Id);
 
   MatrixXd A(_num_cov, _num_cov);
   A.triangularView<Lower>() = (_design_matrix_model->transpose()) *inv_gamma_matrix* (*(_design_matrix_model));

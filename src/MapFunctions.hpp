@@ -41,6 +41,14 @@ namespace map_functions {
     void set_members(const MatrixXd&) override;
   };
 
+  class logMapChol : public logarithmicMap{
+    MatrixXd _Sigma;
+    Vec proj2tspace(const Vec&, const Vec&) const;
+  public:
+    ~logMapChol() = default;
+    MatrixXd map2tplane(const MatrixXd&) const override;
+    void set_members(const MatrixXd&) override;
+  };
 
 
   // EXPONENTIAL MAP
@@ -50,7 +58,6 @@ namespace map_functions {
     virtual ~exponentialMap() = default;
     virtual MatrixXd map2manifold(const MatrixXd&) const = 0;
     virtual void set_members(const MatrixXd&) = 0;
-
   };
 
 
@@ -80,8 +87,15 @@ namespace map_functions {
     void set_members(const MatrixXd&) override;
   };
 
+  class expMapChol : public exponentialMap{
+    MatrixXd _Sigma;
+  public:
+    ~expMapChol() = default;
+    MatrixXd map2manifold(const MatrixXd&) const override;
+    void set_members(const MatrixXd&) override;
+  };
+
 
 }
-
 
 #endif
