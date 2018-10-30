@@ -26,7 +26,7 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
   tmp = (_design_matrix_model->transpose())*inv_gamma_matrix;
 
   if (_distance_Manifold_name== "Correlation") {
-    _beta_matrix.col(0).setZero(_num_cov);
+    _beta_matrix.col(0).setZero();
     for(size_t l=1; l< _num_coeff; l++){
       y = _data_tspace->col(l);
       b = tmp*y;
