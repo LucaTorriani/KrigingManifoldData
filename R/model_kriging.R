@@ -141,7 +141,9 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
   if(is.null(Sigma)){
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
-
+  
+  if(metric_manifold=="Correlation" && is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
+  
   # controllare che else faccia riferimento a if precedente
 
   if(!is.null(param_weighted_vario)){
