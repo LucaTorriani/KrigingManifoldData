@@ -64,7 +64,7 @@ std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd&
   std::vector<MatrixXd> result(N);
 
   if (distance_Manifold_name == "Correlation") {
-    result.setZero(N,N);
+    result.setZero();
     unsigned int k;
     for(size_t l=0; l<N; l++){
       result[l].resize(p,p);
