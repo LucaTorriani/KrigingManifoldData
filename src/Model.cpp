@@ -25,10 +25,20 @@ void Model::update_model(const MatrixXd &gamma_matrix) {
   MatrixXd tmp(_num_cov, _N);
   tmp = (_design_matrix_model->transpose())*inv_gamma_matrix;
 
-  for(size_t l=0; l< _num_coeff; l++){
-    y = _data_tspace->col(l);
-    b = tmp*y;
-    _beta_matrix.col(l) = solver.solve(b);
+  if (_distance_Manifold_name== "Correlation") {
+    _beta_matrix.col(0).setZero(_num_cov);
+    for(size_t l=1; l< _num_coeff; l++){
+      y = _data_tspace->col(l);
+      b = tmp*y;
+      _beta_matrix.col(l) = solver.solve(b);
+    }
+  }
+  else {
+    for(size_t l=0; l< _num_coeff; l++){
+      y = _data_tspace->col(l);
+      b = tmp*y;
+      _beta_matrix.col(l) = solver.solve(b);
+    }
   }
 
   _fitted_values = (*(_design_matrix_tot))*_beta_matrix;

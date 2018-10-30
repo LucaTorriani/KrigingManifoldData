@@ -181,7 +181,7 @@ extern "C"{
         else design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot));
 
         // Model
-        model_fit::Model model(big_matrix_data_tspace_tot_ptr, design_matrix_ptr, design_matrix_tot_ptr, p);
+        model_fit::Model model(big_matrix_data_tspace_tot_ptr, design_matrix_ptr, design_matrix_tot_ptr, p, distance_Manifold_name);
 
         Eigen::MatrixXd resMatrix(N_tot, ((p+1)*p)/2);
         std::vector<MatrixXd> resVec(N_tot);
@@ -278,7 +278,7 @@ extern "C"{
         variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
 
         // Model
-        model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p);
+        model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p, distance_Manifold_name);
 
         Eigen::MatrixXd resMatrix(N, ((p+1)*p)/2);
         std::vector<MatrixXd> resVec(N);
@@ -618,7 +618,7 @@ extern "C"{
         else design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot));
 
         // Model
-        model_fit::Model model(big_matrix_data_tspace_tot_ptr, design_matrix_ptr, design_matrix_tot_ptr, p);
+        model_fit::Model model(big_matrix_data_tspace_tot_ptr, design_matrix_ptr, design_matrix_tot_ptr, p, distance_Manifold_name);
 
         Eigen::MatrixXd resMatrix(N_tot, ((p+1)*p)/2);
         std::vector<MatrixXd> resVec(N_tot);
@@ -773,7 +773,7 @@ extern "C"{
         variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
 
         // Model
-        model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p);
+        model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p, distance_Manifold_name);
 
         Eigen::MatrixXd resMatrix(N, ((p+1)*p)/2);
         std::vector<MatrixXd> resVec(N);

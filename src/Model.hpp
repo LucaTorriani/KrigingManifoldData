@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
 
 #include <utility>
 #include <Eigen/IterativeLinearSolvers>
@@ -15,6 +16,7 @@ private:
   const std::shared_ptr<const MatrixXd> _data_tspace;
   const std::shared_ptr<const MatrixXd> _design_matrix_model;
   const std::shared_ptr<const MatrixXd> _design_matrix_tot;
+  const std::string _distance_Manifold_name;
 
   const unsigned int _N; // Numero stazioni modello
   const unsigned int _p; // dimensione matrice manifold
@@ -25,11 +27,11 @@ private:
   MatrixXd _fitted_values;
   MatrixXd _residuals;
 public:
-  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model, unsigned int p):  // EQUAL WEIGHTS
-        _data_tspace(data_tspace), _design_matrix_model(design_matrix_model), _design_matrix_tot(design_matrix_model),
+  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model, unsigned int p, std::string distance_Manifold_name):  // EQUAL WEIGHTS
+        _data_tspace(data_tspace), _design_matrix_model(design_matrix_model), _design_matrix_tot(design_matrix_model), _distance_Manifold_name(distance_Manifold_name),
        _N(design_matrix_model->rows()), _p(p), _num_cov(_design_matrix_model->cols()), _num_coeff((_p*(_p+1))/2), _beta_matrix(_num_cov, _num_coeff){};
-  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model,  const std::shared_ptr<const MatrixXd> design_matrix_tot, unsigned int p): // KERNEL
-        _data_tspace(data_tspace), _design_matrix_model(design_matrix_model), _design_matrix_tot(design_matrix_tot),
+  Model(const std::shared_ptr<const MatrixXd> data_tspace, const std::shared_ptr<const MatrixXd> design_matrix_model,  const std::shared_ptr<const MatrixXd> design_matrix_tot, unsigned int p, std::string distance_Manifold_name): // KERNEL
+        _data_tspace(data_tspace), _design_matrix_model(design_matrix_model), _design_matrix_tot(design_matrix_tot), _distance_Manifold_name(distance_Manifold_name),
         _N(design_matrix_model->rows()), _p(p), _num_cov(_design_matrix_model->cols()), _num_coeff((_p*(_p+1))/2), _beta_matrix(_num_cov, _num_coeff){};
 
   void update_model(const MatrixXd&);  // Updates Beta, fitted e residuals
