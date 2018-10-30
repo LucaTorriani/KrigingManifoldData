@@ -92,7 +92,8 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
   
-  if(metric_manifold=="Correlation" && is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
+  # if(metric_manifold=="Correlation" && is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
+  if(is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
   
   if(!is.null(param_weighted_vario)){
     if(is.array(param_weighted_vario$data_manifold_tot)) {
