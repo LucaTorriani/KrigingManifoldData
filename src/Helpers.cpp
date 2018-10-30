@@ -64,10 +64,10 @@ std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd&
   std::vector<MatrixXd> result(N);
 
   if (distance_Manifold_name == "Correlation") {
-    result.setZero();
     unsigned int k;
     for(size_t l=0; l<N; l++){
       result[l].resize(p,p);
+      result[l].setZero();
       k = 0;
       for(size_t i=0; i<p; i++){
         result[l](i,i) = bigMatrix(l,k);
