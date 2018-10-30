@@ -59,20 +59,39 @@ MatrixXd matrix_manipulation::sqrtMat(const MatrixXd& A) {
 }
 
 // BIG MATRIX -> VEC of MATRICES
-std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int p){
+std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int p, std::string distance_Manifold_name){
   unsigned int N(bigMatrix.rows());
   std::vector<MatrixXd> result(N);
-  unsigned int k;
-  for(size_t l=0; l<N; l++){
-    result[l].resize(p,p);
-    k = 0;
-    for(size_t i=0; i<p; i++){
-      result[l](i,i) = bigMatrix(l,k);
-      k++;
-      for(size_t j=i+1; j<p; j++){
-        result[l](i,j) = bigMatrix(l,k);
-        result[l](j,i) = bigMatrix(l,k);
+
+  if (distance_Manifold_name == "Correlation") {
+    result.setZero(N,N);
+    unsigned int k;
+    for(size_t l=0; l<N; l++){
+      result[l].resize(p,p);
+      k = 0;
+      for(size_t i=0; i<p; i++){
+        result[l](i,i) = bigMatrix(l,k);
         k++;
+        for(size_t j=i+1; j<p; j++){
+          result[l](i,j) = bigMatrix(l,k);
+          k++;
+        }
+      }
+    }
+  }
+  else {
+    unsigned int k;
+    for(size_t l=0; l<N; l++){
+      result[l].resize(p,p);
+      k = 0;
+      for(size_t i=0; i<p; i++){
+        result[l](i,i) = bigMatrix(l,k);
+        k++;
+        for(size_t j=i+1; j<p; j++){
+          result[l](i,j) = bigMatrix(l,k);
+          result[l](j,i) = bigMatrix(l,k);
+          k++;
+        }
       }
     }
   }

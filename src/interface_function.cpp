@@ -194,7 +194,7 @@ extern "C"{
 
         beta = model.get_beta();
         std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
-        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
         std::vector<Eigen::MatrixXd> beta_old_vec_matrices(n_covariates);
 
         unsigned int num_iter(0);
@@ -206,7 +206,7 @@ extern "C"{
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
-          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
+          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p, distance_Manifold_name);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
 
@@ -220,7 +220,7 @@ extern "C"{
 
           model.update_model(gamma_matrix);
           beta = model.get_beta();
-          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
 
           tol=0.0;
           for (size_t i=0; i<n_covariates; i++) {
@@ -291,7 +291,7 @@ extern "C"{
 
         beta = model.get_beta();
         std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
-        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
         std::vector<Eigen::MatrixXd> beta_old_vec_matrices(n_covariates);
 
         unsigned int num_iter(0);
@@ -303,7 +303,7 @@ extern "C"{
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
-          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
+          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p, distance_Manifold_name);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
 
@@ -317,7 +317,7 @@ extern "C"{
 
           model.update_model(gamma_matrix);
           beta = model.get_beta();
-          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
 
           tol=0.0;
           for (size_t i=0; i<n_covariates; i++) {
@@ -632,7 +632,7 @@ extern "C"{
         beta = model.get_beta();
 
         std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
-        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
         std::vector<Eigen::MatrixXd> beta_old_vec_matrices(n_covariates);
 
         unsigned int num_iter(0);
@@ -644,7 +644,7 @@ extern "C"{
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
-          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
+          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p, distance_Manifold_name);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
 
@@ -659,7 +659,7 @@ extern "C"{
           model.update_model(gamma_matrix);
           beta = model.get_beta();
 
-          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
 
           tol=0.0;
           for (size_t i=0; i<n_covariates; i++) {
@@ -786,7 +786,7 @@ extern "C"{
 
         beta = model.get_beta();
         std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
-        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+        beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
         std::vector<Eigen::MatrixXd> beta_old_vec_matrices(n_covariates);
 
         unsigned int num_iter(0);
@@ -798,7 +798,7 @@ extern "C"{
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
-          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
+          resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p, distance_Manifold_name);
 
           emp_vario.update_emp_vario(resVec, *(theTplaneDist));
 
@@ -812,7 +812,7 @@ extern "C"{
 
           model.update_model(gamma_matrix);
           beta = model.get_beta();
-          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p);
+          beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
 
           tol=0.0;
           for (size_t i=0; i<n_covariates; i++) {
