@@ -138,7 +138,7 @@ extern "C"{
         size_t ii(0);
         if (distance_Manifold_name == "Correlation") {
           for(size_t i=0; i<N_tot; i++){
-            if (ii < indexes_model.size() & i == (indexes_model[ii]-1)) {
+            if (ii < indexes_model.size() && i == (indexes_model[ii]-1)) {
               data_manifold_tot[i] = data_manifold[ii];
               ii++;
             }
@@ -593,7 +593,7 @@ extern "C"{
         size_t ii(0);
         if (distance_Manifold_name == "Correlation") {
           for(size_t i=0; i<N_tot; i++){
-            if (ii < indexes_model.size() & i == (indexes_model[ii]-1)) {
+            if (ii < indexes_model.size() && i == (indexes_model[ii]-1)) {
               data_manifold_tot[i] = data_manifold[ii];
               ii++;
             }
@@ -765,7 +765,7 @@ extern "C"{
         }
 
         if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
-        Rcpp::Rcout << "QUI 18" << "\n"; 
+        Rcpp::Rcout << "QUI 18" << "\n";
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                                  Rcpp::Named("fit_vario_values") = fit_vario_values,
