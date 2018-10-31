@@ -70,6 +70,8 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
   if ((metric_manifold=="Correlation" && metric_ts !="Correlation")
       || (metric_manifold!="Correlation" && metric_ts =="Correlation")) 
     stop("Either metric_manifold and metric_ts are both Correlation, or none of them")
+  
+   
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
   }
@@ -81,6 +83,10 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
   if(length(data_manifold) != dim(coords)[1]){
     stop("Dimension of data_manifold and coords must agree")
   }
+  
+  if (metric_manifold=="Correlation" && (diag(data_manifold[[1]]) !=rep(1,dim(data_manifold[[1]])[1])))
+    stop ("Manifold data must be correlation matrices")
+  
   
   if(!is.null(X)) {
     X = as.matrix(X)

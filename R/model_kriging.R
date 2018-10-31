@@ -137,13 +137,15 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
   if(length(data_manifold) != dim(coords)[1]){
     stop("Dimension of data_manifold and coords must agree")
   }
+  
+  if (metric_manifold=="Correlation" && (diag(data_manifold[[1]]) !=rep(1,dim(data_manifold[[1]])[1])))
+    stop ("Manifold data must be correlation matrices")
 
   if(is.null(Sigma)){
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
+    # if(metric_manifold=="Correlation" && is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
+    if(is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
   }
-  
-  # if(metric_manifold=="Correlation" && is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
-  if(is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
   
   # controllare che else faccia riferimento a if precedente
 
