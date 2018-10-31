@@ -486,7 +486,6 @@ extern "C"{
       unsigned int N = coords.get_N_station();
 
       std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
-      Rcpp::Rcout << "QUI 1" << "\n";
       // Data manifold model
       std::vector<Eigen::MatrixXd> data_manifold(N);
       if (distance_Manifold_name == "Correlation") {
@@ -503,7 +502,6 @@ extern "C"{
       }
       unsigned int p = data_manifold[0].rows();
 
-      Rcpp::Rcout << "QUI 2" << "\n";
       // Distance tplane
       std::string distance_Tplane_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
       tplane_factory::TplaneFactory& tplane_fac (tplane_factory::TplaneFactory::Instance());
@@ -512,7 +510,6 @@ extern "C"{
       // Map functions
       map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
       std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
-      Rcpp::Rcout << "QUI 3" << "\n";
 
       // Punto tangente
       Eigen::MatrixXd Sigma(p,p);
@@ -530,7 +527,6 @@ extern "C"{
         std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
         Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
       }
-      Rcpp::Rcout << "QUI 4" << "\n";
 
       // Distance
       distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
@@ -539,7 +535,6 @@ extern "C"{
 
       // Distance Matrix
       std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
-      Rcpp::Rcout << "QUI 5" << "\n";
 
       // Fitted vario parameters
       double max_a;
@@ -554,7 +549,6 @@ extern "C"{
 
       // Gamma matrix
       Eigen::MatrixXd gamma_matrix(Eigen::MatrixXd::Identity(N,N));
-      Rcpp::Rcout << "QUI 6" << "\n";
 
       // Design matrix
       design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
@@ -567,7 +561,6 @@ extern "C"{
         design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
       }
       else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
-      Rcpp::Rcout << "QUI 7" << "\n";
 
       unsigned int n_covariates(design_matrix_ptr->cols());
 
@@ -575,7 +568,6 @@ extern "C"{
       if(weight_vario.isNotNull()) {
         // Weight vario
         Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
-        Rcpp::Rcout << "Kernel " << "\n";
 
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
@@ -587,7 +579,6 @@ extern "C"{
 
         // Data manifold tot
         std::vector<unsigned int> indexes_model(Rcpp::as<std::vector<unsigned int>> (s_indexes_model));
-        Rcpp::Rcout << "QUI 8" << "\n";
 
         std::vector<Eigen::MatrixXd> data_manifold_tot(N_tot);
         size_t ii(0);
@@ -608,7 +599,6 @@ extern "C"{
              data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
           }
         }
-        Rcpp::Rcout << "QUI 9" << "\n";
 
         // Data tangent space tot
         std::vector<Eigen::MatrixXd> data_tspace_tot(N_tot);
@@ -633,7 +623,6 @@ extern "C"{
           design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot, X_tot));
         }
         else design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot));
-        Rcpp::Rcout << "QUI 10" << "\n";
 
         // Model
         model_fit::Model model(big_matrix_data_tspace_tot_ptr, design_matrix_ptr, design_matrix_tot_ptr, p, distance_Manifold_name);
@@ -646,7 +635,6 @@ extern "C"{
 
         Eigen::MatrixXd beta(n_covariates, ((p+1)*p)/2);
         Eigen::MatrixXd beta_old(n_covariates, ((p+1)*p)/2);
-        Rcpp::Rcout << "QUI 11" << "\n";
 
         beta = model.get_beta();
 
@@ -660,7 +648,6 @@ extern "C"{
 
         double tol = tolerance+1;
         std::vector<double> emp_vario_values;
-        Rcpp::Rcout << "QUI 12" << "\n";
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
@@ -675,7 +662,6 @@ extern "C"{
 
           gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
           beta_old_vec_matrices = beta_vec_matrices;
-          Rcpp::Rcout << "QUI 13" << "\n";
 
           model.update_model(gamma_matrix);
           beta = model.get_beta();
@@ -704,7 +690,6 @@ extern "C"{
         h_vario_values = emp_vario.get_hvec();
 
         hh.setLinSpaced(n_hh, 0, *std::max_element(h_vario_values.begin(), h_vario_values.end()));
-        Rcpp::Rcout << "QUI 14" << "\n";
 
         Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
 
@@ -719,7 +704,6 @@ extern "C"{
         std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
         unsigned int M = new_coords_ptr->rows();
         Coordinates new_coords(new_coords_ptr);
-        Rcpp::Rcout << "QUI 15" << "\n";
 
         // New Design matrix
         std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
@@ -730,7 +714,6 @@ extern "C"{
         else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
 
         std::vector<double> distanceVector(N);
-        Rcpp::Rcout << "QUI 16" << "\n";
 
         Vec ci(N);
         Vec lambda_vec(N);
@@ -750,7 +733,6 @@ extern "C"{
 
         auto weighted_sum_beta = [&beta_vec_matrices, &num_cov, &tmp, p] (const Vec& design_matrix_row) { tmp.setZero(p,p); for (size_t j=0; j<num_cov; j++) tmp = tmp + beta_vec_matrices[j]*design_matrix_row(j); return tmp;};
         auto weighted_sum_residuals = [&resVec_k, &N, &tmp, p] (const Vec& lambda_vec) { tmp.setZero(p,p); for (size_t j=0; j<N; j++) tmp = tmp + resVec_k[j]*lambda_vec(j); return tmp;};
-        Rcpp::Rcout << "QUI 17" << "\n";
 
         Eigen::MatrixXd tplane_prediction(p,p);
         std::vector<Eigen::MatrixXd> manifold_prediction(M);
@@ -765,7 +747,6 @@ extern "C"{
         }
 
         if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
-        Rcpp::Rcout << "QUI 18" << "\n";
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                                  Rcpp::Named("fit_vario_values") = fit_vario_values,
