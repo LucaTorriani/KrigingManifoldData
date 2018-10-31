@@ -10,7 +10,7 @@ distance_manifold(data1, data2, metric_manifold = "Frobenius",
 \arguments{
 \item{data1}{list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}. Or a single \code{nxn} matrix}
 
-\item{data2}{a list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}.
+\item{data2}{list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}.
 Or a single \code{nxn} matrix.}
 
 \item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}

@@ -1,7 +1,7 @@
 #' Distance on the manifold
 #'
 #' @param data1 list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}. Or a single \code{nxn} matrix
-#' @param data2 a list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}.
+#' @param data2 list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}.
 #' Or a single \code{nxn} matrix.
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @description Compute the manifold distance between symmetric positive definite matrices
