@@ -138,7 +138,7 @@ extern "C"{
         size_t ii(0);
         if (distance_Manifold_name == "Correlation") {
           for(size_t i=0; i<N_tot; i++){
-            if (i == indexes_model[ii]) {
+            if (ii < indexes_model.size() & i == (indexes_model[ii]-1)) {
               data_manifold_tot[i] = data_manifold[ii];
               ii++;
             }
@@ -583,13 +583,21 @@ extern "C"{
 
         std::vector<Eigen::MatrixXd> data_manifold_tot(N_tot);
         size_t ii(0);
-        for(size_t i=0; i<N_tot; i++){
-          if (i == indexes_model[ii]) {
-            data_manifold_tot[i] = data_manifold[ii];
-            ii++;
+        if (distance_Manifold_name == "Correlation") {
+          for(size_t i=0; i<N_tot; i++){
+            if (ii < indexes_model.size() & i == (indexes_model[ii]-1)) {
+              data_manifold_tot[i] = data_manifold[ii];
+              ii++;
+            }
+            else {
+              data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+              data_manifold_tot[i] = matrix_manipulation::Chol_decomposition(data_manifold_tot[i]);
+            }
           }
-          else {
-            data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
+        }
+        else {
+          for(size_t i=0; i<N_tot; i++) { // Penso sia più veloce rileggerli tutti piuttosto che fare i vari if
+             data_manifold_tot[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold_tot,i));
           }
         }
 
