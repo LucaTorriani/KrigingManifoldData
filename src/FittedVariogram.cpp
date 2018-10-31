@@ -234,7 +234,7 @@ double GaussVariogram::get_vario_univ(const double & h) const {
     vario_value = 0;
   }
   else {
-    vario_value = _parameters(0) + _parameters(1)*(1-exp(-(h*h)/(_parameters(2)*_parameters(2))));
+    vario_value = _parameters(0) + _parameters(1)*(1-std::exp(-(h*h)/(_parameters(2)*_parameters(2))));
   };
   return vario_value;
 }
@@ -243,7 +243,7 @@ MatrixXd GaussVariogram::compute_jacobian(const std::vector<double> & h_vec, uns
   MatrixXd jacobian (card_h,3);
 
   for (size_t i=0; i<card_h; i++) {
-    double tmp = exp(-(h_vec[i]*h_vec[i])/(_parameters(2)*_parameters(2)));
+    double tmp = std::exp(-(h_vec[i]*h_vec[i])/(_parameters(2)*_parameters(2)));
     jacobian(i,0) = 1.0;
     jacobian(i,1) = 1.0-tmp;
     jacobian(i,2) = -2*(h_vec[i]*h_vec[i])*_parameters(1)*tmp/(_parameters(2)*_parameters(2)*_parameters(2));
@@ -337,7 +337,7 @@ double ExpVariogram::get_vario_univ(const double & h) const {
     vario_value = 0;
   }
   else {
-    vario_value = _parameters(0) + _parameters(1)*(1-exp(-h/_parameters(2)));
+    vario_value = _parameters(0) + _parameters(1)*(1-std::exp(-h/_parameters(2)));
   };
   return vario_value;
 }
@@ -346,7 +346,7 @@ MatrixXd ExpVariogram::compute_jacobian(const std::vector<double> & h_vec, unsig
   MatrixXd jacobian (card_h,3);
 
   for (size_t i=0; i<card_h; i++) {
-    double tmp = exp(-h_vec[i]/_parameters(2));
+    double tmp = std::exp(-h_vec[i]/_parameters(2));
     jacobian(i,0) = 1.0;
     jacobian(i,1) = 1.0-tmp;
     jacobian(i,2) = -h_vec[i]* _parameters(1)*tmp/(_parameters(2)*_parameters(2));

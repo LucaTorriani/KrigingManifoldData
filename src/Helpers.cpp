@@ -12,7 +12,7 @@ MatrixXd matrix_manipulation::expMat(const MatrixXd& A) {
 
   VectorXd expvalues(p);
 
-  for (size_t i = 0; i < p; i++) expvalues(i) = exp(eigenvalues(i).real());
+  for (size_t i = 0; i < p; i++) expvalues(i) = std::exp(eigenvalues(i).real());
 
   MatrixXd result(p, p);
   result =  eigenvectors.real()*expvalues.asDiagonal()*eigenvectors.real().transpose();
@@ -32,7 +32,7 @@ MatrixXd matrix_manipulation::logMat(const MatrixXd& A) {
 
   VectorXd logvalues(p);
 
-  for (size_t i = 0; i < p; i++) logvalues(i) = log(eigenvalues(i).real());
+  for (size_t i = 0; i < p; i++) logvalues(i) = std::log(eigenvalues(i).real());
 
   MatrixXd result(p, p);
   result =  eigenvectors.real()*logvalues.asDiagonal()*eigenvectors.real().transpose();
@@ -59,7 +59,7 @@ MatrixXd matrix_manipulation::sqrtMat(const MatrixXd& A) {
 }
 
 // BIG MATRIX -> VEC of MATRICES
-std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int p, std::string distance_Manifold_name){
+std::vector<MatrixXd> matrix_manipulation::bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int p, const std::string& distance_Manifold_name){
   unsigned int N(bigMatrix.rows());
   std::vector<MatrixXd> result(N);
 
