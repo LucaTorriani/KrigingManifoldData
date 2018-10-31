@@ -16,8 +16,8 @@
 
 distance_manifold = function(data1, data2, metric_manifold = "Frobenius", metric_ts = "Frobenius"){
   if(is.array(data1)){
-    if(length(dim(data1))==3) data1 = alply(data2,3)
-    if(length(dim(data1))==2) data1 = list(data2)
+    if(length(dim(data1))==3) data1 = alply(data1,3)
+    if(length(dim(data1))==2) data1 = list(data1)
   }
   if(is.array(data2)){
     if(length(dim(data2))==3) data2 = alply(data2,3)
