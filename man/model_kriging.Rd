@@ -21,8 +21,8 @@ be provided in signed decimal degrees}
 
 \item{X}{matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL}
 
-\item{Sigma}{\code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
-of \code{data_manifold}}
+\item{Sigma}{\code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean of
+\code{data_manifold}}
 
 \item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
 
@@ -49,7 +49,7 @@ a vector of ones is used. Not needed if Sigma is provided}
 
 \item{max_a}{maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}}
 
-\item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram: 
+\item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram:
 \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
 \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
 \code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
@@ -91,7 +91,7 @@ The manifold values are mapped on the tangent space and then a GLS model is fitt
 is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
-computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the 
+computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
 absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.
 Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
 the estimates are mapped to the manifold.

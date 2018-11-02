@@ -4,8 +4,8 @@
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
 #' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
-#' @param Sigma \code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
-#' of \code{data_manifold}
+#' @param Sigma \code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean of
+#' \code{data_manifold}
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
 #' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
@@ -19,7 +19,7 @@
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
 #' @param max_sill maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
 #' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
-#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram: 
+#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram:
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
 #' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
 #' \code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
@@ -50,7 +50,7 @@
 #' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 #' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 #' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
-#' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the 
+#' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
 #' absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.
 #' Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
 #' the estimates are mapped to the manifold.
@@ -102,10 +102,10 @@
 model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifold = "Frobenius",
                              metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                              n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
-                             tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL, 
+                             tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL,
                             new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE,  weight_extrinsic=NULL){
   if ((metric_manifold=="Correlation" && metric_ts !="Correlation")
-      || (metric_manifold!="Correlation" && metric_ts =="Correlation")) 
+      || (metric_manifold!="Correlation" && metric_ts =="Correlation"))
     stop("Either metric_manifold and metric_ts are both Correlation, or none of them")
 
   if ( distance == "Geodist" & dim(coords)[2] != 2){
@@ -137,7 +137,7 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
   if(length(data_manifold) != dim(coords)[1]){
     stop("Dimension of data_manifold and coords must agree")
   }
-  
+
   if (metric_manifold=="Correlation" && (diag(data_manifold[[1]]) !=rep(1,dim(data_manifold[[1]])[1])))
     stop ("Manifold data must be correlation matrices")
 
@@ -146,7 +146,7 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
     # if(metric_manifold=="Correlation" && is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
     if(is.null(weight_extrinsic)) {weight_extrinsic = weight_intrinsic}
   }
-  
+
   # controllare che else faccia riferimento a if precedente
 
   if(!is.null(param_weighted_vario)){
