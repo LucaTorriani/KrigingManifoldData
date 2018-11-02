@@ -6,7 +6,7 @@
 \usage{
 kriging(GLS_model, coords, new_coords, model_ts = "Additive",
   vario_model = "Gaussian", metric_manifold = "Frobenius",
-  X_new = NULL, distance = "Geodist")
+  X_new = NULL, distance = "Geodist", tolerance_map_cor = 1e-06)
 }
 \arguments{
 \item{GLS_model}{the object returned by \code{model_GLS}, or a list containing the fields:
@@ -28,6 +28,8 @@ be provided in signed decimal degrees}
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
 
 \item{distance}{type of distance between coordinates. It must be either "Eucldist" or "Geodist"}
+
+\item{tolerance_map_cor}{tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}}
 }
 \value{
 A list with a single field:

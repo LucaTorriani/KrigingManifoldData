@@ -11,7 +11,7 @@ model_kriging(data_manifold, coords, X = NULL, Sigma,
   weight_intrinsic = NULL, tolerance_intrinsic = 1e-06,
   max_sill = NULL, max_a = NULL, param_weighted_vario = NULL,
   new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE,
-  weight_extrinsic = NULL)
+  weight_extrinsic = NULL, tolerance_map_cor = 1e-06)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
@@ -69,6 +69,8 @@ be provided in signed decimal degrees),
 
 \item{weight_extrinsic}{vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
 weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}}
+
+\item{tolerance_map_cor}{tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}}
 }
 \value{
 list with the following fields:
