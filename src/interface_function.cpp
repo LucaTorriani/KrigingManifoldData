@@ -25,7 +25,7 @@ extern "C"{
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
     SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax,  SEXP s_indexes_model, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic, SEXP s_weight_extrinsic,  // Tangent point
-    SEXP s_suppressMes) {
+    SEXP s_suppressMes, SEXP s_tolerance_map_cor) {
 
       BEGIN_RCPP
       Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
@@ -44,6 +44,10 @@ extern "C"{
       std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
       map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
       std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
+      if (distance_Manifold_name == "Correlation") {
+        double tolerance_map_cor(Rcpp::as<double> (s_tolerance_map_cor));
+        theLogMap->set_tolerance(tolerance_map_cor);
+      }
 
       // Data manifold model
       std::vector<Eigen::MatrixXd> data_manifold(N);
@@ -366,7 +370,7 @@ extern "C"{
 // KRIGING
   RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
-    SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, SEXP s_X_new) {
+    SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, SEXP s_X_new, SEXP s_tolerance_map_cor) {
 
     BEGIN_RCPP
 
@@ -387,6 +391,10 @@ extern "C"{
     map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
     std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
     theExpMap->set_members(Sigma);
+    if (distance_Manifold_name == "Correlation") {
+      double tolerance_map_cor(Rcpp::as<double> (s_tolerance_map_cor));
+      theExpMap->set_tolerance(tolerance_map_cor);
+    }
 
     // Old coordinates
     std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -469,7 +477,7 @@ extern "C"{
     SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, SEXP s_indexes_model, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic, SEXP s_weight_extrinsic,
     SEXP s_new_coordinates, SEXP s_X_new,  // KRIGING
-    SEXP s_suppressMes) {
+    SEXP s_suppressMes, SEXP s_tolerance_map_cor) {
 
       BEGIN_RCPP
       Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
@@ -510,6 +518,13 @@ extern "C"{
       // Map functions
       map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
       std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
+      map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+      std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+      if (distance_Manifold_name == "Correlation") {
+        double tolerance_map_cor(Rcpp::as<double> (s_tolerance_map_cor));
+        theLogMap->set_tolerance(tolerance_map_cor);
+        theExpMap->set_tolerance(tolerance_map_cor);
+      }
 
       // Punto tangente
       Eigen::MatrixXd Sigma(p,p);
@@ -518,13 +533,14 @@ extern "C"{
         if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
         theTplaneDist->set_members(Sigma);
         theLogMap->set_members(Sigma);
+        theExpMap->set_members(Sigma);
       }
       else {
         double tolerance_intrinsic(Rcpp::as<double> (s_tolerance_intrinsic));
         Eigen::Map<Vec> weights_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
         Eigen::Map<Vec> weights_extrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_extrinsic));
-        map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
-        std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+        // map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+        // std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
         Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
       }
 
@@ -695,10 +711,10 @@ extern "C"{
 
         // KRIGING
 
-        // Map functions
-        map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
-        std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
-        theExpMap->set_members(Sigma);
+        // // Map functions
+        // map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+        // std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+        // theExpMap->set_members(Sigma);
 
         // New coordinates
         std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
@@ -848,10 +864,10 @@ extern "C"{
 
         // KRIGING
 
-        // Map functions
-        map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
-        std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
-        theExpMap->set_members(Sigma);
+        // // Map functions
+        // map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+        // std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+        // theExpMap->set_members(Sigma);
 
         // New coordinates
         std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
@@ -913,7 +929,7 @@ extern "C"{
 
 // INTRINSIC MEAN
 RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
-  SEXP s_tolerance, SEXP s_weight_intrinsic, SEXP s_weight_extrinsic) {
+  SEXP s_tolerance, SEXP s_weight_intrinsic, SEXP s_weight_extrinsic, SEXP s_tolerance_map_cor) {
     BEGIN_RCPP
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
     // Data
@@ -943,6 +959,12 @@ RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, S
     std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
     map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
     std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+
+    if (distance_Manifold_name == "Correlation") {
+      double tolerance_map_cor(Rcpp::as<double> (s_tolerance_map_cor));
+      theLogMap->set_tolerance(tolerance_map_cor);
+      theExpMap->set_tolerance(tolerance_map_cor);
+    }
 
     // Tolerance
     double tolerance (Rcpp::as<double> (s_tolerance));

@@ -43,11 +43,13 @@ namespace map_functions {
 
   class logMapChol : public logarithmicMap{
     MatrixXd _Sigma;
+    double _tolerance_map_cor;
     Vec proj2tspace(const Vec&, const Vec&) const;
   public:
     ~logMapChol() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
+    void set_tolerance(double);
   };
 
 
@@ -88,11 +90,13 @@ namespace map_functions {
   };
 
   class expMapChol : public exponentialMap{
+    double _tolerance_map_cor;
     MatrixXd _Sigma;
   public:
     ~expMapChol() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
+    void set_tolerance(double);
   };
 
 

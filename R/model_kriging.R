@@ -34,6 +34,7 @@
 #' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
 #' @param weight_extrinsic vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
 #' weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}
+#' @param tolerance_map_cor tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}
 #' @return list with the following fields:
 #' \item{\code{beta}}{ vector of the beta matrices of the fitted model}
 #' \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
@@ -103,7 +104,7 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
                              metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                              n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
                              tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL,
-                            new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE,  weight_extrinsic=NULL){
+                            new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE,  weight_extrinsic=NULL, tolerance_map_cor=1e-6){
   if ((metric_manifold=="Correlation" && metric_ts !="Correlation")
       || (metric_manifold!="Correlation" && metric_ts =="Correlation"))
     stop("Either metric_manifold and metric_ts are both Correlation, or none of them")
@@ -174,13 +175,13 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifol
     result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot,
                   param_weighted_vario$data_manifold_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot,
-                  param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, new_coords, X_new, suppressMes )
+                  param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, new_coords, X_new, suppressMes, tolerance_map_cor )
   }
 
   else {
     result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL,
-                  coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model = NULL, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, new_coords, X_new, suppressMes)
+                  coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model = NULL, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, new_coords, X_new, suppressMes, tolerance_map_cor)
 
   }
 
