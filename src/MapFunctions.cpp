@@ -30,6 +30,8 @@ void logMapFrob::set_members(const MatrixXd& Sigma) {
   _sqrtSigmaInv = solver.solve(Id);
 }
 
+void logMapFrob::set_tolerance(double) {}
+
 //LOGMAPLOGEUCL
 MatrixXd logMapLogEucl::map2tplane(const MatrixXd& M) const{
   return (matrix_manipulation::logMat(M) - matrix_manipulation::logMat(_Sigma));
@@ -40,6 +42,8 @@ void logMapLogEucl::set_members(const MatrixXd& Sigma) {
   _Sigma = Sigma;
 }
 
+void logMapLogEucl::set_tolerance(double) {}
+
 //LOGMAPSQROOT
 MatrixXd logMapSqRoot::map2tplane(const MatrixXd& M) const{
   return (matrix_manipulation::sqrtMat(M) - matrix_manipulation::sqrtMat(_Sigma));
@@ -49,6 +53,8 @@ MatrixXd logMapSqRoot::map2tplane(const MatrixXd& M) const{
 void logMapSqRoot::set_members(const MatrixXd& Sigma) {
   _Sigma = Sigma;
 }
+
+void logMapSqRoot::set_tolerance(double) {}
 
 // CORRELATION
 MatrixXd logMapChol::map2tplane (const MatrixXd& H) const{
@@ -111,6 +117,8 @@ void expMapFrob::set_members(const MatrixXd& Sigma){
   _sqrtSigmaInv = solver.solve(Id);
 }
 
+void expMapFrob::set_tolerance(double) {}
+
 //EXPMAPLOEGEUCL
 MatrixXd expMapLogEucl::map2manifold(const MatrixXd& M) const{
   unsigned int p(M.cols());
@@ -127,6 +135,8 @@ void expMapLogEucl::set_members(const MatrixXd& Sigma){
   _Sigma = Sigma;
 }
 
+void expMapLogEucl::set_tolerance(double) {}
+
 //LOGMAPSQROOT
 MatrixXd expMapSqRoot::map2manifold(const MatrixXd& M) const{
   unsigned int p(M.cols());
@@ -142,6 +152,8 @@ MatrixXd expMapSqRoot::map2manifold(const MatrixXd& M) const{
 void expMapSqRoot::set_members(const MatrixXd& Sigma){
   _Sigma = Sigma;
 }
+
+void expMapSqRoot::set_tolerance(double) {}
 
 // CORRELATION
 MatrixXd expMapChol::map2manifold (const MatrixXd& V) const{

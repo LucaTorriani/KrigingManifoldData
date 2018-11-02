@@ -12,7 +12,7 @@ namespace map_functions {
     virtual ~logarithmicMap() = default;
     virtual MatrixXd map2tplane(const MatrixXd&) const = 0;
     virtual void set_members(const MatrixXd&) = 0;
-
+    virtual void set_tolerance(double) = 0;
   };
 
   class logMapFrob : public logarithmicMap{
@@ -22,6 +22,7 @@ namespace map_functions {
      ~logMapFrob() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
+    void set_tolerance(double) override;
   };
 
   class logMapLogEucl : public logarithmicMap{
@@ -30,7 +31,7 @@ namespace map_functions {
     ~logMapLogEucl() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
-
+    void set_tolerance(double) override;
   };
 
   class logMapSqRoot : public logarithmicMap{
@@ -39,6 +40,7 @@ namespace map_functions {
     ~logMapSqRoot() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
+    void set_tolerance(double) override;
   };
 
   class logMapChol : public logarithmicMap{
@@ -49,7 +51,7 @@ namespace map_functions {
     ~logMapChol() = default;
     MatrixXd map2tplane(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
-    void set_tolerance(double);
+    void set_tolerance(double) override;
   };
 
 
@@ -60,6 +62,7 @@ namespace map_functions {
     virtual ~exponentialMap() = default;
     virtual MatrixXd map2manifold(const MatrixXd&) const = 0;
     virtual void set_members(const MatrixXd&) = 0;
+    virtual void set_tolerance(double) = 0;
   };
 
 
@@ -70,7 +73,7 @@ namespace map_functions {
     ~expMapFrob() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
-
+    void set_tolerance(double) override;
   };
 
   class expMapLogEucl : public exponentialMap{
@@ -79,6 +82,7 @@ namespace map_functions {
     ~expMapLogEucl() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
+    void set_tolerance(double) override;
   };
 
   class expMapSqRoot : public exponentialMap{
@@ -87,6 +91,7 @@ namespace map_functions {
     ~expMapSqRoot() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
+    void set_tolerance(double) override;
   };
 
   class expMapChol : public exponentialMap{
@@ -96,7 +101,7 @@ namespace map_functions {
     ~expMapChol() = default;
     MatrixXd map2manifold(const MatrixXd&) const override;
     void set_members(const MatrixXd&) override;
-    void set_tolerance(double);
+    void set_tolerance(double) override;
   };
 
 
