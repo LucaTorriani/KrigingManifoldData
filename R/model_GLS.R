@@ -6,8 +6,8 @@
 #' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
 #' @param Sigma \code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
 #' of \code{data_manifold}
-#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
-#' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
+#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+#' @param metric_ts metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
 #' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
 #' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
 #' @param n_h number of bins in the emprical variogram

@@ -14,7 +14,7 @@ intrinsic_mean(data, metric_manifold = "Frobenius",
 
 \item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
 
-\item{metric_ts}{metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"}
+\item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
 
 \item{tolerance}{tolerance for the computation of the intrinsic_mean}
 

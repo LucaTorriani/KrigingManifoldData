@@ -13,7 +13,10 @@ distance_manifold(data1, data2, metric_manifold = "Frobenius",
 \item{data2}{list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}.
 Or a single \code{nxn} matrix.}
 
-\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
+\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"}
+}
+\value{
+A double or a vector of distances
 }
 \description{
 Compute the manifold distance between symmetric positive definite matrices

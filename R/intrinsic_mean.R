@@ -2,7 +2,7 @@
 #'
 #' @param data list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
-#' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
+#' @param metric_ts metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
 #' @param tolerance tolerance for the computation of the intrinsic_mean
 #' @param weight_intrinsic vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
 #' a vector of ones is used

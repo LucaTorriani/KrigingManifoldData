@@ -23,7 +23,7 @@ be provided in signed decimal degrees}
 
 \item{vario_model}{type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"}
 
-\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
+\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"}
 
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
 

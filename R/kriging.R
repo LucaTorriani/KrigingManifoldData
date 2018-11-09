@@ -9,7 +9,7 @@
 #' @param new_coords matrix of coordinates for the new locations where to perform kriging
 #' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
 #' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
-#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
+#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
 #' @param tolerance_map_cor tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}

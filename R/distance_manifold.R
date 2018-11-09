@@ -3,7 +3,8 @@
 #' @param data1 list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}. Or a single \code{nxn} matrix
 #' @param data2 list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}.
 #' Or a single \code{nxn} matrix.
-#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
+#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+#' @return A double or a vector of distances
 #' @description Compute the manifold distance between symmetric positive definite matrices
 #' @details If \code{B2}=\code{B1} then the result is a vector of length \code{B1=B2} containing in position \code{i} the manifold distance beetween \code{data1[,,i]} and \code{data2[,,i]}.
 #' Instead if \code{B2}=1 and \code{B1}!=1 the result is a vector of length \code{B1} containing in position \code{i} the manifold distance between \code{data1[,,i]} and \code{data2[,,1]}

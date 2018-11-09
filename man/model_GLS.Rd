@@ -24,9 +24,9 @@ be provided in signed decimal degrees}
 \item{Sigma}{\code{p*p} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
 of \code{data_manifold}}
 
-\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
+\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"}
 
-\item{metric_ts}{metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"}
+\item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
 
 \item{model_ts}{type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"}
 
