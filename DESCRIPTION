@@ -11,9 +11,10 @@ Description: Inference and prediction for manifold-valued data analysis. This
 		for spatial dependent	manifold valued data, in order to perform kriging.
 		In each location, specified by a vector of coordinates ([lat,long], [x,y]
 		or [x,y,z]), the datum is supposed to be a symmetric and positive definite
-		matrix. The algorithm exploits a projection of these data on the tangent
-		space of symmetric matrices, where the tangent point is either provided by
-		the user or computed as intrinsic mean of the data in input.
+		matrix (possibly a correlation matrix). The algorithm exploits a projection
+		of these data on a tangent space, where the tangent 
+		point is either provided by the user or computed as intrinsic mean of the
+		data in input.
 Depends: R (>= 3.2.0), Rcpp (>= 0.12.16), RcppEigen (>= 0.3.3.4.0), plyr(>= 1.8.4)
 LinkingTo: Rcpp, RcppEigen
 NeedsCompilation: yes
