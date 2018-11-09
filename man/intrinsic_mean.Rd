@@ -12,7 +12,7 @@ intrinsic_mean(data, metric_manifold = "Frobenius",
 \arguments{
 \item{data}{list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}}
 
-\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
+\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"}
 
 \item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
 
