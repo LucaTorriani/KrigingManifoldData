@@ -156,15 +156,15 @@ void expMapSqRoot::set_members(const MatrixXd& Sigma){
 void expMapSqRoot::set_tolerance(double) {}
 
 // CORRELATION
-MatrixXd expMapChol::map2manifold (const MatrixXd& V) const{
-  unsigned int p(V.rows());
+MatrixXd expMapChol::map2manifold (const MatrixXd& M) const{
+  unsigned int p(M.rows());
   MatrixXd result(p,p);
   result.setZero(p,p);
   result(0,0)=1;
   for (size_t i=1; i<p; i++) {
-    double col_norm (V.col(i).norm());
+    double col_norm (M.col(i).norm());
     if (col_norm < _tolerance_map_cor) result.col(i) = _Sigma.col(i);
-    else result.col(i) = cos(col_norm)* _Sigma.col(i) + sin(col_norm)*V.col(i)/col_norm;
+    else result.col(i) = cos(col_norm)* _Sigma.col(i) + sin(col_norm)*M.col(i)/col_norm;
   }
   return result;
 }
