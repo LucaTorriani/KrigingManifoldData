@@ -35,7 +35,8 @@ Otherwise you can install directly from github:
 
     devtools::install_github("LucaTorriani/KrigingManifoldData", ref = "master")
 
-To run some examples in R:
-    example(model_GLS, "Manifoldgstat")
-    example(kriging, "Manifoldgstat")
-    example(model_kriging, "Manifoldgstat")
+To run an example in R:
+
+        example(model_GLS, "Manifoldgstat")
+        example(kriging, "Manifoldgstat")
+        example(model_kriging, "Manifoldgstat")
