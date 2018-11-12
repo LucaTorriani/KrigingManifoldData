@@ -4,107 +4,200 @@
 
 #include "DistanceManifold.hpp"
 
+/*! \file
+  @brief Classes to compute the exponential and logarithmic map according to the manifold metric
+*/
+
 namespace map_functions {
 
 // LOGARITHMIC MAP
+/*!
+  @brief	Abstract class for the computation of the logarithmic map
+*/
   class logarithmicMap{
   public:
+    /*!
+      @brief Destructor
+    */
     virtual ~logarithmicMap() = default;
-    virtual MatrixXd map2tplane(const MatrixXd&) const = 0;
-    virtual void set_members(const MatrixXd&) = 0;
-    virtual void set_tolerance(double) = 0;
+    /*!
+      @brief Map a manifold matrix to the tangent space
+      @param M Manifold matrix to map
+      @return Tangent space matrix identifying the mapped data
+    */
+    virtual MatrixXd map2tplane(const MatrixXd& M) const = 0;
+    /*!
+      @brief Set class members
+      @param Sigma Tangent point
+    */
+    virtual void set_members(const MatrixXd& Sigma) = 0;
+    /*!
+      @brief Set tolerance
+      @param tolerance_map_cor Tolerance
+    */
+    virtual void set_tolerance(double tolerance_map_cor) = 0;
   };
-
+  /*!
+    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="Frobenius"}\f$
+  */
   class logMapFrob : public logarithmicMap{
+    /*! Square root of the tangent point Sigma */
     MatrixXd  _sqrtSigma;
+    /*! Inverse of the square root of the tangent point Sigma */
     MatrixXd  _sqrtSigmaInv;
   public:
+    /*!
+      @brief Destructor
+    */
      ~logMapFrob() = default;
-    MatrixXd map2tplane(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2tplane(const MatrixXd& M) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
-
+  /*!
+    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="LogEuclidean"}\f$
+  */
   class logMapLogEucl : public logarithmicMap{
+    /*! Tangent point Sigma */
     MatrixXd _Sigma;
   public:
+    /*!
+      @brief Destructor
+    */
     ~logMapLogEucl() = default;
-    MatrixXd map2tplane(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2tplane(const MatrixXd& M) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
-
+  /*!
+    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="SqRoot"}\f$
+  */
   class logMapSqRoot : public logarithmicMap{
+    /*! Tangent point Sigma */
     MatrixXd _Sigma;
   public:
+    /*!
+      @brief Destructor
+    */
     ~logMapSqRoot() = default;
-    MatrixXd map2tplane(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2tplane(const MatrixXd& M) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
-
+  /*!
+    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="Correlation"}\f$
+  */
   class logMapChol : public logarithmicMap{
+    /*! Tangent point Sigma */
     MatrixXd _Sigma;
+    /*! Tolerance on the norm of the columns to avoid Nan */
     double _tolerance_map_cor;
     Vec proj2tspace(const Vec&, const Vec&) const;
   public:
+    /*!
+      @brief Destructor
+    */
     ~logMapChol() = default;
-    MatrixXd map2tplane(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2tplane(const MatrixXd& M) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
 
 
   // EXPONENTIAL MAP
-
+  /*!
+    @brief	Abstract class for the computation of the exponential map
+  */
   class exponentialMap{
   public:
+    /*!
+      @brief Destructor
+    */
     virtual ~exponentialMap() = default;
-    virtual MatrixXd map2manifold(const MatrixXd&) const = 0;
-    virtual void set_members(const MatrixXd&) = 0;
-    virtual void set_tolerance(double) = 0;
+    /*!
+      @brief Map a tangent space matrix to the manifold
+      @param M Tangent space matrix to map
+      @return Manifold matrix identifying the mapped data
+    */
+    virtual MatrixXd map2manifold(const MatrixXd& M) const = 0;
+    /*!
+      @brief Set class members
+      @param Sigma Tangent point
+    */
+    virtual void set_members(const MatrixXd& Sigma) = 0;
+    /*!
+      @brief Set tolerance
+      @param tolerance_map_cor Tolerance
+    */
+    virtual void set_tolerance(double tolerance_map_cor) = 0;
   };
 
-
+  /*!
+    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="Frobenius"}\f$
+  */
   class expMapFrob : public exponentialMap{
+    /*! Square root of the tangent point Sigma */
     MatrixXd _sqrtSigma;
+    /*! Inverse of the square root of the tangent point Sigma */
     MatrixXd _sqrtSigmaInv;
   public:
+    /*!
+      @brief Destructor
+    */
     ~expMapFrob() = default;
-    MatrixXd map2manifold(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2manifold(const MatrixXd& M) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
-
+  /*!
+    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="LogEuclidean"}\f$
+  */
   class expMapLogEucl : public exponentialMap{
+    /*! Tangent point Sigma */
     MatrixXd _Sigma;
   public:
+    /*!
+      @brief Destructor
+    */
     ~expMapLogEucl() = default;
-    MatrixXd map2manifold(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2manifold(const MatrixXd& M ) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
-
+  /*!
+    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="SqRoot"}\f$
+  */
   class expMapSqRoot : public exponentialMap{
+    /*! Tangent point Sigma */
     MatrixXd _Sigma;
   public:
+    /*!
+      @brief Destructor
+    */
     ~expMapSqRoot() = default;
-    MatrixXd map2manifold(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2manifold(const MatrixXd& M) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
-
+  /*!
+    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="Correlation"}\f$
+  */
   class expMapChol : public exponentialMap{
+    /*! Tolerance on the norm of the columns to avoid Nan */
     double _tolerance_map_cor;
+    /*! Tangent point Sigma */
     MatrixXd _Sigma;
   public:
+    /*!
+      @brief Destructor
+    */
     ~expMapChol() = default;
-    MatrixXd map2manifold(const MatrixXd&) const override;
-    void set_members(const MatrixXd&) override;
-    void set_tolerance(double) override;
+    MatrixXd map2manifold(const MatrixXd& M) const override;
+    void set_members(const MatrixXd& Sigma) override;
+    void set_tolerance(double tolerance_map_cor) override;
   };
 
 
 }
 
-#endif
+#endif  // _MAPFUNCTIONS_HPP_

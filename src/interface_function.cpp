@@ -17,9 +17,61 @@
 #include "Model.hpp"
 #include "IntrinsicMean.hpp"
 
-extern "C"{
+/*! \file
+ @brief Main functions to create the model and perform kriging, along with functions to compute the distance on the manifold and the intrinsic mean.
+ */
 
-// CREATE MODEL
+extern "C"{
+/*!
+  @brief  Given the coordinates and corresponding manifold values, this function creates a GLS model on the tangent space.
+  @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
+  is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the \f$\texttt{beta}\f$ are obtained as a result of a
+  weighted least square problem where the weight matrix is the inverse of \f$\texttt{gamma\_matrix}\f$. The residuals \f$\texttt{(residuals = data\_ts - fitted)}\f$
+  are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \f$\texttt{gamma\_matrix})\f$ are
+  computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
+  absolute value of the variogram residuals' norm if \f$\texttt{ker.width.vario=0}\f$, while it is based on its increment otherwise.
+  @note
+    Reference: "Kriging prediction for manifold-valued random fields." \n
+    Authors: D. Pigoli, A. Menafoglio & P. Secchi (2016) \n
+    Periodical: Journal of Multivariate Analysis, 145, 117-131.
+  @param s_data_manifold list of \f$N\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+  @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+  @param s_X matrix Matrix with \f$N\f$ rows and unrestricted number of columns of additional covariates for the tangent space model, possibly NULL
+  @param s_Sigma Matrix \f$\left(p*p\right)\f$ representing the tangent point. If NULL the tangent point is computed as the intrinsic mean of \f$\texttt{s\_data\_manifold}\f$
+  @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+  @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+  @param s_ts_metric Metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
+  @param s_ts_model Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
+  @param s_vario_model Type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
+  @param s_n_h Number of bins in the emprical variogram
+  @param s_max_it Max number of iterations for the main loop
+  @param s_tolerance Tolerance for the main loop
+  @param s_max_sill Maximum value allowed for \f$\textit{sill}\f$ in the fitted variogram. If NULL it is defined as \f$1.15*\max(\text{emp\_vario\_values})\f$
+  @param s_max_a Maximum value for \f$\textit{a}\f$ in the fitted variogram. If NULL it is defined as \f$1.15*\text{h\_max}\f$
+  @param s_weight_vario Vector of length \f$N\_tot\f$ to weight the locations in the computation of the empirical variogram
+  @param s_distance_matrix_tot Matrix \f$\left(N\_tot*N\_tot\right)\f$ of distances between the locations,
+  @param s_data_manifold_tot List of \f$N\_tot\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+  @param s_coordinates_tot \f$\left(N\_tot*2\right)\f$ or \f$\left(N\_tot*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees),
+  @param s_X_tot Matrix with \f$N\_tot\f$ rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL
+  @param s_hmax Maximum value of distance for which the variogram is computed
+  @param s_indexes_model Indexes corresponding to \f$\texttt{coords}\f$ in \f$\texttt{coords\_tot}\f$. Required only in the case \f$\texttt{metric\_manifold == "Correlation"}\f$
+  @param s_weight_intrinsic Vector of length \f$N\f$ to weight the locations in the computation of the intrinsic mean. If NULL a vector of ones is used. Not needed if Sigma is provided
+  @param s_tolerance_intrinsic Tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
+  @param s_weight_extrinsic Vector of length \f$N\f$ to weight the locations in the computation of the extrinsic mean. If NULL \f$\texttt{weight\_intrinsic}\f$ are used. Needed only if \f$\texttt{Sigma}\f$ is not provided and \f$\texttt{metric\_manifold== "Correlation"}\f$
+  @param s_suppressMes Boolean. If \f$\texttt{TRUE}\f$ warning messagges are not printed
+  @param s_tolerance_map_cor Tolerance to use in the maps. Required only if \f$\texttt{metric\_manifold== "Correlation"}\f$
+  @return A list with the following fields:
+   - \f$\texttt{beta}\f$ Vector of the beta matrices of the fitted model
+   - \f$\texttt{fit\_vario\_values}\f$ Vector of fitted variogram values in correspondence of \f$\texttt{hh}\f$
+   - \f$\texttt{hh}\f$ Dense vector of positions at which \f$\texttt{fit\_vario\_values}\f$ is computed
+   - \f$\texttt{gamma\_matrix}\f$ Covariogram matrix \f$\left(N*N\right)\f$
+   - \f$\texttt{residuals}\f$ Vector of the \f$N\f$ residual matrices
+   - \f$\texttt{emp\_vario\_values}\f$ Vector of empircal variogram values in correspondence of  \f$\texttt{h\_vec}\f$
+   - \f$\texttt{h\_vec}\f$ Vector of positions at which the empirical variogram is computed
+   - \f$\texttt{fitted\_par\_vario}\f$ Estimates of \f$\textit{nugget}\f$, \f$\textit{sill-nugget}\f$ and \f$\textit{practical range}\f$
+   - \f$\texttt{iterations}\f$ Number of iterations of the main loop
+   - \f$\texttt{Sigma}\f$ Tangent point
+*/
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
@@ -366,9 +418,30 @@ extern "C"{
       END_RCPP
   }
 
-
-// KRIGING
-  RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
+/*!
+    @brief  Given the GLS model kriging prediction on new location is performed.
+    @details The model provided is used to perform simple kriging on the tangent space in correspondence of the new locations. The estimates are then mapped to the manifold to produce the actual prediction.
+    @note
+      Reference: "Kriging prediction for manifold-valued random fields." \n
+      Authors: D. Pigoli, A. Menafoglio & P. Secchi (2016) \n
+      Periodical: Journal of Multivariate Analysis, 145, 117-131.
+    @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_new_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_Sigma Matrix \f$\left(p*p\right)\f$ representing the tangent point. If NULL the tangent point is computed as the intrinsic mean of \f$\texttt{s\_data\_manifold}\f$
+    @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+    @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+    @param s_ts_model Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
+    @param s_vario_model Type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
+    @param s_beta Vector of the beta matrices of the fitted model
+    @param s_gamma_matrix Covariogram matrix \f$\left(N*N\right)\f$
+    @param s_vario_parameters Estimates of \f$\textit{nugget}\f$, \f$\textit{sill-nugget}\f$ and \f$\textit{practical range}\f$
+    @param s_residuals Vector of the \f$N\f$ residual matrices
+    @param s_X_new Matrix (with the same number of rows of \f$\texttt{s\_new\_coordinates}\f$) of additional covariates for the new locations, possibly NULL
+    @param s_tolerance_map_cor Tolerance to use in the maps. Required only if \f$\texttt{metric\_manifold== "Correlation"}\f$
+    @return A list with the following field:
+     - \f$\texttt{prediction}\f$ Vector of matrices predicted at the new locations
+  */
+RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
     SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, SEXP s_X_new, SEXP s_tolerance_map_cor) {
 
@@ -469,8 +542,60 @@ extern "C"{
     END_RCPP
   }
 
-
-  // CREATE MODEL AND KRIGNG
+  /*!
+    @brief  Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then it performs kriging on the new locations.
+    @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
+    is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the \f$\texttt{beta}\f$ are obtained as a result of a
+    weighted least square problem where the weight matrix is the inverse of \f$\texttt{gamma\_matrix}\f$. The residuals \f$\texttt{(residuals = data\_ts - fitted)}\f$
+    are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \f$\texttt{gamma\_matrix})\f$ are
+    computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
+    absolute value of the variogram residuals' norm if \f$\texttt{ker.width.vario=0}\f$, while it is based on its increment otherwise.
+    Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually the estimates are mapped to the manifold.
+    @note
+      Reference: "Kriging prediction for manifold-valued random fields." \n
+      Authors: D. Pigoli, A. Menafoglio & P. Secchi (2016)   \n
+      Periodical: Journal of Multivariate Analysis, 145, 117-131.
+    @param s_data_manifold list of \f$N\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+    @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_X matrix Matrix with \f$N\f$ rows and unrestricted number of columns of additional covariates for the tangent space model, possibly NULL
+    @param s_Sigma Matrix \f$\left(p*p\right)\f$ representing the tangent point. If NULL the tangent point is computed as the intrinsic mean of \f$\texttt{s\_data\_manifold}\f$
+    @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+    @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+    @param s_ts_metric Metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
+    @param s_ts_model Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
+    @param s_vario_model Type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
+    @param s_n_h Number of bins in the emprical variogram
+    @param s_max_it Max number of iterations for the main loop
+    @param s_tolerance Tolerance for the main loop
+    @param s_max_sill Maximum value allowed for \f$\textit{sill}\f$ in the fitted variogram. If NULL it is defined as \f$1.15*\max(\text{emp\_vario\_values})\f$
+    @param s_max_a Maximum value for \f$\textit{a}\f$ in the fitted variogram. If NULL it is defined as \f$1.15*\text{h\_max}\f$
+    @param s_weight_vario Vector of length \f$N\_tot\f$ to weight the locations in the computation of the empirical variogram
+    @param s_distance_matrix_tot Matrix \f$\left(N\_tot*N\_tot\right)\f$ of distances between the locations,
+    @param s_data_manifold_tot List of \f$N\_tot\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+    @param s_coordinates_tot \f$\left(N\_tot*2\right)\f$ or \f$\left(N\_tot*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees),
+    @param s_X_tot Matrix with \f$N\_tot\f$ rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL
+    @param s_hmax Maximum value of distance for which the variogram is computed
+    @param s_indexes_model Indexes corresponding to \f$\texttt{coords}\f$ in \f$\texttt{coords\_tot}\f$. Required only in the case \f$\texttt{metric\_manifold == "Correlation"}\f$
+    @param s_weight_intrinsic Vector of length \f$N\f$ to weight the locations in the computation of the intrinsic mean. If NULL a vector of ones is used. Not needed if Sigma is provided
+    @param s_tolerance_intrinsic Tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
+    @param s_weight_extrinsic Vector of length \f$N\f$ to weight the locations in the computation of the extrinsic mean. If NULL \f$\texttt{weight\_intrinsic}\f$ are used. Needed only if \f$\texttt{Sigma}\f$ is not provided and \f$\texttt{metric\_manifold== "Correlation"}\f$
+    @param s_new_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_X_new Matrix (with the same number of rows of \f$\texttt{s\_new\_coordinates}\f$) of additional covariates for the new locations, possibly NULL
+    @param s_suppressMes Boolean. If \f$\texttt{TRUE}\f$ warning messagges are not printed
+    @param s_tolerance_map_cor Tolerance to use in the maps. Required only if \f$\texttt{metric\_manifold== "Correlation"}\f$
+    @return A list with the following fields:
+     - \f$\texttt{beta}\f$ Vector of the beta matrices of the fitted model
+     - \f$\texttt{fit\_vario\_values}\f$ Vector of fitted variogram values in correspondence of \f$\texttt{hh}\f$
+     - \f$\texttt{hh}\f$ Dense vector of positions at which \f$\texttt{fit\_vario\_values}\f$ is computed
+     - \f$\texttt{gamma\_matrix}\f$ Covariogram matrix \f$\left(N*N\right)\f$
+     - \f$\texttt{residuals}\f$ Vector of the \f$N\f$ residual matrices
+     - \f$\texttt{emp\_vario\_values}\f$ Vector of empircal variogram values in correspondence of  \f$\texttt{h\_vec}\f$
+     - \f$\texttt{h\_vec}\f$ Vector of positions at which the empirical variogram is computed
+     - \f$\texttt{fitted\_par\_vario}\f$ Estimates of \f$\textit{nugget}\f$, \f$\textit{sill-nugget}\f$ and \f$\textit{practical range}\f$
+     - \f$\texttt{iterations}\f$ Number of iterations of the main loop
+     - \f$\texttt{Sigma}\f$ Tangent point
+     - \f$\texttt{prediction}\f$ Vector of matrices predicted at the new locations
+  */
   RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
     SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
@@ -926,9 +1051,19 @@ extern "C"{
     END_RCPP
 }
 
-
-// INTRINSIC MEAN
-RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
+/*!
+  @brief  Evaluate the intrinsic mean of a given set of symmetric positive definite matrices.
+  @param s_data list of \f$N\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+  @param s_N Number of data. N = s_data.size()
+  @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+  @param s_ts_metric Metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
+  @param s_tolerance Tolerance for the computation of the intrinsic_mean
+  @param s_weight_intrinsic Vector of length \f$N\f$ to weight the locations in the computation of the intrinsic mean. If NULL a vector of ones is used
+  @param s_weight_extrinsic Vector of length \f$N\f$ to weight the locations in the computation of the extrinsic mean. If NULL \f$\texttt{weight\_intrinsic}\f$ are used
+  @param s_tolerance_map_cor Tolerance to use in the maps. Required only if \f$\texttt{metric\_manifold== "Correlation"}\f$
+  @return A matrix representing the intrinsic mean of the \f$\texttt{s\_data}\f$
+*/
+ RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
   SEXP s_tolerance, SEXP s_weight_intrinsic, SEXP s_weight_extrinsic, SEXP s_tolerance_map_cor) {
     BEGIN_RCPP
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
@@ -1073,8 +1208,18 @@ RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, S
     END_RCPP
 }
 
-
-  RcppExport SEXP distance_manifold (SEXP s_data1, SEXP s_data2, SEXP s_N1, SEXP s_N2, SEXP s_manifold_metric) {
+/*!
+  @brief Compute the manifold distance between symmetric positive definite matrices.
+  @details If \f$texttt{N1==N2}\f$ then the result is a vector of length \f$texttt{N1=N2}\f$ containing in position \f$texttt{i}\f$ the manifold distance beetween \f$\texttt{data1[[i]]}\f$ and \f$\texttt{data2[[i]]}\f$.
+  Instead if \f$\texttt{N2=1}\f$ and \f$\texttt{N1!=1}\f$ the result is a vector of length \f$\texttt{B1}\f$ containing in position \f$\texttt{i}\f$ the manifold distance between \f$\texttt{data1[[i]]}\f$ and \f$\texttt{data2[[1]]}\f$
+  @param s_data1 list of \f$N1\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+  @param s_data2 list of \f$N2\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+  @param s_N1 Number of data1. N1 = s_data1.size()
+  @param s_N2 Number of data2. N2 = s_data2.size()
+  @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+  @return A double or a vector of distances
+*/
+ RcppExport SEXP distance_manifold (SEXP s_data1, SEXP s_data2, SEXP s_N1, SEXP s_N2, SEXP s_manifold_metric) {
       BEGIN_RCPP
 
       std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, FrobeniusScaled)

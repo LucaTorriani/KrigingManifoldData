@@ -8,32 +8,65 @@
 #include <type_traits>
 #include <Rcpp.h>
 
+/*! \file
+  @brief Factory class
+*/
 
 namespace generic_factory{
+  /*! @brief A generic factory.
 
+    It is implemented as a Singleton. The compulsory way to
+    access a method is Factory::Instance().method().
+    Typycally to access the factory one does
+    \code
+    auto&  myFactory = Factory<A,I,B>::Instance();
+    myFactory.add(...)
+    \endcode
+  */
   template <typename AbstractProduct, typename Identifier, typename Builder=std::function<std::unique_ptr<AbstractProduct> ()>>
   class Factory{
 
   public:
+    //! The container for the rules.
     using AbstractProduct_type = AbstractProduct;
+    //! The identifier.
+    /*
+  We must have an ordering since we use a map with
+  the identifier as key.
+    */
     using  Identifier_type=Identifier;
+    //! The builder type.
+    /*
+      The default is a function.
+    */
     using  Builder_type=Builder;
-
+    //! Method to access the only instance of the factory. We use Meyer's trick to istantiate the factory.
     static Factory & Instance();
+    //! Get the rule with given name
+    /*!
+      The pointer is null if no rule is present.
+    */
     std::unique_ptr<AbstractProduct> create(Identifier const & name) const;
+    //! Register the given rule.
     void add(Identifier const &, Builder_type const &);
+    //! Returns a list of registered rules.
     std::vector<Identifier> registered()const;
+    //! Unregister a rule.
     void unregister(Identifier const & name){ _storage.erase(name);}
+    //! Destructor
     ~Factory()=default;
 
   private:
     typedef std::map<Identifier,Builder_type> Container_type;
+    //! Constructor made private since it is a Singleton
     Factory()=default;
+    //! Copy constructor deleted since it is a Singleton
     Factory(Factory const &)=delete;
+    //! Assignment operator deleted since it is a Singleton
     Factory & operator =(Factory const &)=delete;
+    //! It contains the actual object factory.
     Container_type _storage;
   };
-
 
 
   template <typename AbstractProduct, typename Identifier, typename Builder>
@@ -81,4 +114,4 @@ namespace generic_factory{
 }
 
 
-#endif
+#endif // H_FACTORY_HPP_
