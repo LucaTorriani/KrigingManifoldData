@@ -17,7 +17,7 @@ namespace generic_factory {
     and the automatic registration mechanism.
 
     \param Factory The type of the factory.
-    \param ConcreteProduct is the derived (concrete) type to be
+    \param ConcreteProduct Is the derived (concrete) type to be
     registered in the factory
 
     @note I have to use the default builder provided by the factory. No check is made to verify it
@@ -44,7 +44,7 @@ namespace generic_factory {
 
     //! The constructor does the registration.
     Proxy(Identifier_type const &);
-    //! The builder. Must comply with the signature.
+    //! The builder.
     static std::unique_ptr<AbstractProduct_type> Build(){
       return std::unique_ptr<AbstractProduct_type>(new ConcreteProduct());
     }
