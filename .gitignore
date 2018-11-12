@@ -10,5 +10,5 @@ main
 cmake-build-debug
 *.pdf
 *.dll
-/latex
-/html
+/src/latex
+/src/html
