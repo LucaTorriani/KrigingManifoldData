@@ -43,8 +43,8 @@
 #' \item{\code{iterations}}{ number of iterations of the main loop}
 #' \item{\code{Sigma}}{ tangent point}
 #' @description Given the coordinates and corresponding manifold values, this function creates a GLS model on the tangent space.
-#' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
-#' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
+#' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the \code{beta} coefficients
+#' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the \code{beta} are obtained as a result of a
 #' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 #' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 #' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
