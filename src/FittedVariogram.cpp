@@ -125,7 +125,7 @@ void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vari
 
     iter++;
   }
-  if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
+  if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimization");
 }
 
 void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double max_sill, double max_a){
