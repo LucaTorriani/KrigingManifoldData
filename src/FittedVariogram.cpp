@@ -74,7 +74,7 @@ void FittedVariogram::evaluate_par_fitted_W (const EmpiricalVariogram & emp_vari
 
     iter++;
   }
-  if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimizaion");
+  if(iter == max_iter) Rcpp::warning("Reached max number of iterations in Gauss Newton minimization");
 }
 
 void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vario, double max_sill, double max_a){
