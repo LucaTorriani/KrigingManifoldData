@@ -11,7 +11,7 @@
 
 namespace generic_factory {
 
-  /*! A simple proxy for registering into a factory.
+  /*! @brief A simple proxy for registering into a factory.
 
     It provides the builder as static method
     and the automatic registration mechanism.
