@@ -22,8 +22,8 @@ using namespace Eigen;
   @param distanceTplane Distance on the tangent space
   @param tolerance Tolerance for the algorithm's loop
   @param weight_intrinsic Weights
-  @param weight_extrinsic Weights for the computation of the extrinsic mean (used if distance_Manifold_name=="Correlation")
-  @return Matrix identifying the intrinsic mean of data_manifold
+  @param weight_extrinsic Weights for the computation of the extrinsic mean (used if `distance_Manifold_name=="Correlation"`)
+  @return Matrix identifying the intrinsic mean of `data_manifold`
 */
 MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>& data_manifold, std::string distance_Manifold_name,
                           map_functions::logarithmicMap& logMap, map_functions::exponentialMap& expMap,
@@ -34,7 +34,7 @@ MatrixXd intrinsic_mean_C(const std::vector<MatrixXd>& data_manifold, std::strin
   @brief Compute the extrinsic mean of a set of matrices in \f$ Chol\left(p\right) \f$
   @param data_manifold Vector of matrices in  \f$ Chol\left(p\right) \f$
   @param weight_extrinsic Weights
-  @return Matrix identifying the extrinsic mean of data_manifold
+  @return Matrix identifying the extrinsic mean of `data_manifold`
 */
 MatrixXd extrinsic_mean (const std::vector<MatrixXd>& data_manifold, const Vec& weight_extrinsic);
 

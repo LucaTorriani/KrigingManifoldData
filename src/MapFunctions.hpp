@@ -38,12 +38,12 @@ namespace map_functions {
     virtual void set_tolerance(double tolerance_map_cor) = 0;
   };
   /*!
-    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="Frobenius"}\f$
+    @brief	Class for the computation of the logarithmic map when `manifold_metric=="Frobenius"`
   */
   class logMapFrob : public logarithmicMap{
-    /*! Square root of the tangent point Sigma */
+    /*! Square root of the tangent point `Sigma` */
     MatrixXd  _sqrtSigma;
-    /*! Inverse of the square root of the tangent point Sigma */
+    /*! Inverse of the square root of the tangent point `Sigma` */
     MatrixXd  _sqrtSigmaInv;
   public:
     /*!
@@ -55,10 +55,10 @@ namespace map_functions {
     void set_tolerance(double tolerance_map_cor) override;
   };
   /*!
-    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="LogEuclidean"}\f$
+    @brief	Class for the computation of the logarithmic map when `manifold_metric=="LogEuclidean"`
   */
   class logMapLogEucl : public logarithmicMap{
-    /*! Tangent point Sigma */
+    /*! Tangent point `Sigma` */
     MatrixXd _Sigma;
   public:
     /*!
@@ -70,10 +70,10 @@ namespace map_functions {
     void set_tolerance(double tolerance_map_cor) override;
   };
   /*!
-    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="SqRoot"}\f$
+    @brief	Class for the computation of the logarithmic map when `manifold_metric=="SqRoot"`
   */
   class logMapSqRoot : public logarithmicMap{
-    /*! Tangent point Sigma */
+    /*! Tangent point `Sigma` */
     MatrixXd _Sigma;
   public:
     /*!
@@ -85,13 +85,16 @@ namespace map_functions {
     void set_tolerance(double tolerance_map_cor) override;
   };
   /*!
-    @brief	Class for the computation of the logarithmic map when \f$\texttt{manifold\_metric=="Correlation"}\f$
+    @brief	Class for the computation of the logarithmic map when `manifold_metric=="Correlation"`
   */
   class logMapChol : public logarithmicMap{
-    /*! Tangent point Sigma */
+    /*! Tangent point `Sigma` */
     MatrixXd _Sigma;
-    /*! Tolerance on the norm of the columns to avoid Nan */
+    /*! Tolerance on the norm of the columns to avoid `Nan` */
     double _tolerance_map_cor;
+    /*!
+      @brief Project a matrix in \f$ Chol(p) \f$ to the tangent space 
+    */
     Vec proj2tspace(const Vec&, const Vec&) const;
   public:
     /*!
@@ -133,12 +136,12 @@ namespace map_functions {
   };
 
   /*!
-    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="Frobenius"}\f$
+    @brief	Class for the computation of the exponential map when `manifold_metric=="Frobenius"`
   */
   class expMapFrob : public exponentialMap{
-    /*! Square root of the tangent point Sigma */
+    /*! Square root of the tangent point `Sigma` */
     MatrixXd _sqrtSigma;
-    /*! Inverse of the square root of the tangent point Sigma */
+    /*! Inverse of the square root of the tangent point `Sigma` */
     MatrixXd _sqrtSigmaInv;
   public:
     /*!
@@ -150,10 +153,10 @@ namespace map_functions {
     void set_tolerance(double tolerance_map_cor) override;
   };
   /*!
-    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="LogEuclidean"}\f$
+    @brief	Class for the computation of the exponential map when `manifold_metric=="LogEuclidean"`
   */
   class expMapLogEucl : public exponentialMap{
-    /*! Tangent point Sigma */
+    /*! Tangent point `Sigma` */
     MatrixXd _Sigma;
   public:
     /*!
@@ -165,10 +168,10 @@ namespace map_functions {
     void set_tolerance(double tolerance_map_cor) override;
   };
   /*!
-    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="SqRoot"}\f$
+    @brief	Class for the computation of the exponential map when `manifold_metric=="SqRoot"`
   */
   class expMapSqRoot : public exponentialMap{
-    /*! Tangent point Sigma */
+    /*! Tangent point `Sigma` */
     MatrixXd _Sigma;
   public:
     /*!
@@ -180,12 +183,12 @@ namespace map_functions {
     void set_tolerance(double tolerance_map_cor) override;
   };
   /*!
-    @brief	Class for the computation of the exponential map when \f$\texttt{manifold\_metric=="Correlation"}\f$
+    @brief	Class for the computation of the exponential map when `manifold_metric=="Correlation"`
   */
   class expMapChol : public exponentialMap{
-    /*! Tolerance on the norm of the columns to avoid Nan */
+    /*! Tolerance on the norm of the columns to avoid `Nan` */
     double _tolerance_map_cor;
-    /*! Tangent point Sigma */
+    /*! Tangent point `Sigma` */
     MatrixXd _Sigma;
   public:
     /*!

@@ -34,7 +34,7 @@ namespace distances_manifold{
   };
 
   /*!
-    @brief	Class for the computation of the distance on the manifold when \f$\texttt{manifold\_metric=="Frobenius"}\f$
+    @brief	Class for the computation of the distance on the manifold when `manifold_metric=="Frobenius"`
   */
   class Frobenius : public DistanceManifold{
   public:
@@ -46,7 +46,7 @@ namespace distances_manifold{
     };
 
     /*!
-      @brief	Class for the computation of the distance on the manifold when \f$\texttt{manifold\_metric=="LogEuclidean"}\f$
+      @brief	Class for the computation of the distance on the manifold when `manifold_metric=="LogEuclidean"`
     */
   class LogEuclidean : public DistanceManifold{
   public:
@@ -58,7 +58,7 @@ namespace distances_manifold{
   };
 
   /*!
-    @brief	Class for the computation of the distance on the manifold when \f$\texttt{manifold\_metric=="SqRoot"}\f$
+    @brief	Class for the computation of the distance on the manifold when `manifold_metric=="SqRoot"`
   */
   class SqRoot : public DistanceManifold{
   public:
@@ -70,7 +70,7 @@ namespace distances_manifold{
   };
 
   /*!
-    @brief	Class for the computation of the distance on the manifold when \f$\texttt{manifold\_metric=="Chol"}\f$
+    @brief	Class for the computation of the distance on the manifold when `manifold_metric=="Chol"`
     @note The data on the manifold must be correlation matrices
   */
   class Chol : public DistanceManifold{

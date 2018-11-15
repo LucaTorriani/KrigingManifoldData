@@ -44,7 +44,7 @@ namespace design_matrix {
   };
 
   /*!
-    @brief	Class for the computation of the design_matrix when \f$\texttt{model\_ts=="Intercept"}\f$
+    @brief	Class for the computation of the design_matrix when `model_ts=="Intercept"`
   */
   class InterceptDM : public DesignMatrix {
   public:
@@ -58,7 +58,7 @@ namespace design_matrix {
   };
 
   /*!
-    @brief	Class for the computation of the design_matrix when \f$\texttt{model\_ts=="Coord1"}\f$
+    @brief	Class for the computation of the design_matrix when `model_ts=="Coord1"`
   */
   class Coord1DM: public DesignMatrix {
   public:
@@ -72,7 +72,7 @@ namespace design_matrix {
   };
 
   /*!
-    @brief	Class for the computation of the design_matrix when \f$\texttt{model\_ts=="Coord2"}\f$
+    @brief	Class for the computation of the design_matrix when `model_ts=="Coord2"`
   */
   class Coord2DM: public DesignMatrix {
   public:
@@ -86,7 +86,7 @@ namespace design_matrix {
   };
 
   /*!
-    @brief	Class for the computation of the design_matrix when \f$\texttt{model\_ts=="Additive"}\f$
+    @brief	Class for the computation of the design_matrix when `model_ts=="Additive"`
   */
   class AdditiveDM: public DesignMatrix {
   public:

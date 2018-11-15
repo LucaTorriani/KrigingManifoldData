@@ -15,26 +15,26 @@ namespace variogram_evaluation {
   */
 class FittedVariogram{
 protected:
-  /*! Vector storing the three parameters of the fitted varriogram \f$ \left(\textit{nugget}, \textit{sill-nugget}, \textit{practical range} \right) \f$ */
+  /*! Vector storing the three parameters of the fitted varriogram \e (nugget, \e sill-nugget, \e practical \e range) */
   Vector3d _parameters; // tau2, sigma2, a
   /*!
     @brief Compute weighted median
     @param values Values whose median must be computed
     @param card Weights
-    @return Median of \f$ \texttt{values} \f$, weighted using \f$ \texttt{card} \f$
+    @return Median of `values`, weighted using `card`
   */
   double weighted_median (const std::vector<double> & values, const std::vector<unsigned int> & card);
   /*!
-    @brief Initialize \f$\texttt{\_parameters}\f$
-    @details The \f$\texttt{\_parameters}\f$ are initialized as follows: \n
-      \f$ \text{\_parameters}\left(0\right)=\text{weighted\_median} \left(\text{\_emp\_vario\_values.head} \left(2\right), \text{\_N\_hvec.head} \left(2\right)\right) \f$ \n
-      \f$ \text{\_parameters}\left(1\right)=\text{weighted\_median} \left(\text{\_emp\_vario\_values.tail} \left(4\right), \text{\_N\_hvec.tail} \left(4\right)\right) - \text{\_parameters}\left(0\right) \f$  \n
-      \f$ \text{\_parameters}\left(2\right)= \text{\_hvec}\left(i^\ast \right) \f$  \n where \f$i^\ast\f$ is the first \f$i \text{ s.t.} \left| \text{\_emp\_vario\_values}\left(i\right)- \left( \text{\_parameters}\left(0\right) + \text{\_parameters}\left(1\right) \right) \right| < \text{tol} \f$
+    @brief Initialize `_parameters`
+    @details The `_parameters` are initialized as follows: \n
+      \f$ \mbox{\_parameters}\left(0\right)=\text{weighted\_median} \left(\mbox{\_emp\_vario\_values.head} \left(2\right), \mbox{\_N\_hvec.head} \left(2\right)\right) \f$ \n
+      \f$ \mbox{\_parameters}\left(1\right)=\text{weighted\_median} \left(\mbox{\_emp\_vario\_values.tail} \left(4\right), \mbox{\_N\_hvec.tail} \left(4\right)\right) - \mbox{\_parameters}\left(0\right) \f$  \n
+      \f$ \mbox{\_parameters}\left(2\right)= \mbox{\_hvec}\left(i^\ast \right) \f$  \n where \f$i^\ast\f$ is the first \f$i \text{ s.t.} \left| \mbox{\_emp\_vario\_values}\left(i\right)- \left( \mbox{\_parameters}\left(0\right) + \mbox{\_parameters}\left(1\right) \right) \right| < \mbox{tol} \f$
     @param emp_vario Empirical variogram
   */
   virtual void get_init_par(const EmpiricalVariogram & emp_vario) = 0;
   /*!
-    @brief Update \f$\texttt{\_parameters}\f$ moving along \f$\texttt{dir}\f$
+    @brief Update `_parameters`moving along `dir`
   */
   void backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double max_sill, double max_a);
   /*!
@@ -43,83 +43,83 @@ protected:
   virtual MatrixXd compute_jacobian(const std::vector<double> & h_vec, unsigned int card_h) const = 0;
 public:
   /*!
-    @brief Return \f$ \texttt{\_parameters}\left(0\right) \f$, i.e. the \f$ \textit{nugget}\f$
+    @brief Return `_parameters(0)`, i.e. the \e nugget
   */
   double get_tau2() const;
   /*!
-    @brief Return \f$\texttt{\_parameters}\left(1\right)\f$, i.e. the \f$ \textit{sill-nugget}\f$
+    @brief Return `_parameters(1)`, i.e. the \e sill-nugget
   */
   double get_sigma2() const;
   /*!
-    @brief Return \f$\texttt{\_parameters}\left(2\right)\f$, i.e. the \f$ \textit{practical range}\f$
+    @brief Return `_parameters(2)`, i.e. the \e practical \e range
   */
   double get_a() const;
   /*!
     @brief Compute the parameters of the fitted variogram
-    @note Like evaluate_par_fitted_W, but different stopping criteria. This function is used when equal weights are considered
+    @note Like ::variogram_evaluation::FittedVariogram::evaluate_par_fitted_W, but different stopping criteria. This function is used when equal weights are considered
     @details The parameters are computed using Gauss-Newton with backtrack method to solve the non-linear least square problem:
     \f{equation*}{
     \begin{aligned}
-        & \underset{\text{\_parameters}}{\arg\min}
-        & & \underset{h \in \_hvec} {\sum} \left( \gamma_m \left(\text{\_parameters}, h\right) - \widehat{\gamma} \left(h\right) \right)^2 \\
+        & \underset{\mbox{\_parameters}}{\arg\min}
+        & & \underset{h \in \mbox{\_hvec}} {\sum} \left( \gamma_m \left(\mbox{\_parameters}, h\right) - \widehat{\gamma} \left(h\right) \right)^2 \\
         & \text{subject to}
-        & & 0 \leq \text{\_parameters}\left(0\right) \\
-        &&& 0 \leq \text{\_parameters}\left(1\right) \leq \text{max\_sill} - \text{\_parameters}\left(0\right) \\
-        &&& 0 \leq \text{\_parameters}\left(2\right) \leq \text{max\_a}
+        & & 0 \leq \mbox{\_parameters}\left(0\right) \\
+        &&& 0 \leq \mbox{\_parameters}\left(1\right) \leq \mbox{max\_sill} - \mbox{\_parameters}\left(0\right) \\
+        &&& 0 \leq \mbox{\_parameters}\left(2\right) \leq \mbox{max\_a}
     \end{aligned}
     \f}
-    The starting values for the \f$ \texttt{\_parameters} \f$ are obtained through ::variogram_evaluation::FittedVariogram::get_init_par. \n
+    The starting values for the `_parameters` are obtained through ::variogram_evaluation::FittedVariogram::get_init_par. \n
     The stopping criteria is based on the decrease of the error norm.
     @param emp_vario Empirical variogram
-    @param max_sill Maximum value for the \f$ \textit{sill} \f$
-    @param max_a Maximum value for  \f$ \textit{a} \f$
+    @param max_sill Maximum value for the \e sill
+    @param max_a Maximum value for  \e a
   */
   void evaluate_par_fitted_E(const EmpiricalVariogram & emp_vario, double max_sill, double max_a);
   /*!
     @brief Compute the parameters of the fitted variogram
-    @note Like evaluate_par_fitted_E, but different stopping criteria. This function is used when kernel weights are considered
+    @note Like ::variogram_evaluation::FittedVariogram::evaluate_par_fitted_E, but different stopping criteria. This function is used when kernel weights are considered
     @details The parameters are computed using Gauss-Newton with backtrack method to solve the non-linear least square problem:
     \f{equation*}{
     \begin{aligned}
         & \underset{\text{\_parameters}}{\arg\min}
-        & & \underset{h \in \_hvec} {\sum} \left( \gamma_m \left(\text{\_parameters}, h\right) - \widehat{\gamma} \left(h\right) \right)^2 \\
+        & & \underset{h \in \mbox{\_hvec}} {\sum} \left( \gamma_m \left(\mbox{\_parameters}, h\right) - \widehat{\gamma} \left(h\right) \right)^2 \\
         & \text{subject to}
-        & & 0 \leq \text{\_parameters}\left(0\right) \\
-        &&& 0 \leq \text{\_parameters}\left(1\right) \leq \text{max\_sill} - \text{\_parameters}\left(0\right) \\
-        &&& 0 \leq \text{\_parameters}\left(2\right) \leq \text{max\_a}
+        & & 0 \leq \mbox{\_parameters}\left(0\right) \\
+        &&& 0 \leq \mbox{\_parameters}\left(1\right) \leq \mbox{max\_sill} - \mbox{\_parameters}\left(0\right) \\
+        &&& 0 \leq \mbox{\_parameters}\left(2\right) \leq \mbox{max\_a}
     \end{aligned}
     \f}
-    The starting values for the \f$ \texttt{\_parameters} \f$ are obtained through ::variogram_evaluation::FittedVariogram::get_init_par.  \n
+    The starting values for the `_parameters` are obtained through ::variogram_evaluation::FittedVariogram::get_init_par.  \n
     The stopping criteria is based on the difference in the decrease of the error norm between two consecutive iterations.
     @param emp_vario Empirical variogram
-    @param max_sill Maximum value for the \f$ \textit{sill} \f$
-    @param max_a Maximum value for  \f$ \textit{a} \f$
+    @param max_sill Maximum value for the \e sill
+    @param max_a Maximum value for  \e a
   */
   void evaluate_par_fitted_W(const EmpiricalVariogram & emp_vario, double max_sill, double max_a);
   /*!
     @brief Compute the value of the model variogram at a given distance, according to the variogram type
-    @param h Distance where to evaluate the variogram
+    @param h The distance where to evaluate the variogram
     @return Variogram value at distance h: \f$ \gamma_m \left(h\right) \f$
   */
   virtual double get_vario_univ(const double & h) const = 0;
   /*!
     @brief Compute the value of the model covariogram at a given distance, according to the variogram type
-    @param h Distance where to evaluate the covariogram
-    @return Covariogram value at distance \f$ h: C_m \left(h\right) = \left(\text{\_parameters}\left(0\right) + \text{\_parameters}\left(1\right) \right) - \gamma_m \left(h\right) \f$
+    @param h The distance where to evaluate the covariogram
+    @return Covariogram value at distance \f$ h: C_m \left(h\right) = \left(\mbox{\_parameters}\left(0\right) + \mbox{\_parameters}\left(1\right) \right) - \gamma_m \left(h\right) \f$
   */
   double get_covario_univ(const double & h) const;
   /*!
     @brief Compute the values of the model variogram at a given vector of distances, according to the variogram type
-    @param h_vec Distances where to evaluate the variogram
-    @param card_h Number of distances where the variogram must be computed. \f$ \text{card\_h} = \text{h\_vec.size()}  \f$
-    @return Vector of variogram values at distances \f$h \in \text{\_h\_vec} \f$
+    @param h_vec The distances where to evaluate the variogram
+    @param card_h Number of distances where the variogram must be computed. `card_h = h_vec.size()`
+    @return Vector of variogram values at distances \f$h \in \f$ `_h_vec`
   */
   Vec get_vario_vec(const std::vector<double> & h_vec, unsigned int card_h) const;
   /*!
     @brief Compute the values of the model variogram at a given vector of distances, according to the variogram type
-    @param h_vec Distances where to evaluate the variogram
-    @param card_h Number of distances where the variogram must be computed. \f$ \text{card\_h} = \text{h\_vec.size()}  \f$
-    @return Vector of variogram values at distances \f$ h \in \text{h\_vec} \f$
+    @param h_vec The distances where to evaluate the variogram
+    @param card_h Number of distances where the variogram must be computed. `card_h = h_vec.size()`
+    @return Vector of variogram values at distances \f$ h \in \f$ `h_vec`
   */
   Vec get_vario_vec(const Vec & h_vec, unsigned int card_h) const;
   /*!
@@ -130,7 +130,7 @@ public:
   */
   MatrixXd compute_gamma_matrix(const std::shared_ptr<const MatrixXd> distanceMatrix, unsigned int N) const;
   /*!
-    @brief Return \f$ \texttt{\_parameters} \f$
+    @brief Return `_parameters`
   */
   Vector3d get_parameters() const;
   /*!
@@ -140,9 +140,9 @@ public:
   void set_parameters(const Vector3d& parameters);
   /*!
     @brief Compute the values of the model covariogram at a given vector of distances, according to the variogram type
-    @param h_vec Distances where to evaluate the covariogram
-    @param card_h Number of distances where the covariogram must be computed. \f$ \text{card\_h} = \text{h\_vec.size()}  \f$
-    @return Vector of covariogram values at distances \f$ h \in \text{h\_vec} \f$
+    @param h_vec The distances where to evaluate the covariogram
+    @param card_h Number of distances where the covariogram must be computed. `card_h = h_vec.size()`
+    @return Vector of covariogram values at distances \f$ h \in \f$ `h_vec`
   */
   Vec get_covario_vec(const std::vector<double> & h_vec, unsigned int card_h) const;
   /*!
@@ -153,7 +153,7 @@ public:
 };
 
 /*!
-  @brief	Class for computation and storage of the fitted variogram when \f$\texttt{vario\_model=="Gaussian"}\f$
+  @brief	Class for computation and storage of the fitted variogram when `vario_model=="Gaussian"`
 */
 class GaussVariogram : public FittedVariogram {
   void get_init_par(const EmpiricalVariogram &) override;
@@ -168,7 +168,7 @@ public:
 };
 
 /*!
-  @brief	Class for computation and storage of the fitted variogram when \f$\texttt{vario\_model=="Exponential"}\f$
+  @brief	Class for computation and storage of the fitted variogram when `vario_model=="Exponential"`
 */
 class ExpVariogram : public FittedVariogram {
   void get_init_par(const EmpiricalVariogram &) override;
@@ -183,7 +183,7 @@ public:
 };
 
 /*!
-  @brief	Class for computation and storage of the fitted variogram when \f$\texttt{vario\_model=="Spherical"}\f$
+  @brief	Class for computation and storage of the fitted variogram when `vario_model=="Spherical"`
 */
 class SphVariogram : public FittedVariogram {
   void get_init_par(const EmpiricalVariogram &) override;

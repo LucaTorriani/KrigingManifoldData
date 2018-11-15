@@ -46,7 +46,7 @@ namespace distances_tplane{
   };
 
   /*!
-    @brief	Class for the computation of the distance on the tangent space when \f$\texttt{ts\_metric=="Frobenius"}\f$
+    @brief	Class for the computation of the distance on the tangent space when `ts_metric=="Frobenius"`
   */
  class Frobenius : public DistanceTplane{
  public:
@@ -60,7 +60,7 @@ namespace distances_tplane{
  };
 
  /*!
-   @brief	Class for the computation of the distance on the tangent space when \f$\texttt{ts\_metric=="FrobeniusScaled"}\f$
+   @brief	Class for the computation of the distance on the tangent space when `ts_metric=="FrobeniusScaled"`
  */
  class FrobeniusScaled : public DistanceTplane{
    /*! Inverse of the tangent point Sigma */
@@ -78,7 +78,7 @@ namespace distances_tplane{
 };
 
 /*!
-  @brief	Class for the computation of the distance on the tangent space when \f$\texttt{ts\_metric=="Correlation"}\f$
+  @brief	Class for the computation of the distance on the tangent space when `ts_metric=="Correlation"`
 */
 class Chol : public DistanceTplane{
 public:

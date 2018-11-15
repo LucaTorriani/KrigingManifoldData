@@ -23,7 +23,7 @@ namespace distances{
       @brief Compute the distance between two locations
       @param P1 Vector of coordinates for the first location
       @param P2 Vector of coordinates for the second location
-      @return Distance
+      @return Points' distance
     */
     virtual double compute_distance(const Vec& P1, const Vec& P2) const = 0;
 
@@ -31,15 +31,15 @@ namespace distances{
       @brief Compute the distance matrix among a set of locations
       @param coordinates Matrix of the coordinates of the locations
       @param N Number of locations
-      @return Distance matrix
+      @return Matrix of distances
     */
     std::shared_ptr<const MatrixXd> create_distance_matrix(const Coordinates & coordinates, unsigned int N) const;
 
     /*!
       @brief Compute the vector of distances between a point and a set of locations
       @param coordinates Matrix of the coordinates of the locations
-      @param new_coord Coordinates of the new location
-      @return Distance vector
+      @param new_coord Vector of coordinates of the new location
+      @return Vector of distances
     */
     std::vector<double> create_distance_vector(const Coordinates & coordinates, const Vec & new_coord) const;
     /*!
@@ -48,7 +48,7 @@ namespace distances{
     virtual ~Distance() = default;
   };
   /*!
-    @brief	Class for the computation of the distance between data locations when \f$\texttt{distance=="Eucldist"}\f$
+    @brief	Class for the computation of the distance between data locations when `distance=="Eucldist"`
   */
   class EuclDist : public Distance{
   public:
@@ -59,7 +59,7 @@ namespace distances{
     ~EuclDist() = default;
   };
   /*!
-    @brief	Class for the computation of the distance between data locations when \f$\texttt{distance=="Geodist"}\f$
+    @brief	Class for the computation of the distance between data locations when `distance=="Geodist"`
   */
   class GeoDist : public Distance{
     /*! Earth radius */

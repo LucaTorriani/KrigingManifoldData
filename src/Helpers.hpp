@@ -46,7 +46,7 @@ namespace matrix_manipulation {
     @brief Transform a \f$ \left(\frac{p*\left(p+1\right)}{2}, N\right)  \f$ matrix in a vector of \f$ N p*p\f$ symmetric matrices
     @param bigMatrix Matrix whose rows store the values of the upper triangular parts of \f$ N p*p \f$ symmetric matrices
     @param p Dimension of the matrices
-    @param distance_Manifold_name Name of the metric on the manifold to use. If distance_Manifold_name == "Correlation" then only the upper triangular parts of the matrices is filled
+    @param distance_Manifold_name Name of the metric on the manifold to use. If `distance_Manifold_name=="Correlation"` then only the upper triangular parts of the matrices is filled
     @return Vector of \f$ N p*p\f$ symmetricmatrices corresponding to the transformation of bigMatrix
   */
   std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int p, const std::string& distance_Manifold_name);
@@ -64,7 +64,7 @@ namespace matrix_manipulation {
   MatrixXd Chol_semidef (const MatrixXd& M1);
   /*!
     @brief Compute the Cholesky decomposition of a matrix
-    @param M1 Positive definite or semidefine matrix whose Cholesky decomposition must be computed ()
+    @param M1 Positive definite or semidefine matrix whose Cholesky decomposition must be computed
     @return Matrix in \f$ Chol\left(p\right) \f$, representing the upper trianglar matrix of A's Cholesky decomposition
   */
   MatrixXd Chol_decomposition (const MatrixXd M1);

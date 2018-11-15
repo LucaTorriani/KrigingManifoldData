@@ -57,6 +57,9 @@ namespace generic_factory{
     ~Factory()=default;
 
   private:
+    /*! \var typedef std::map<Identifier,Builder_type> Container_type
+      @brief Type of the object used to store the object factory
+    */
     typedef std::map<Identifier,Builder_type> Container_type;
     //! Constructor made private since it is a Singleton
     Factory()=default;
