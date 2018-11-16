@@ -73,6 +73,7 @@ kriging = function(GLS_model, coords, new_coords, model_ts= "Additive", vario_mo
   new_coords = as.matrix(new_coords)
   if(!is.null(X_new)) {X_new = as.matrix(X_new)}
   if(length(GLS_model$residuals) != dim(coords)[1]) stop("Dimension of residuals and coords must agree")
+  if(metric_manifold == "Correlation" && (diag(GLS_model$Sigma) != rep(1, dim(GLS_model$Sigma)[1]))) stop("Sigma must be a correlation matrix")
   result = .Call("get_kriging", coords, new_coords, GLS_model$Sigma, distance, metric_manifold, model_ts, vario_model,
                  GLS_model$beta, GLS_model$gamma_matrix, GLS_model$fitted_par_vario, GLS_model$residuals, X_new, tolerance_map_cor)
 

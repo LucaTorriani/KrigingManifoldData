@@ -125,7 +125,7 @@ extern "C"{
       // Punto tangente
       Eigen::MatrixXd Sigma(p,p);
       if(Sigma_n.isNotNull()) {
-        Sigma = Rcpp::as<<Eigen::MatrixXd> (s_Sigma);
+        Sigma = Rcpp::as<Eigen::MatrixXd> (s_Sigma);
         if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
         theTplaneDist->set_members(Sigma);
         theLogMap->set_members(Sigma);
