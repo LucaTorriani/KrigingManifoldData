@@ -125,15 +125,15 @@ extern "C"{
       // Punto tangente
       Eigen::MatrixXd Sigma(p,p);
       if(Sigma_n.isNotNull()) {
-        Sigma = Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma);
+        Sigma = Rcpp::as<<Eigen::MatrixXd> (s_Sigma);
         if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
         theTplaneDist->set_members(Sigma);
         theLogMap->set_members(Sigma);
       }
       else {
         double tolerance_intrinsic(Rcpp::as<double> (s_tolerance_intrinsic));
-        Eigen::Map<Vec> weights_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
-        Eigen::Map<Vec> weights_extrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_extrinsic)); // Suppongo che la intermediate me li passi sempre (anche nel caso non correlation, magari un rep(1,...))
+        Vec weights_intrinsic(Rcpp::as<Vec> (s_weight_intrinsic));
+        Vec weights_extrinsic(Rcpp::as<Vec> (s_weight_extrinsic));
         map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
         std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
         Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
@@ -168,7 +168,7 @@ extern "C"{
 
       std::shared_ptr<Eigen::MatrixXd> design_matrix_ptr;
       if(X.isNotNull()) {
-        Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
+        Eigen::MatrixXd X(Rcpp::as<Eigen::MatrixXd> (s_X));
         design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
       }
       else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
@@ -178,7 +178,7 @@ extern "C"{
       // KERNEL
       if(weight_vario.isNotNull()) {
         // Weight vario
-        Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
+        Vec weight_vario(Rcpp::as<Vec> (s_weight_vario));
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
 
@@ -231,7 +231,7 @@ extern "C"{
         // Design matrix tot
         std::shared_ptr<Eigen::MatrixXd> design_matrix_tot_ptr;
         if(X_tot.isNotNull()) {
-          Eigen::Map<Eigen::MatrixXd> X_tot(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_tot));
+          Eigen::MatrixXd X_tot(Rcpp::as<Eigen::MatrixXd> (s_X_tot));
           design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot, X_tot));
         }
         else design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot));
@@ -242,7 +242,7 @@ extern "C"{
         Eigen::MatrixXd resMatrix(N_tot, ((p+1)*p)/2);
         std::vector<MatrixXd> resVec(N_tot);
 
-        // DA QUI è TUTTO UGUALE
+        // DA QUI è TUTTO UGUALE (tranne la selezione dei residui)
         model.update_model(gamma_matrix);
 
         Eigen::MatrixXd beta(n_covariates, ((p+1)*p)/2);
@@ -303,6 +303,13 @@ extern "C"{
         Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
 
         if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
+
+        // Select residuals in the k-th cell
+        std::vector<Eigen::MatrixXd> resVec_k(N);
+        for (size_t ii=0; ii<N; ii++ ) {
+            resVec_k[ii]=resVec[indexes_model[ii]-1];
+        }
+        //
 
         Rcpp::List result = Rcpp::List::create( Rcpp::Named("beta") = beta_vec_matrices,
                              Rcpp::Named("fit_vario_values") = fit_vario_values,
@@ -451,7 +458,7 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
 
     // Punto tangente
-    Eigen::Map<Eigen::MatrixXd> Sigma(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma));
+    Eigen::MatrixXd Sigma(Rcpp::as<Eigen::MatrixXd> (s_Sigma));
     if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
     unsigned int p = Sigma.rows();
 
@@ -486,21 +493,21 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
 
     std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
     if(X_new.isNotNull()) {
-      Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
+      Eigen::MatrixXd X_new(Rcpp::as<Eigen::MatrixXd> (s_X_new));
       new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords, X_new));
     }
     else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
 
     // Fitted vario
-    Eigen::Map<Eigen::VectorXd> parameters(Rcpp::as<Eigen::Map<Eigen::VectorXd>> (s_vario_parameters));
+    Eigen::VectorXd parameters(Rcpp::as<Eigen::VectorXd> (s_vario_parameters));
 
     vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
-    std::string variogram_type (Rcpp::as<std::string> (s_vario_model)); // (Gaussian, Exponential, Spherical) //IMPLEMENTAREEE
+    std::string variogram_type (Rcpp::as<std::string> (s_vario_model)); // (Gaussian, Exponential, Spherical)
     std::unique_ptr<variogram_evaluation::FittedVariogram> the_variogram = vf.create(variogram_type);
     the_variogram->set_parameters(parameters);
 
     // Gamma matrix
-    Eigen::Map<Eigen::MatrixXd> gamma_matrix(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_gamma_matrix));
+    Eigen::MatrixXd gamma_matrix(Rcpp::as<Eigen::MatrixXd> (s_gamma_matrix));
 
     // Beta (lista di matrici)
     Rcpp::List list_beta(s_beta);
@@ -654,7 +661,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       // Punto tangente
       Eigen::MatrixXd Sigma(p,p);
       if(Sigma_n.isNotNull()) {
-        Sigma = Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_Sigma);
+        Sigma = Rcpp::as<Eigen::MatrixXd> (s_Sigma);
         if (distance_Manifold_name == "Correlation") { Sigma = matrix_manipulation::Chol_decomposition(Sigma); }
         theTplaneDist->set_members(Sigma);
         theLogMap->set_members(Sigma);
@@ -662,8 +669,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       }
       else {
         double tolerance_intrinsic(Rcpp::as<double> (s_tolerance_intrinsic));
-        Eigen::Map<Vec> weights_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
-        Eigen::Map<Vec> weights_extrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_extrinsic));
+        Vec weights_intrinsic(Rcpp::as<Vec> (s_weight_intrinsic));
+        Vec weights_extrinsic(Rcpp::as<Vec> (s_weight_extrinsic));
         // map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
         // std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
         Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
@@ -698,7 +705,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
 
       std::shared_ptr<Eigen::MatrixXd> design_matrix_ptr;
       if(X.isNotNull()) {
-        Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
+        Eigen::MatrixXd X(Rcpp::as<Eigen::MatrixXd> (s_X));
         design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
       }
       else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
@@ -708,7 +715,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       // KERNEL
       if(weight_vario.isNotNull()) {
         // Weight vario
-        Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
+        Vec weight_vario(Rcpp::as<Vec> (s_weight_vario));
 
         // Distance Matrix tot
         std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_tot_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_distance_matrix_tot));
@@ -760,7 +767,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         // Design matrix tot
         std::shared_ptr<Eigen::MatrixXd> design_matrix_tot_ptr;
         if(X_tot.isNotNull()) {
-          Eigen::Map<Eigen::MatrixXd> X_tot(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_tot));
+          Eigen::MatrixXd X_tot(Rcpp::as<Eigen::MatrixXd> (s_X_tot));
           design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot, X_tot));
         }
         else design_matrix_tot_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords_tot));
@@ -849,7 +856,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         // New Design matrix
         std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
         if(X_new.isNotNull()) {
-          Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
+          Eigen::MatrixXd X_new(Rcpp::as<Eigen::MatrixXd> (s_X_new));
           new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords, X_new));
         }
         else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
@@ -893,7 +900,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
                                  Rcpp::Named("fit_vario_values") = fit_vario_values,
                                  Rcpp::Named("hh") = hh,
                                  Rcpp::Named("gamma_matrix") = gamma_matrix,
-                                 Rcpp::Named("residuals") = resVec,
+                                 Rcpp::Named("residuals") = resVec_k,
                                  Rcpp::Named("emp_vario_values") = emp_vario_values,
                                  Rcpp::Named("h_vec") = h_vario_values,
                                  Rcpp::Named("fitted_par_vario") = fit_parameters,
@@ -1002,7 +1009,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         // New Design matrix
         std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
         if(X_new.isNotNull()) {
-          Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
+          Eigen::MatrixXd X_new(Rcpp::as<Eigen::MatrixXd> (s_X_new));
           new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords, X_new));
         }
         else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
@@ -1105,8 +1112,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
     double tolerance (Rcpp::as<double> (s_tolerance));
 
     // Weights
-    Eigen::Map<Vec> weight_intrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_intrinsic));
-    Eigen::Map<Vec> weight_extrinsic(Rcpp::as<Eigen::Map<Vec>> (s_weight_extrinsic));
+    Vec weight_intrinsic(Rcpp::as<Vec> (s_weight_intrinsic));
+    Vec weight_extrinsic(Rcpp::as<Vec> (s_weight_extrinsic));
     double sum_weight_intrinsic(weight_intrinsic.sum());
 
     if (distance_Manifold_name == "Correlation") {
