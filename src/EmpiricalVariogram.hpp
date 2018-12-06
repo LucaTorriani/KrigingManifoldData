@@ -55,12 +55,12 @@ public:
                       const Vec&, double);
 
   /*!
-    @brief Update `_emp_vario_values`, `_hvec` and `_N_hvec` according to the new residuals \f$ \Delta \left(\boldsymbol{s_{i}}\right) i=1,\cdot,\_N \f$.
+    @brief Update `_emp_vario_values`, `_hvec` and `_N_hvec` according to the new residuals \f$ \Delta \left(\boldsymbol{s_{i}}\right) i=1,\ldots,\_N \f$.
     @details `_emp_vario_values` are estimated through the method of moments:
     \f[
       \widehat{\gamma}\left(h\right) = \frac{\underset{N\left(h\right)}{\sum} w\left(\boldsymbol{s_{i}}\right)w\left(\boldsymbol{s_{j}}\right)\left\Vert \Delta \left(\boldsymbol{s_{i}}\right)-\Delta \left(\boldsymbol{s_{j}}\right)\right\Vert ^{2} } {2\underset{N\left(h\right)}{\sum} w\left(\boldsymbol{s_{i}}\right)w\left(\boldsymbol{s_{j}}\right) }
     \f]
-      where \f$ N\left(h\right) = \left\lbrace \left(\boldsymbol{s}_{i}, \boldsymbol{s}_{j} \in D\right)\, : \, h - \varDelta h \leq \left\Vert \boldsymbol{s}_{i} - \boldsymbol{s}_{j} \right\Vert \leq h - \varDelta h  \right\rbrace \f$
+      where \f$ N\left(h\right) = \left\lbrace \left(\boldsymbol{s}_{i}, \boldsymbol{s}_{j} \in D\right)\, : \, h - \varDelta h \leq \left\Vert \boldsymbol{s}_{i} - \boldsymbol{s}_{j} \right\Vert \leq h + \varDelta h  \right\rbrace \f$
     @param res Vector of the \f$N\f$ residual matrices
     @param distanceTplane Distance on the tangent space
   */
