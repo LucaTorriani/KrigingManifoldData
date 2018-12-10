@@ -1218,7 +1218,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
 /*!
   @brief Compute the manifold distance between symmetric positive definite matrices.
   @details If \f$ N1==N2 \f$ then the result is a vector of length \f$ N1=N2 \f$ containing in position `i` the manifold distance beetween `data1[[i]]` and `data2[[i]]`.
-  Instead if \f$ N2=1 \f$ and \f$ N1!=1 \f$ the result is a vector of length \f$ B1 \f$ containing in position `i` the manifold distance between `data1[[i]]`and `data2[[1]]`
+  Instead if \f$ N2==1 \f$ and \f$ N1!=1 \f$ the result is a vector of length \f$ N1 \f$ containing in position `i` the manifold distance between `data1[[i]]`and `data2[[1]]`
   @param s_data1 list of \f$N1\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
   @param s_data2 list of \f$N2\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
   @param s_N1 Number of data1. `N1 = s_data1.size()`

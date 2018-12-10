@@ -29,9 +29,9 @@ class EmpiricalVariogram {
   std::vector<double> _hvec;
   /*! Vector storing the number of data used in the estimation of the corresponding empirical variogram value */
   std::vector<unsigned int> _N_hvec;
-  /*! Number of distances for which the variogram has been evaluated. `_card_h = _hvec.size()` */
+  /*! Number of distances for which the variogram has been evaluated.  \f$\mbox{\_card\_h} = \mbox{\_hvec.size()}\f$  */
   unsigned int _card_h;
-  /*! Vector of equispaced distances whose midpoints are the candidates to enter in `_hvec` */
+  /*! Vector of equispaced distances whose midpoints are the candidates to enter in \f$\_hvec\f$  */
   Vec _d; // Vettore h+-deltah
   /*! Maximum distance considered */
   double _hmax;

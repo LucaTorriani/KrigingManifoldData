@@ -43,15 +43,15 @@ namespace matrix_manipulation {
   MatrixXd sqrtMat(const MatrixXd& A);
 
   /*!
-    @brief Transform a \f$ \left(\frac{p*\left(p+1\right)}{2}, N\right)  \f$ matrix in a vector of \f$ N p*p\f$ symmetric matrices
+    @brief Transform a \f$ \left(N, \frac{p*\left(p+1\right)}{2}\right)\f$ matrix (where each row represents a symmetric matrix) in a vector of length \f$ N \f$ of \f$ p*p\f$symmetric matrices
     @param bigMatrix Matrix whose rows store the values of the upper triangular parts of \f$ N p*p \f$ symmetric matrices
     @param p Dimension of the matrices
     @param distance_Manifold_name Name of the metric on the manifold to use. If `distance_Manifold_name=="Correlation"` then only the upper triangular parts of the matrices is filled
-    @return Vector of \f$ N p*p\f$ symmetricmatrices corresponding to the transformation of bigMatrix
+    @return Vector of length \f$ N \f$ of \f$ p*p\f$ symmetric matrices corresponding to the transformation of bigMatrix
   */
   std::vector<MatrixXd> bigMatrix2VecMatrices(const MatrixXd& bigMatrix, unsigned int p, const std::string& distance_Manifold_name);
   /*!
-    @brief Transform a vector of \f$ N p*p\f$ symmetric matrices in a \f$ \left(\frac{p*\left(p+1\right)}{2}, N\right)  \f$ matrix
+    @brief Transform a vector of length \f$ N \f$ of \f$ p*p\f$ symmetric matrices in a \f$ \left(N,\frac{p*\left(p+1\right)}{2}\right) \f$ matrix (where each row represents a symmetric matrix)
     @param vecMatrices Vector of symmetric matrices whose upper trinagular parts will be stored in the rows of the output matrix
     @return Matrix \f$ \left(\frac{p*\left(p+1\right)}{2}, N\right)\f$ correponsing to the transformation of vecMatrices
   */

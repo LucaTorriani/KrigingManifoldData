@@ -34,7 +34,7 @@ protected:
   */
   virtual void get_init_par(const EmpiricalVariogram & emp_vario) = 0;
   /*!
-    @brief Update `_parameters`moving along `dir`
+    @brief Update `_parameters` moving along `dir`
   */
   void backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double max_sill, double max_a);
   /*!
@@ -111,15 +111,15 @@ public:
   /*!
     @brief Compute the values of the model variogram at a given vector of distances, according to the variogram type
     @param h_vec The distances where to evaluate the variogram
-    @param card_h Number of distances where the variogram must be computed. `card_h = h_vec.size()`
-    @return Vector of variogram values at distances \f$h \in \f$ `_h_vec`
+    @param card_h Number of distances where the variogram must be computed. \f$ card\_h = h\_vec.size() \f$
+    @return Vector of variogram values at distances \f$ h \in  h\_vec \f$
   */
   Vec get_vario_vec(const std::vector<double> & h_vec, unsigned int card_h) const;
   /*!
     @brief Compute the values of the model variogram at a given vector of distances, according to the variogram type
     @param h_vec The distances where to evaluate the variogram
-    @param card_h Number of distances where the variogram must be computed. `card_h = h_vec.size()`
-    @return Vector of variogram values at distances \f$ h \in \f$ `h_vec`
+    @param card_h Number of distances where the variogram must be computed. \f$ card\_h = h\_vec.size() \f$
+    @return Vector of variogram values at distances  \f$ h  \in  h\_vec \f$
   */
   Vec get_vario_vec(const Vec & h_vec, unsigned int card_h) const;
   /*!
@@ -141,8 +141,8 @@ public:
   /*!
     @brief Compute the values of the model covariogram at a given vector of distances, according to the variogram type
     @param h_vec The distances where to evaluate the covariogram
-    @param card_h Number of distances where the covariogram must be computed. `card_h = h_vec.size()`
-    @return Vector of covariogram values at distances \f$ h \in \f$ `h_vec`
+    @param card_h Number of distances where the covariogram must be computed. \f$ card\_h = h\_vec.size() \f$
+    @return Vector of covariogram values at distances \f$ h \in  h\_vec \f$
   */
   Vec get_covario_vec(const std::vector<double> & h_vec, unsigned int card_h) const;
   /*!
