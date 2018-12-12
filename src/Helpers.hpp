@@ -53,7 +53,7 @@ namespace matrix_manipulation {
   /*!
     @brief Transform a vector of length \f$ N \f$ of \f$ p*p\f$ symmetric matrices in a \f$ \left(N,\frac{p*\left(p+1\right)}{2}\right) \f$ matrix (where each row represents a symmetric matrix)
     @param vecMatrices Vector of symmetric matrices whose upper trinagular parts will be stored in the rows of the output matrix
-    @return Matrix \f$ \left(\frac{p*\left(p+1\right)}{2}, N\right)\f$ correponsing to the transformation of vecMatrices
+    @return Matrix \f$ \left(N,\frac{p*\left(p+1\right)}{2}\right) \f$ correponsing to the transformation of vecMatrices
   */
   MatrixXd VecMatrices2bigMatrix(const std::vector<MatrixXd>& vecMatrices);
   /*!
