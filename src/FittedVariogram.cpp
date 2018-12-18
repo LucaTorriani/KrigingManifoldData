@@ -60,8 +60,6 @@ void FittedVariogram::evaluate_par_fitted_W (const EmpiricalVariogram & emp_vari
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
 
-    vario_residuals = new_vario_residuals;
-
     backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, max_sill, max_a);
 
     J = compute_jacobian(h_vec, card_h);
@@ -71,6 +69,7 @@ void FittedVariogram::evaluate_par_fitted_W (const EmpiricalVariogram & emp_vari
     converged = std::abs(err_new-err_old) < tol;
 
     err_old = err_new;
+    vario_residuals = new_vario_residuals;
 
     iter++;
   }
@@ -115,13 +114,13 @@ void FittedVariogram::evaluate_par_fitted_E (const EmpiricalVariogram & emp_vari
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
 
-    vario_residuals = new_vario_residuals;
-
     backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, max_sill, max_a);
 
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
     converged = (std::abs(vario_residuals.squaredNorm() - new_vario_residuals.squaredNorm())) < tol;
+
+    vario_residuals = new_vario_residuals;
 
     iter++;
   }
