@@ -1,6 +1,6 @@
 #' Intrinsic mean
 #'
-#' @param data list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}
+#' @param data list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
 #' @param tolerance tolerance for the computation of the intrinsic_mean

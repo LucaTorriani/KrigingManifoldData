@@ -1,25 +1,19 @@
 #' Create a GLS model and directly perform kriging
 #'
-#' @param data_manifold list or array [\code{n,n,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}
+#' @param data_manifold list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
 #' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
-#' @param Sigma \code{n*n} matrix representing the tangent point. If NULL the tangent point is computed as the intrinsic mean
-#' of \code{data_manifold}
+#' @param Sigma_data List of \code{N} matrices of dimension \code{p*p} representing the tangent points in correspondence of the \code{coords} 
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
-#' @param metric_ts metric used on the tangent space. It must be either "Frobenius" or "FrobeniusScaled"
 #' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
 #' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
 #' @param n_h number of bins in the emprical variogram
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
 #' @param max_it max number of iterations for the main loop
 #' @param tolerance tolerance for the main loop
-#' @param weight_vario vector of length \code{N} to weight the locations in the computation of the empirical variogram. If NULL
-#' a vector of ones is used
-#' @param weight_intrinsic vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
-#' a vector of ones is used. Not needed if Sigma is provided
-#' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
-#' @param new_coords matrix of coordinates for the new locations where to perform kriging
+#' @param new_coords matrix of coordinates for the \code{M} new locations where to perform kriging
+#' @param Sigma_new List of \code{M} matrices of dimension \code{p*p} representing the tangent points in correspondence of the \code{new_coords} 
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
 #' @return list with the following fields:
@@ -87,10 +81,11 @@
 #' @useDynLib Manifoldgstat
 #' @export
 
-model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold = "Frobenius",
-                                 metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
-                                 n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_vario = NULL,
-                                 weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, new_coords, X_new = NULL, plot = TRUE){
+model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
+                         model_ts = "Additive", vario_model = "Gaussian", # metric_ts = "Frobenius",
+                         n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
+                         # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, 
+                         new_coords, Sigma_new, X_new = NULL, plot = TRUE){
 
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
@@ -122,12 +117,8 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma, metric_manifold
     stop("Dimension of data_manifold and coords must agree")
   }
 
-  if(is.null(Sigma)){
-    if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
-  }
-
-  result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
-                n_h, max_it, tolerance, weight_vario, weight_intrinsic, tolerance_intrinsic, new_coords, X_new )
+  result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma_data, distance, metric_manifold, model_ts, vario_model, # metric_ts
+                n_h, max_it, tolerance, new_coords, Sigma_new, X_new ) # weight_vario, weight_intrinsic, tolerance_intrinsic,
 
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
