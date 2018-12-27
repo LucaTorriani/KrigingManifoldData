@@ -5,7 +5,7 @@ using namespace variogram_evaluation;
 
 // EmpiricalVariogram
 EmpiricalVariogram::EmpiricalVariogram (const Coordinates& coords, const distances::Distance& distance, unsigned int n_h, const std::shared_ptr<const SpMat> distanceMatrix):
-  _N(coords.get_N_station()), _n(coords.get_n_coords()), _distanceMatrix(distanceMatrix), _n_h(n_h) {
+  _N(coords.get_N_station()), _p(coords.get_n_coords()), _distanceMatrix(distanceMatrix), _n_h(n_h) {
     compute_hmax(coords, distance);
     _d.resize(n_h +1);
     _d.setLinSpaced(n_h+1, 0, _hmax);

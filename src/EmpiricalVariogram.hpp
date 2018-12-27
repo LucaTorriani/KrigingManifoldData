@@ -16,7 +16,7 @@ class EmpiricalVariogram {
   unsigned int _card_h;
   // Costanti
   const unsigned int _N;
-  const unsigned int _n;
+  const unsigned int _p;
   Vec _d; // Vettore h+-deltah
   double _hmax;
   // const distances_tplane::DistanceTplane & _distanceTplane;
