@@ -1,12 +1,12 @@
 #' Distance on the manifold
 #'
-#' @param data1 list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}
-#' @param data2 a list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}.
-#' Or a single \code{nxn} matrix.
+#' @param data1 list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix.
+#' @param data2 a list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix.
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
+#' @return A double or a vector of distances
 #' @description Compute the manifold distance between symmetric positive definite matrices
-#' @details If \code{B2}=\code{B1} then the result is a vector of length \code{B1=B2} containing in position \code{i} the manifold distance beetween \code{data1[,,i]} and \code{data2[,,i]}.
-#' Instead if \code{B2}=1 the result is a vector of length \code{B1} containing in position \code{i} the manifold distance between \code{data1[,,i]} and \code{data2[,,1]}
+#' @details If \code{B2}=\code{B1} then the result is a vector of length \code{B1=B2} containing in position \code{i} the manifold distance between \code{data1[,,i]} and \code{data2[,,i]}.
+#' Instead if \code{B2}=1 and \code{B1}!=1 the result is a vector of length \code{B1} containing in position \code{i} the manifold distance between \code{data1[,,i]} and \code{data2[,,1]}
 #' @examples
 #' data_manifold_model <- Manifoldgstat::rCov
 #' distances <-distance_manifold(data_manifold_model, diag(2), metric_manifold = "Frobenius")
@@ -16,7 +16,8 @@
 
 distance_manifold = function(data1, data2, metric_manifold = "Frobenius", metric_ts = "Frobenius"){
   if(is.array(data1)){
-    data1 = alply(data1,3)
+    if(length(dim(data1))==3) data1 = alply(data1,3)
+    if(length(dim(data1))==2) data1 = list(data1)
   }
   if(is.array(data2)){
     if(length(dim(data2))==3) data2 = alply(data2,3)
