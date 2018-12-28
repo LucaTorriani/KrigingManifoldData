@@ -331,7 +331,7 @@ extern "C"{
     END_RCPP
 }
 
-  // INTRINSIC MEAN
+  // DISTANCE MANIFOLD
   RcppExport SEXP distance_manifold (SEXP s_data1, SEXP s_data2, SEXP s_N1, SEXP s_N2, SEXP s_manifold_metric) {
     BEGIN_RCPP
     // Data1
