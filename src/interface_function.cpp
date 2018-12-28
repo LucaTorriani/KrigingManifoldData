@@ -86,7 +86,7 @@ extern "C"{
     variogram_evaluation::EmpiricalVariogram emp_vario(coords, *(theDistance), n_h, distanceMatrix_ptr);
 
     if(weight_vario.isNotNull()) {
-      Eigen::Map<Vec> weight_vario(Rcpp::as<Eigen::Map<Vec>> (s_weight_vario));
+      Vec weight_vario(Rcpp::as<Vec> (s_weight_vario));
       emp_vario.set_weight(weight_vario);
     }
 
@@ -111,7 +111,7 @@ extern "C"{
 
     std::shared_ptr<Eigen::MatrixXd> design_matrix_ptr;
     if(X.isNotNull()) {
-      Eigen::Map<Eigen::MatrixXd> X(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X));
+      Eigen::MatrixXd X(Rcpp::as<Eigen::MatrixXd> (s_X));
       design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
     }
     else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
@@ -203,7 +203,7 @@ extern "C"{
     // New Design matrix
     std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
     if(X_new.isNotNull()) {
-      Eigen::Map<Eigen::MatrixXd> X_new(Rcpp::as<Eigen::Map<Eigen::MatrixXd>> (s_X_new));
+      Eigen::MatrixXd X_new(Rcpp::as<Eigen::MatrixXd> (s_X_new));
       new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords, X_new));
     }
     else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
@@ -278,7 +278,7 @@ extern "C"{
     double tolerance (Rcpp::as<double> (s_tolerance));
 
     // Weights
-    Eigen::Map<Vec> weight(Rcpp::as<Eigen::Map<Vec>> (s_weight));
+    Vec weight(Rcpp::as<Vec> (s_weight));
     double sum_weight(weight.sum());
 
     // CODE
