@@ -19,35 +19,39 @@ namespace design_matrix {
   public:
     virtual MatrixXd compute_design_matrix(const Coordinates&) const = 0;
     virtual MatrixXd compute_design_matrix(const Coordinates&, const MatrixXd&) const =0;
-
+    virtual ~DesignMatrix() = default;
   };
 
   class InterceptDM : public DesignMatrix {
   public:
     MatrixXd compute_design_matrix(const Coordinates&) const override;
     MatrixXd compute_design_matrix(const Coordinates&, const MatrixXd&) const override;
-    std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new InterceptDM));}
+    // std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new InterceptDM));}
+    ~InterceptDM() = default;
   };
 
   class Coord1DM: public DesignMatrix {
   public:
     MatrixXd compute_design_matrix(const Coordinates&) const override;
     MatrixXd compute_design_matrix(const Coordinates&, const MatrixXd&) const override;
-    std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new Coord1DM));}
+    // std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new Coord1DM));}
+    ~Coord1DM() = default;
   };
 
   class Coord2DM: public DesignMatrix {
   public:
     MatrixXd compute_design_matrix(const Coordinates&) const override;
     MatrixXd compute_design_matrix(const Coordinates&, const MatrixXd&) const override;
-    std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new Coord2DM));}
+    // std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new Coord2DM));}
+    ~Coord2DM() = default;
   };
 
   class AdditiveDM: public DesignMatrix {
   public:
     MatrixXd compute_design_matrix(const Coordinates&)const override;
     MatrixXd compute_design_matrix(const Coordinates&, const MatrixXd&) const override;
-    std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new AdditiveDM));}
+    // std::unique_ptr<DesignMatrix> operator()(){return (std::unique_ptr<DesignMatrix>(new AdditiveDM));}
+    ~AdditiveDM() = default;
   };
 
   // void registerDesignMatrices();
