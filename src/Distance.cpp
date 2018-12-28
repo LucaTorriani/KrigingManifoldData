@@ -1,7 +1,6 @@
-#include "Distance.hpp"
 #define _USE_MATH_DEFINES
 #include <cmath>
-
+#include "Distance.hpp"
 
 using namespace distances;
 
