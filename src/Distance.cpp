@@ -18,9 +18,9 @@ double EuclDist::compute_distance(const Vec& P1, const Vec& P2) const{
 //   double long2 =  P2(2);
 //   double cos_angle = sin(lat1*coeff)*sin(lat2*coeff)+cos(lat1*coeff)*cos(lat2*coeff)*cos(cmath::abs(long2-long1)*coeff);
 //
-//   if (abs(cos_angle-1) < 2*eps_dbl)
+//   if (cmath::abs(cos_angle-1) < 2*eps_dbl)
 //     return (0);
-//   else if (abs(cos_angle+1) < 2*eps_dbl)
+//   else if (cmath::abs(cos_angle+1) < 2*eps_dbl)
 //     return (Earth_R * M_PI);
 //   else
 //     return (Earth_R*acos(cos_angle));

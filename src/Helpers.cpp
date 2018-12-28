@@ -12,7 +12,7 @@ MatrixXd matrix_manipulation::expMat(const MatrixXd& A) {
 
   VectorXd expvalues(p);
 
-  for (size_t i = 0; i < p; i++) expvalues(i) = exp(eigenvalues(i).real());
+  for (size_t i = 0; i < p; i++) expvalues(i) = std::exp(eigenvalues(i).real());
 
   MatrixXd result(p, p);
   result =  eigenvectors.real()*expvalues.asDiagonal()*eigenvectors.real().transpose();
@@ -32,7 +32,7 @@ MatrixXd matrix_manipulation::logMat(const MatrixXd& A) {
 
   VectorXd logvalues(p);
 
-  for (size_t i = 0; i < p; i++) logvalues(i) = log(eigenvalues(i).real());
+  for (size_t i = 0; i < p; i++) logvalues(i) = std::log(eigenvalues(i).real());
 
   MatrixXd result(p, p);
   result =  eigenvectors.real()*logvalues.asDiagonal()*eigenvectors.real().transpose();
