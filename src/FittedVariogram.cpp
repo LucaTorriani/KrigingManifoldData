@@ -16,7 +16,7 @@ double FittedVariogram::get_a() const{
   return _parameters(2);
 }
 
-void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
+void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario, double max_sill, double max_a){
 
   double c = 1e-4; //Valori presi da libro quarteroni
   double s = 0.25;
@@ -63,7 +63,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario){
   }
 }
 
-void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values){
+void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const std::vector<double> & h_vec, unsigned int card_h, double c, double s, const Vec& emp_vario_values, double max_sill, double max_a){
 
   double alpha = 1;
   const double alphamin = 1.e-5;
@@ -71,14 +71,27 @@ void FittedVariogram::backtrack(const Vector3d &dir,Vector3d &gk, Vec &res,const
 
   Vector3d parameters_k = _parameters;
   _parameters = parameters_k + alpha*dir;
+
   if (_parameters(0) < 0) _parameters(0) = 1e-7;
+  if (_parameters(1) < 0) _parameters(1) = 1e-7;
+  if (_parameters(2) < 0) _parameters(2) = 1e-7;
+
+  if (_parameters(1)+_parameters(0) > max_sill) _parameters(1) = max_sill-_parameters(0);
+  if (_parameters(2) > max_a) _parameters(2) = max_a;
+
   res = get_vario_vec(h_vec, card_h)  - emp_vario_values;
 
   while(res.squaredNorm() > fk + alpha*c*gk.transpose()*dir && alpha > alphamin){
 
     alpha = alpha*s;
     _parameters = parameters_k + alpha*dir;
+    
     if (_parameters(0) < 0) _parameters(0) = 1e-7;
+    if (_parameters(1) < 0) _parameters(1) = 1e-7;
+    if (_parameters(2) < 0) _parameters(2) = 1e-7;
+
+    if (_parameters(1)+_parameters(0) > max_sill) _parameters(1) = max_sill-_parameters(0);
+    if (_parameters(2) > max_a) _parameters(2) = max_a;
 
     res = get_vario_vec(h_vec, card_h) - emp_vario_values;
 

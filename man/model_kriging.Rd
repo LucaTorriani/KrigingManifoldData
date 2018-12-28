@@ -7,8 +7,8 @@
 model_kriging(data_manifold, coords, X = NULL, Sigma_data,
   metric_manifold = "Frobenius", model_ts = "Additive",
   vario_model = "Gaussian", n_h = 15, distance = "Geodist",
-  max_it = 100, tolerance = 1e-06, new_coords, Sigma_new,
-  X_new = NULL, plot = TRUE)
+  max_it = 100, tolerance = 1e-06, max_sill = NULL, max_a = NULL,
+  new_coords, Sigma_new, X_new = NULL, plot = TRUE)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}}
@@ -33,6 +33,10 @@ be provided in signed decimal degrees}
 \item{max_it}{max number of iterations for the main loop}
 
 \item{tolerance}{tolerance for the main loop}
+
+\item{max_sill}{maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}}
+
+\item{max_a}{maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}}
 
 \item{new_coords}{matrix of coordinates for the \code{M} new locations where to perform kriging}
 

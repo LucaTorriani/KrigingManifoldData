@@ -4,7 +4,7 @@
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
 #' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
-#' @param Sigma_data List of \code{N} matrices of dimension \code{p*p} representing the tangent points in correspondence of the \code{coords} 
+#' @param Sigma_data List of \code{N} matrices of dimension \code{p*p} representing the tangent points in correspondence of the \code{coords}
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
 #' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
@@ -12,8 +12,10 @@
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
 #' @param max_it max number of iterations for the main loop
 #' @param tolerance tolerance for the main loop
+#' @param max_sill maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
+#' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
 #' @param new_coords matrix of coordinates for the \code{M} new locations where to perform kriging
-#' @param Sigma_new List of \code{M} matrices of dimension \code{p*p} representing the tangent points in correspondence of the \code{new_coords} 
+#' @param Sigma_new List of \code{M} matrices of dimension \code{p*p} representing the tangent points in correspondence of the \code{new_coords}
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
 #' @return list with the following fields:
@@ -84,7 +86,8 @@
 model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
                          model_ts = "Additive", vario_model = "Gaussian", # metric_ts = "Frobenius",
                          n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
-                         # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6, 
+                         # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
+                         max_sill=NULL, max_a=NULL,
                          new_coords, Sigma_new, X_new = NULL, plot = TRUE){
 
   if ( distance == "Geodist" & dim(coords)[2] != 2){

@@ -22,14 +22,16 @@ extern "C"{
   // CREATE MODEL AND KRIGNG
   RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma_data,
      SEXP s_distance, SEXP s_manifold_metric,  SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h, // SEXP s_ts_metric,
-     SEXP s_max_it, SEXP s_tolerance, // SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
-     SEXP s_new_coordinates, SEXP s_Sigma_new, SEXP s_X_new) {
+     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a, // SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
+     SEXP s_new_coordinates, SEXP s_Sigma_new, SEXP s_X_new, SEXP s_suppressMes) {
 
     BEGIN_RCPP
 
     Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
     Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
     Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
+    Rcpp::Nullable<double> max_sill_n (s_max_sill);
+    Rcpp::Nullable<double> max_a_n (s_max_a);
 
     // Coordinates
     std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -88,6 +90,12 @@ extern "C"{
       emp_vario.set_weight(weight_vario);
     }
 
+    // Fitted vario parameters
+    double max_a;
+    double max_sill;
+    if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
+    if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
+
     // Fitted vario
     vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
     std::string variogram_type (Rcpp::as<std::string> (s_vario_model));
@@ -136,7 +144,11 @@ extern "C"{
       resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p);
 
       emp_vario.update_emp_vario(resVec, *(theTplaneDist));
-      the_variogram -> evaluate_par_fitted(emp_vario);
+
+      emp_vario_values = emp_vario.get_emp_vario_values();
+      if(!max_sill_n.isNotNull()) max_sill = 1.15 * (*std::max_element(emp_vario_values.begin(), emp_vario_values.end()));
+      if(!max_a_n.isNotNull()) max_a = 1.15 * emp_vario.get_hmax();
+      the_variogram -> evaluate_par_fitted(emp_vario, max_sill, max_a);
 
       gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
       beta_old_vec_matrices = beta_vec_matrices;
@@ -153,6 +165,14 @@ extern "C"{
       num_iter++;
     }
     if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+
+    Vec fit_parameters (the_variogram->get_parameters());
+
+    bool suppressMes(Rcpp::as<bool> (s_suppressMes));
+    if (!suppressMes) {
+      if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+      if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+    }
 
     unsigned int n_hh(1000);
     Vec hh(n_hh);
