@@ -18,6 +18,7 @@
 #' @param Sigma_new List of \code{M} matrices of dimension \code{p*p} representing the tangent points in correspondence of the \code{new_coords}
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
+#' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
 #' @return list with the following fields:
 #' \item{\code{beta}}{ vector of the beta matrices of the fitted model}
 #' \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
@@ -88,7 +89,7 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
                          n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                          # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                          max_sill=NULL, max_a=NULL,
-                         new_coords, Sigma_new, X_new = NULL, plot = TRUE){
+                         new_coords, Sigma_new, X_new = NULL, plot = TRUE, suppressMes = FALSE){
 
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
@@ -121,7 +122,7 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
   }
 
   result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma_data, distance, metric_manifold, model_ts, vario_model, # metric_ts
-                n_h, max_it, tolerance, max_sill, max_a, new_coords, Sigma_new, X_new ) # weight_vario, weight_intrinsic, tolerance_intrinsic,
+                n_h, max_it, tolerance, max_sill, max_a, new_coords, Sigma_new, X_new, suppressMes ) # weight_vario, weight_intrinsic, tolerance_intrinsic,
 
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
