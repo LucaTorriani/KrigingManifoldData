@@ -6,7 +6,7 @@
 using namespace Eigen;
 
 namespace parallel_transport {
-  MatrixXd trasport_to_TI(MatrixXd, MatrixXd);
+  MatrixXd transport_to_TI(MatrixXd, MatrixXd);
   MatrixXd transport_from_TI(MatrixXd, MatrixXd);
 }
 
