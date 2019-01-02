@@ -54,7 +54,7 @@ void FittedVariogram::evaluate_par_fitted(const EmpiricalVariogram & emp_vario, 
     bb = - J.transpose()*(vario_residuals);
     dir = solver.solve(bb);
 
-    backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values);
+    backtrack(dir, gk, new_vario_residuals, h_vec, card_h, c,s, emp_vario_values, max_sill, max_a);
 
     J = compute_jacobian(h_vec, card_h);
     gk =  J.transpose()*new_vario_residuals;
