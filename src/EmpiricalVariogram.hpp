@@ -28,12 +28,13 @@ public:
   EmpiricalVariogram (const std::shared_ptr<const SpMat>, unsigned int, const Coordinates&, const distances::Distance&);
 
   void update_emp_vario(const std::vector<MatrixXd>&, const distances_tplane::DistanceTplane &);
-  void set_weight(const Vec&);
+  // void set_weight(const Vec&);
   std::vector<double> get_emp_vario_values () const;
   std::vector<unsigned int> get_N_hvec() const;
   std::vector<double> get_hvec() const;
   unsigned int get_card_h() const;
   unsigned int get_N() const;
+  double get_hmax() const;
 };
 
 }

@@ -20,9 +20,9 @@ double EmpiricalVariogram::get_hmax() const {
   return _hmax;
 }
 
-void EmpiricalVariogram::set_weight(const Vec& weights){
-  _weights = weights;
-}
+// void EmpiricalVariogram::set_weight(const Vec& weights){
+//   _weights = weights;
+// }
 
 void EmpiricalVariogram::update_emp_vario(const std::vector<MatrixXd>& res, const distances_tplane::DistanceTplane & distanceTplane) {
   _emp_vario_values.clear();
