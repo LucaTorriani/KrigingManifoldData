@@ -16,6 +16,7 @@
 #include "MapFunctions.hpp"
 #include "Model.hpp"
 #include "IntrinsicMean.hpp"
+#include "ParallelTransport.hpp"
 
 extern "C"{
 
@@ -27,7 +28,7 @@ extern "C"{
 
     BEGIN_RCPP
 
-    Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
+    // Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
     Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
     Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
     Rcpp::Nullable<double> max_sill_n (s_max_sill);
@@ -60,13 +61,13 @@ extern "C"{
     // Tangent points
     Rcpp::List Sigma_data(s_Sigma_data);
     std::vector<Eigen::MatrixXd> Sigma_data_vec(N);
-    for(size_t i=0; i<N; i++) beta_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(Sigma_data,i));
+    for(size_t i=0; i<N; i++) Sigma_data_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(Sigma_data,i));
 
     // Data tangent space
     std::vector<Eigen::MatrixXd> data_tspace(N);
     for (size_t i=0; i<N; i++) {
       theLogMap->set_members(Sigma_data_vec[i]);
-      data_tspace[i] = trasport_to_TI(Sigma_data_vec[i], theLogMap->map2tplane(data_manifold[i]));
+      data_tspace[i] = parallel_transport::transport_to_TI(Sigma_data_vec[i], theLogMap->map2tplane(data_manifold[i]));
     }
 
     std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace));
@@ -83,12 +84,12 @@ extern "C"{
 
     // Emp vario
     unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-    variogram_evaluation::EmpiricalVariogram emp_vario(coords, *(theDistance), n_h, distanceMatrix_ptr);
+    variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
 
-    if(weight_vario.isNotNull()) {
-      Vec weight_vario(Rcpp::as<Vec> (s_weight_vario));
-      emp_vario.set_weight(weight_vario);
-    }
+    // if(weight_vario.isNotNull()) {
+    //   Vec weight_vario(Rcpp::as<Vec> (s_weight_vario));
+    //   emp_vario.set_weight(weight_vario);
+    // }
 
     // Fitted vario parameters
     double max_a;
@@ -230,7 +231,7 @@ extern "C"{
       lambda_vec = solver.solve(ci);
       tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
       theExpMap->set_members(Sigma_new_vec[i]);
-      manifold_prediction[i] = theExpMap->map2manifold(trasport_from_TI(Sigma_new_vec[i], tplane_prediction));
+      manifold_prediction[i] = theExpMap->map2manifold(parallel_transport::transport_from_TI(Sigma_new_vec[i], tplane_prediction));
     }
 
 
