@@ -121,10 +121,9 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
     stop("Dimension of data_manifold and coords must agree")
   }
 
-  print("Prima della chiamata")
   result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma_data, distance, metric_manifold, model_ts, vario_model, # metric_ts
                 n_h, max_it, tolerance, max_sill, max_a, new_coords, Sigma_new, X_new, suppressMes ) # weight_vario, weight_intrinsic, tolerance_intrinsic,
-  print("Dopo la chiamata")
+
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
 

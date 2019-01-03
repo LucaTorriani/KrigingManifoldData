@@ -27,7 +27,6 @@ extern "C"{
      SEXP s_new_coordinates, SEXP s_Sigma_new, SEXP s_X_new, SEXP s_suppressMes) {
 
     BEGIN_RCPP
-    std::cout << "Inizio " << "\n";
 
     // Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
     Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
@@ -47,7 +46,6 @@ extern "C"{
     }
 
     unsigned int p = data_manifold[0].rows();
-    Rcpp::Rcout << "QUI1 " << "\n";
 
     // Distance tplane
     // std::string distance_Tplane_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
@@ -59,7 +57,6 @@ extern "C"{
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
     map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
     std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
-    Rcpp::Rcout << "QUI2 " << "\n";
 
     // Tangent points
     Rcpp::List Sigma_data(s_Sigma_data);
@@ -84,7 +81,6 @@ extern "C"{
 
     // Distance Matrix
     std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
-    Rcpp::Rcout << "QUI3 " << "\n";
 
     // Emp vario
     unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
@@ -100,7 +96,6 @@ extern "C"{
     double max_sill;
     if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
     if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
-    Rcpp::Rcout << "QUI4 " << "\n";
 
     // Fitted vario
     vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
@@ -121,7 +116,6 @@ extern "C"{
       design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
     }
     else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
-    Rcpp::Rcout << "QUI5 " << "\n";
 
     unsigned int n_covariates(design_matrix_ptr->cols());
 
@@ -132,7 +126,6 @@ extern "C"{
     Eigen::MatrixXd resMatrix(N, ((p+1)*p)/2);
     Eigen::MatrixXd beta(n_covariates, ((p+1)*p)/2);
     Eigen::MatrixXd beta_old(n_covariates, ((p+1)*p)/2);
-    Rcpp::Rcout << "QUI16 " << "\n";
 
     beta = model.get_beta();
     std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
@@ -146,7 +139,6 @@ extern "C"{
 
     double tol = tolerance+1;
     std::vector<double> emp_vario_values;
-    Rcpp::Rcout << "QUI7 " << "\n";
 
     max_iter = 10;
     while (num_iter < max_iter && tol > tolerance) {
@@ -175,7 +167,6 @@ extern "C"{
       num_iter++;
     }
     if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
-    Rcpp::Rcout << "QUI8 " << "\n";
 
     Vec fit_parameters (the_variogram->get_parameters());
 
@@ -195,7 +186,6 @@ extern "C"{
     Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
 
     // KRIGING
-    Rcpp::Rcout << "Inizio kriging " << "\n";
 
     // New coordinates
     std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
@@ -234,10 +224,8 @@ extern "C"{
 
     Eigen::MatrixXd tplane_prediction(p,p);
     std::vector<Eigen::MatrixXd> manifold_prediction(M);
-    Rcpp::Rcout << "Prima ciclo kriging " << "\n";
 
     for (size_t i=0; i<M; i++) {
-      Rcpp::Rcout << "Ciclo kriging " << "\n";
       distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
       ci = the_variogram->get_covario_vec(distanceVector, N);
       lambda_vec = solver.solve(ci);
