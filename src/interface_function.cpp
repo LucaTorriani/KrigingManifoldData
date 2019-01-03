@@ -27,7 +27,7 @@ extern "C"{
      SEXP s_new_coordinates, SEXP s_Sigma_new, SEXP s_X_new, SEXP s_suppressMes) {
 
     BEGIN_RCPP
-    Rcpp::Rcout << "Inizio " << "\n";
+    std::cout << "Inizio " << "\n";
 
     // Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
     Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
