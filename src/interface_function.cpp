@@ -186,6 +186,7 @@ extern "C"{
     Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
 
     // KRIGING
+    Rcpp::Rcout << "Inizio kriging " << "\n";
 
     // New coordinates
     std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
@@ -224,8 +225,10 @@ extern "C"{
 
     Eigen::MatrixXd tplane_prediction(p,p);
     std::vector<Eigen::MatrixXd> manifold_prediction(M);
+    Rcpp::Rcout << "Prima ciclo kriging " << "\n";
 
     for (size_t i=0; i<M; i++) {
+      Rcpp::Rcout << "Ciclo kriging " << "\n";
       distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
       ci = the_variogram->get_covario_vec(distanceVector, N);
       lambda_vec = solver.solve(ci);
