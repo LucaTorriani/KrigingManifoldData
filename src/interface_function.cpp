@@ -232,8 +232,12 @@ extern "C"{
       tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
       theExpMap->set_members(Sigma_new_vec[i]);
       manifold_prediction[i] = theExpMap->map2manifold(parallel_transport::transport_from_TI(Sigma_new_vec[i], tplane_prediction));
+      if (i==13 || i==56 || i == 82 || i==235 || i==543) {
+        Rcpp::Rcout << "tplane_prediction "<< "\n" << tplane_prediction << "\n";
+        Rcpp::Rcout << "transported_from_TI "<< "\n" << parallel_transport::transport_from_TI(Sigma_new_vec[i], tplane_prediction) << "\n";
+        Rcpp::Rcout << "manifold_prediction "<< "\n" << manifold_prediction[i] << "\n";
+      }
     }
-
 
     Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                              Rcpp::Named("fit_vario_values") = fit_vario_values,
