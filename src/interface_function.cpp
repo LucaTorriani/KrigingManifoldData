@@ -15,7 +15,7 @@
 #include "HelpersFactory.hpp"
 #include "MapFunctions.hpp"
 #include "Model.hpp"
-#include "IntrinsicMean.hpp"
+// #include "IntrinsicMean.hpp"
 #include "ParallelTransport.hpp"
 
 extern "C"{
