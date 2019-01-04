@@ -15,7 +15,7 @@ double Frobenius::norm(const MatrixXd& M1) const{
 
 void Frobenius::set_members(const MatrixXd& Sigma) {}
 
-FROBENIUS SCALED
+// FROBENIUS SCALED
 double FrobeniusScaled::norm(const MatrixXd& M) const{
   MatrixXd tmp(_p, _p);
   tmp = _SigmaInv*M*_SigmaInv*M;
