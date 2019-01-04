@@ -14,7 +14,7 @@
 #' @useDynLib Manifoldgstat
 #' @export
 
-distance_manifold = function(data1, data2, metric_manifold = "Frobenius", metric_ts = "Frobenius"){
+distance_manifold = function(data1, data2, metric_manifold = "Frobenius"){
   if(is.array(data1)){
     if(length(dim(data1))==3) data1 = alply(data1,3)
     if(length(dim(data1))==2) data1 = list(data1)
