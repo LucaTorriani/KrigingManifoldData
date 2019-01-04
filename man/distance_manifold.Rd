@@ -4,8 +4,7 @@
 \alias{distance_manifold}
 \title{Distance on the manifold}
 \usage{
-distance_manifold(data1, data2, metric_manifold = "Frobenius",
-  metric_ts = "Frobenius")
+distance_manifold(data1, data2, metric_manifold = "Frobenius")
 }
 \arguments{
 \item{data1}{list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix.}
