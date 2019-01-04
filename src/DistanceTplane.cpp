@@ -15,18 +15,18 @@ double Frobenius::norm(const MatrixXd& M1) const{
 
 void Frobenius::set_members(const MatrixXd& Sigma) {}
 
-// FROBENIUS SCALED
-// double FrobeniusScaled::norm(const MatrixXd& M) const{
-//   MatrixXd tmp(_p, _p);
-//   tmp = _SigmaInv*M*_SigmaInv*M;
-//   return (sqrt(tmp.trace()));
-// }
-//
-// void FrobeniusScaled::set_members(const MatrixXd& Sigma) {
-//   _p = Sigma.rows();
-//   Eigen::LDLT<MatrixXd> solver(_p);
-//   solver.compute(Sigma);
-//   MatrixXd Id(_p,_p);
-//   Id.setIdentity();
-//   _SigmaInv = solver.solve(Id);
-// }
+FROBENIUS SCALED
+double FrobeniusScaled::norm(const MatrixXd& M) const{
+  MatrixXd tmp(_p, _p);
+  tmp = _SigmaInv*M*_SigmaInv*M;
+  return (sqrt(tmp.trace()));
+}
+
+void FrobeniusScaled::set_members(const MatrixXd& Sigma) {
+  _p = Sigma.rows();
+  Eigen::LDLT<MatrixXd> solver(_p);
+  solver.compute(Sigma);
+  MatrixXd Id(_p,_p);
+  Id.setIdentity();
+  _SigmaInv = solver.solve(Id);
+}

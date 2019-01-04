@@ -37,7 +37,7 @@ namespace {
   ManifoldProxy<distances_manifold::SqRoot> mansqroot("SquareRoot");
 
   TplaneProxy<distances_tplane::Frobenius> tplanfrob("Frobenius");
-  // TplaneProxy<distances_tplane::FrobeniusScaled> tplanfrobscal("FrobeniusScaled");
+  TplaneProxy<distances_tplane::FrobeniusScaled> tplanfrobscal("FrobeniusScaled");
 
 
 

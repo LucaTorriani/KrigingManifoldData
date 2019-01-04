@@ -26,15 +26,15 @@ namespace distances_tplane{
 
  };
 
-//  class FrobeniusScaled : public DistanceTplane{
-//    MatrixXd _SigmaInv;
-//    unsigned int _p;
-//  public:
-//    ~FrobeniusScaled() = default;
-//    double norm(const MatrixXd &) const override;
-//    void set_members(const MatrixXd&) override;
-//
-// };
+ class FrobeniusScaled : public DistanceTplane{
+   MatrixXd _SigmaInv;
+   unsigned int _p;
+ public:
+   ~FrobeniusScaled() = default;
+   double norm(const MatrixXd &) const override;
+   void set_members(const MatrixXd&) override;
+
+};
 
 
 
