@@ -58,21 +58,21 @@ list with the following fields:
 \item{\code{h_vec}}{ vector of positions at which the empirical variogram is computed}
 \item{\code{fitted_par_vario}}{ estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range}}
 \item{\code{iterations}}{ number of iterations of the main loop}
-\item{\code{Sigma}}{ tangent point}
 \item{\code{prediction}}{ vector of matrices predicted at the new locations}
 }
 \description{
 Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then
-it performs kriging on the new locations.
+performs kriging on the new locations.
 }
 \details{
-The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
+For all \code{i in 1:N}, \code{data_manifold[,,i]} is mapped to the space tangent in \code{Sigma_data[,,i]}. Those values are, on their turn, 
+parallely transported to the common Hilbert space tangent in the identity matrix, where a GLS model is fitted to them. A first estimate of the beta coefficients
 is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem.
-Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
-the estimates are mapped to the manifold.
+Once the model is computed, simple kriging on the tangent space is performed in correspondence of all the new locations \code{new_coords[j,]}, with \code{j in 1:M}. 
+Then each estimate is parallely transported to the space tangent in \code{Sigma_new[,,j]} and finally mapped to the manifold.
 }
 \examples{
 data_manifold_tot <- Manifoldgstat::fieldCov
@@ -119,4 +119,8 @@ rect(x.min, y.min, x.max, y.max)
 D. Pigoli, A. Menafoglio & P. Secchi (2016):
 Kriging prediction for manifold-valued random fields.
 Journal of Multivariate Analysis, 145, 117-131.
+
+O Yair, M Ben-Chen, R Talmon (2018)
+Parallel transport on the cone manifold of spd matrices for domain adaptation.
+ArXiv Preprint, 1807.10479
 }

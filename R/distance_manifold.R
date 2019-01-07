@@ -1,7 +1,7 @@
 #' Distance on the manifold
 #'
-#' @param data1 list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix.
-#' @param data2 a list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix.
+#' @param data1 list or array [\code{p,p,B1}] of \code{B1} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix.
+#' @param data2 list or array [\code{p,p,B2}] of \code{B2} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix.
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @return A double or a vector of distances
 #' @description Compute the manifold distance between symmetric positive definite matrices
