@@ -4,7 +4,7 @@
 \alias{model_kriging}
 \title{Create a GLS model and directly perform kriging}
 \usage{
-model_kriging(data_manifold, coords, X = NULL, Sigma,
+model_kriging(data_manifold, coords, X = NULL, Sigma = NULL,
   metric_manifold = "Frobenius", metric_ts = "Frobenius",
   model_ts = "Additive", vario_model = "Gaussian", n_h = 15,
   distance = "Geodist", max_it = 100, tolerance = 1e-06,

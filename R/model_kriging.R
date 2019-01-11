@@ -100,7 +100,7 @@
 #' @useDynLib Manifoldgstat
 #' @export
 #'
-model_kriging = function(data_manifold, coords,  X = NULL, Sigma, metric_manifold = "Frobenius",
+model_kriging = function(data_manifold, coords,  X = NULL, Sigma = NULL, metric_manifold = "Frobenius",
                              metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                              n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
                              tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL,
