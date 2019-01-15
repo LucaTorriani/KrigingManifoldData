@@ -11,7 +11,7 @@ namespace variogram_evaluation{
 class EmpiricalVariogram {
   const unsigned int _n_h;
   const unsigned int _N;
-  const std::shared_ptr<const SpMat> _distanceMatrix;
+  std::shared_ptr<const SpMat> _distanceMatrix;
 
   std::vector<double> _emp_vario_values;
   std::vector<double> _hvec;
@@ -25,8 +25,9 @@ class EmpiricalVariogram {
 
 public:
   // EmpiricalVariogram()= default;
-  EmpiricalVariogram (const std::shared_ptr<const SpMat>, unsigned int, const Coordinates&, const distances::Distance&);
-
+  EmpiricalVariogram (unsigned int, const Coordinates&);
+  void set_distance_and_h_max(const std::shared_ptr<const SpMat>, const Coordinates&, const distances::Distance&);
+  void set_distance_and_h_max(const std::shared_ptr<const SpMat>, const double&);
   void update_emp_vario(const std::vector<MatrixXd>&, const distances_tplane::DistanceTplane &);
   // void set_weight(const Vec&);
   std::vector<double> get_emp_vario_values () const;

@@ -4,12 +4,21 @@
 using namespace variogram_evaluation;
 
 // EmpiricalVariogram
-EmpiricalVariogram::EmpiricalVariogram (const std::shared_ptr<const SpMat> distanceMatrix, unsigned int n_h, const Coordinates& coords, const distances::Distance& distance):
-  _n_h(n_h), _N(coords.get_N_station()), _distanceMatrix(distanceMatrix),
-  _emp_vario_values(_n_h), _hvec(n_h), _N_hvec(_n_h), _d(_n_h+1), _weights(_N)  {
-    compute_hmax(coords, distance);
-    _d.setLinSpaced(n_h+1, 0, _hmax);
+EmpiricalVariogram::EmpiricalVariogram (unsigned int n_h, const Coordinates& coords):
+  _n_h(n_h), _N(coords.get_N_station()), _emp_vario_values(_n_h), _hvec(_n_h), _N_hvec(_n_h), _d(_n_h+1), _weights(_N)  {
     _weights.setOnes(_N);
+}
+
+void EmpiricalVariogram::set_distance_and_h_max(const std::shared_ptr<const SpMat> distanceMatrix, const Coordinates& coords, const distances::Distance& distance) {
+  _distanceMatrix = distanceMatrix;
+  compute_hmax(coords, distance);
+  _d.setLinSpaced(_n_h+1, 0, _hmax);
+}
+
+void EmpiricalVariogram::set_distance_and_h_max(const std::shared_ptr<const SpMat> distanceMatrix, const double& max_dist) {
+  _distanceMatrix = distanceMatrix;
+  _hmax = (1.0/3)*max_dist;
+  _d.setLinSpaced(_n_h+1, 0, _hmax);
 }
 
 unsigned int EmpiricalVariogram::get_N() const {
