@@ -15,7 +15,7 @@ namespace distances{
   public:
     virtual double compute_distance(const Vec&, const Vec&) const = 0;
     std::shared_ptr<const SpMat> create_distance_matrix(const Coordinates &, unsigned int) const;
-    std::vector<double> create_distance_vector(const Coordinates &, const Vec &) const;
+    Vec create_distance_vector(const Coordinates &, const Vec &) const;
     virtual ~Distance() = default;
   };
 
