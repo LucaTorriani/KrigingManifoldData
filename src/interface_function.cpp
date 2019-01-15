@@ -75,18 +75,30 @@ extern "C"{
     data_manifold.clear();
     data_tspace.clear();
 
+    // Emp vario
+    unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
+    variogram_evaluation::EmpiricalVariogram emp_vario(n_h, coords);
+
     // Distance
-    std::shared_ptr<SpMat> distanceMatrix_ptr;
+    std::unique_ptr<distances::Distance> theDistance; // Used only if distance is not NULL
+    std::shared_ptr<const SpMat> distanceMatrix_ptr;
+    std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr; // Used only if distance is NULL
+
     if(distance_n.isNotNull()) {
       distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
       std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
-      std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+      // std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+      theDistance = distance_fac.create(distance_name);
 
       // Distance Matrix
       // std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
       distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+
+      // Emp vario
+      emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
     }
     else {
+      // Data dist mat
       Vec disance_vec(Rcpp::as<Vec> (s_data_dist_vec));
       std::vector<TripType> tripletList;
       tripletList.reserve((N*(N-1))/2);
@@ -95,18 +107,19 @@ extern "C"{
           tripletList.push_back( TripType(i,j,disance_vec(N*i-(i+1)*i/2 + j-i -1)) );
         }
       }
-      // SpMat distance_matrix(N, N);
-      // distance_matrix.setFromTriplets(tripletList.begin(), tripletList.end());
-      distanceMatrix_ptr->setFromTriplets(tripletList.begin(), tripletList.end());
-      // distanceMatrix_ptr = std::make_shared<SpMat> (Rcpp::as<SpMat> (s_data_dist_mat));
+      SpMat distance_matrix(N, N);
+      distance_matrix.setFromTriplets(tripletList.begin(), tripletList.end());
+      distanceMatrix_ptr = std::make_shared<const SpMat> (distance_matrix);
 
-      std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr = std::make_shared<SpMat> (Rcpp::as<SpMat> (s_data_grid_dist_mat));
+      // Data grid dist mat
+      distanceDataGridMatrix_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_data_grid_dist_mat));
+
+      // Emp vario
+      emp_vario.set_distance_and_h_max(distanceMatrix_ptr, disance_vec.maxCoeff());
     }
 
 
-    // Emp vario
-    unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-    variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
+
 
     // if(weight_vario.isNotNull()) {
     //   Vec weight_vario(Rcpp::as<Vec> (s_weight_vario));
@@ -231,7 +244,7 @@ extern "C"{
     }
     else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
 
-    std::vector<double> distanceVector(N);
+    Vec distanceVector(N);
 
     Vec ci(N);
     Vec lambda_vec(N);
