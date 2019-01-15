@@ -10,6 +10,8 @@
 #' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
 #' @param n_h number of bins in the emprical variogram
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+#' @param data_dist_mat Matrix of dimension \code{N*N} of distances between data points. If not provided it is computed using \code{distance}
+#' @param data_grid_dist_mat Matrix of dimension \code{N*M} of distances between data points and grid points. If not provided it is computed using \code{distance}
 #' @param max_it max number of iterations for the main loop
 #' @param tolerance tolerance for the main loop
 #' @param max_sill maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
@@ -30,18 +32,18 @@
 #' \item{\code{prediction}}{ vector of matrices predicted at the new locations}
 #' @description Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then
 #' performs kriging on the new locations.
-#' @details For all \code{i in 1:N}, \code{data_manifold[,,i]} is mapped to the space tangent in \code{Sigma_data[,,i]}. Those values are, on their turn, 
+#' @details For all \code{i in 1:N}, \code{data_manifold[,,i]} is mapped to the space tangent in \code{Sigma_data[,,i]}. Those values are, on their turn,
 #' parallely transported to the common Hilbert space tangent in the identity matrix, where a GLS model is fitted to them. A first estimate of the beta coefficients
 #' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 #' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 #' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 #' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem.
-#' Once the model is computed, simple kriging on the tangent space is performed in correspondence of all the new locations \code{new_coords[j,]}, with \code{j in 1:M}. 
+#' Once the model is computed, simple kriging on the tangent space is performed in correspondence of all the new locations \code{new_coords[j,]}, with \code{j in 1:M}.
 #' Then each estimate is parallely transported to the space tangent in \code{Sigma_new[,,j]} and finally mapped to the manifold.
 #' @references D. Pigoli, A. Menafoglio & P. Secchi (2016):
 #' Kriging prediction for manifold-valued random fields.
 #' Journal of Multivariate Analysis, 145, 117-131.
-#' 
+#'
 #' O Yair, M Ben-Chen, R Talmon (2018)
 #' Parallel transport on the cone manifold of spd matrices for domain adaptation.
 #' ArXiv Preprint, 1807.10479
@@ -90,16 +92,32 @@
 
 model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
                          model_ts = "Additive", vario_model = "Gaussian", # metric_ts = "Frobenius",
-                         n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
+                         n_h=15, distance = "Geodist", data_dist_mat=NULL,
+                         data_grid_dist_mat=NULL, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                          # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                          max_sill=NULL, max_a=NULL,
                          new_coords, Sigma_new, X_new = NULL, plot = TRUE, suppressMes = FALSE){
-
+  coords = as.matrix(coords)
+  new_coords = as.matrix(new_coords)
+  N = dim(coords)[1]
+  M = dim(new_coords)[1]
   if ( distance == "Geodist" & dim(coords)[2] != 2){
     stop("Geodist requires two coordinates")
   }
-  coords = as.matrix(coords)
-  new_coords = as.matrix(new_coords)
+  if(is.null(distance)) {
+    if ((is.null(data_grid_dist_mat)+is.null(data_dist_mat))!=0)
+      stop("If distance is NULL data_dist_mat and data_grid_dist_mat must be provided")
+    else {
+      # Controllo dimensioni matrici
+      if(dim(data_dist_mat)[1]!=N || dim(data_dist_mat)[2]!=N) stop("data_dist_mat must be an N*N matrix")
+      if(dim(data_grid_dist_mat)[1]!=N || dim(data_grid_dist_mat)[2]!=M) stop("data_dist_mat must be an N*M matrix")
+    }
+  }
+  else {
+    if ((is.null(data_grid_dist_mat)+is.null(data_dist_mat))!=2)
+      warning("Since distance is not NULL parameters data_dist_mat and data_grid_dist_mat will be discarded")
+  }
+
 
   if(!is.null(X)) {
     X = as.matrix(X)
@@ -121,11 +139,12 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
     data_manifold = alply(data_manifold,3)
   }
 
-  if(length(data_manifold) != dim(coords)[1]){
+  if(length(data_manifold) != N){
     stop("Dimension of data_manifold and coords must agree")
   }
+  data_dist_vec = as.vector(as.dist(data_dist_mat))
 
-  result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma_data, distance, metric_manifold, model_ts, vario_model, # metric_ts
+  result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma_data, distance, data_dist_vec, data_grid_dist_mat,  metric_manifold, model_ts, vario_model, # metric_ts
                 n_h, max_it, tolerance, max_sill, max_a, new_coords, Sigma_new, X_new, suppressMes ) # weight_vario, weight_intrinsic, tolerance_intrinsic,
 
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)

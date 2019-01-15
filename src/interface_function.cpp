@@ -22,7 +22,7 @@ extern "C"{
 
   // CREATE MODEL AND KRIGNG
   RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma_data,
-     SEXP s_distance, SEXP s_manifold_metric,  SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h, // SEXP s_ts_metric,
+     SEXP s_distance, SEXP s_data_dist_vec, SEXP s_data_grid_dist_mat, SEXP s_manifold_metric,  SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h, // SEXP s_ts_metric,
      SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a, // SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
      SEXP s_new_coordinates, SEXP s_Sigma_new, SEXP s_X_new, SEXP s_suppressMes) {
 
@@ -33,6 +33,7 @@ extern "C"{
     Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
     Rcpp::Nullable<double> max_sill_n (s_max_sill);
     Rcpp::Nullable<double> max_a_n (s_max_a);
+    Rcpp::Nullable<std::string> distance_n(s_distance);
 
     // Coordinates
     std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -75,12 +76,33 @@ extern "C"{
     data_tspace.clear();
 
     // Distance
-    distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
-    std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
-    std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+    std::shared_ptr<SpMat> distanceMatrix_ptr;
+    if(distance_n.isNotNull()) {
+      distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+      std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+      std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
 
-    // Distance Matrix
-    std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+      // Distance Matrix
+      // std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+      distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+    }
+    else {
+      Vec disance_vec(Rcpp::as<Vec> (s_data_dist_vec));
+      std::vector<TripType> tripletList;
+      tripletList.reserve((N*(N-1))/2);
+      for (size_t i=0; i<(N-1); i++ ) {
+        for (size_t j=(i+1); j<N; j++ ) {
+          tripletList.push_back( TripType(i,j,disance_vec(N*i-(i+1)*i/2 + j-i -1)) );
+        }
+      }
+      // SpMat distance_matrix(N, N);
+      // distance_matrix.setFromTriplets(tripletList.begin(), tripletList.end());
+      distanceMatrix_ptr->setFromTriplets(tripletList.begin(), tripletList.end());
+      // distanceMatrix_ptr = std::make_shared<SpMat> (Rcpp::as<SpMat> (s_data_dist_mat));
+
+      std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr = std::make_shared<SpMat> (Rcpp::as<SpMat> (s_data_grid_dist_mat));
+    }
+
 
     // Emp vario
     unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
@@ -226,7 +248,8 @@ extern "C"{
     std::vector<Eigen::MatrixXd> manifold_prediction(M);
 
     for (size_t i=0; i<M; i++) {
-      distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+      if (distance_n.isNotNull()) distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+      else distanceVector = distanceDataGridMatrix_ptr->col(i);
       ci = the_variogram->get_covario_vec(distanceVector, N);
       lambda_vec = solver.solve(ci);
       tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);

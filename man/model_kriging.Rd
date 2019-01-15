@@ -7,9 +7,9 @@
 model_kriging(data_manifold, coords, X = NULL, Sigma_data,
   metric_manifold = "Frobenius", model_ts = "Additive",
   vario_model = "Gaussian", n_h = 15, distance = "Geodist",
-  max_it = 100, tolerance = 1e-06, max_sill = NULL, max_a = NULL,
-  new_coords, Sigma_new, X_new = NULL, plot = TRUE,
-  suppressMes = FALSE)
+  data_dist_mat = NULL, data_grid_dist_mat = NULL, max_it = 100,
+  tolerance = 1e-06, max_sill = NULL, max_a = NULL, new_coords,
+  Sigma_new, X_new = NULL, plot = TRUE, suppressMes = FALSE)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}}
@@ -30,6 +30,10 @@ be provided in signed decimal degrees}
 \item{n_h}{number of bins in the emprical variogram}
 
 \item{distance}{type of distance between coordinates. It must be either "Eucldist" or "Geodist"}
+
+\item{data_dist_mat}{Matrix of dimension \code{N*N} of distances between data points. If not provided it is computed using \code{distance}}
+
+\item{data_grid_dist_mat}{Matrix of dimension \code{N*M} of distances between data points and grid points. If not provided it is computed using \code{distance}}
 
 \item{max_it}{max number of iterations for the main loop}
 
@@ -65,13 +69,13 @@ Given the coordinates and corresponding manifold values, this function firstly c
 performs kriging on the new locations.
 }
 \details{
-For all \code{i in 1:N}, \code{data_manifold[,,i]} is mapped to the space tangent in \code{Sigma_data[,,i]}. Those values are, on their turn, 
+For all \code{i in 1:N}, \code{data_manifold[,,i]} is mapped to the space tangent in \code{Sigma_data[,,i]}. Those values are, on their turn,
 parallely transported to the common Hilbert space tangent in the identity matrix, where a GLS model is fitted to them. A first estimate of the beta coefficients
 is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
 are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem.
-Once the model is computed, simple kriging on the tangent space is performed in correspondence of all the new locations \code{new_coords[j,]}, with \code{j in 1:M}. 
+Once the model is computed, simple kriging on the tangent space is performed in correspondence of all the new locations \code{new_coords[j,]}, with \code{j in 1:M}.
 Then each estimate is parallely transported to the space tangent in \code{Sigma_new[,,j]} and finally mapped to the manifold.
 }
 \examples{
