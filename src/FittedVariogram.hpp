@@ -26,7 +26,7 @@ public:
   MatrixXd compute_gamma_matrix(const std::shared_ptr<const SpMat>, unsigned int) const;
   Vector3d get_parameters() const;
   void set_parameters(const Vector3d&);
-  Vec get_covario_vec(const std::vector<double> &, unsigned int) const;
+  Vec get_covario_vec(const Vec &, unsigned int) const;
    virtual ~FittedVariogram() = default;
 };
 

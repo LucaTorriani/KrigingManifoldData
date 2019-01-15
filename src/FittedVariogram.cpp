@@ -156,10 +156,10 @@ MatrixXd FittedVariogram::compute_gamma_matrix(const std::shared_ptr<const SpMat
   return (gamma_matrix);
 }
 
-Vec FittedVariogram::get_covario_vec(const std::vector<double> & h_vec, unsigned int card_h) const {
+Vec FittedVariogram::get_covario_vec(const Vec & h_vec, unsigned int card_h) const {
   Vec covario_values(card_h);
   for (size_t i=0; i<card_h; i++) {
-    covario_values(i) = get_covario_univ(h_vec[i]);
+    covario_values(i) = get_covario_univ(h_vec(i));
   }
   return covario_values;
 }
