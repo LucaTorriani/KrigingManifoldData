@@ -101,9 +101,6 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
   new_coords = as.matrix(new_coords)
   N = dim(coords)[1]
   M = dim(new_coords)[1]
-  if ( distance == "Geodist" & dim(coords)[2] != 2){
-    stop("Geodist requires two coordinates")
-  }
   if(is.null(distance)) {
     if ((is.null(data_grid_dist_mat)+is.null(data_dist_mat))!=0)
       stop("If distance is NULL data_dist_mat and data_grid_dist_mat must be provided")
@@ -116,6 +113,9 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
   else {
     if ((is.null(data_grid_dist_mat)+is.null(data_dist_mat))!=2)
       warning("Since distance is not NULL parameters data_dist_mat and data_grid_dist_mat will be discarded")
+    if ( distance == "Geodist" & dim(coords)[2] != 2){
+        stop("Geodist requires two coordinates")
+    }
   }
 
 
