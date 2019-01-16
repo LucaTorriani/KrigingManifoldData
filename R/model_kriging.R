@@ -109,6 +109,7 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
       if(dim(data_dist_mat)[1]!=N || dim(data_dist_mat)[2]!=N) stop("data_dist_mat must be an N*N matrix")
       if(dim(data_grid_dist_mat)[1]!=N || dim(data_grid_dist_mat)[2]!=M) stop("data_dist_mat must be an N*M matrix")
     }
+    data_dist_vec = as.vector(as.dist(data_dist_mat))
   }
   else {
     if ((is.null(data_grid_dist_mat)+is.null(data_dist_mat))!=2)
@@ -142,7 +143,6 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
   if(length(data_manifold) != N){
     stop("Dimension of data_manifold and coords must agree")
   }
-  data_dist_vec = as.vector(as.dist(data_dist_mat))
 
   result =.Call("get_model_and_kriging",data_manifold, coords,X, Sigma_data, distance, data_dist_vec, data_grid_dist_mat,  metric_manifold, model_ts, vario_model, # metric_ts
                 n_h, max_it, tolerance, max_sill, max_a, new_coords, Sigma_new, X_new, suppressMes ) # weight_vario, weight_intrinsic, tolerance_intrinsic,
