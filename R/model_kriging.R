@@ -117,6 +117,7 @@ model_kriging = function(data_manifold, coords, X = NULL, Sigma_data, metric_man
     if ( distance == "Geodist" & dim(coords)[2] != 2){
         stop("Geodist requires two coordinates")
     }
+    data_dist_vec = NULL
   }
 
 
