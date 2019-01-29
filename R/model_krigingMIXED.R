@@ -54,10 +54,10 @@
 #' coords_tot <- Manifoldgstat::gridCov
 #' Sigma <- matrix(c(2,1,1,1), 2,2)
 #'
-#' result = model_krigingMIXED (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
+#' result = model_kriging_mixed (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
 #'                         metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
 #'                         max_it = 100, tolerance = 10e-7,new_coords = coords_model)
-#' result_tot = model_krigingMIXED (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
+#' result_tot = model_kriging_mixed (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
 #'                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
 #'                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
 #'
@@ -90,7 +90,7 @@
 #' @useDynLib Manifoldgstat
 #' @export
 
-model_krigingMIXED = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
+model_kriging_mixed = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
                          model_ts = "Additive", vario_model = "Gaussian", # metric_ts = "Frobenius",
                          n_h=15, distance = "Geodist", data_dist_mat=NULL,
                          data_grid_dist_mat=NULL, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,

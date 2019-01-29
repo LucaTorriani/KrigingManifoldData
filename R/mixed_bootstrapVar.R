@@ -1,3 +1,4 @@
+#' Bootstrap variance for method mixed_RDD
 #' @useDynLib Manifoldgstat
 #' @export
 boot.var.man <- function(res_RDD_OOK, K, metric_manifold)
@@ -11,7 +12,7 @@ boot.var.man <- function(res_RDD_OOK, K, metric_manifold)
   # dim_matrix = p
   # OUTPUT :
   # bootstrap variance at the predicted locations
-  
+
   # res.boot = res_RDD_OOK$resBootstrap$fpred
   res.boot = res_RDD_OOK$resBootstrap$fmean
   res.aggr = res_RDD_OOK$resAggregated
@@ -19,13 +20,13 @@ boot.var.man <- function(res_RDD_OOK, K, metric_manifold)
   dimgrid = length(res.boot[[1]])
   B=length(res.boot)
   boot.v <- rep(0,dimgrid)
-  
+
   if(K==1)
     return(boot.v)
   if(K>1)
   {
     for(i in 1:dimgrid)
-    {  
+    {
       if(!is.na(res.aggr[[i]][1,1]))
       {
         # imat = matrix_to_matrixArray(map(res.boot, return_ith_row, i)%>%ldply, dim_matrix)

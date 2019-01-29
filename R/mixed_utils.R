@@ -14,40 +14,40 @@ RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_sample
   # num_signif_entries = (p*(p+1))/2
   # Output:
   # Average prediction (on the grid used to produce fOKBV)
-  # 
-  
+  #
+
   if(num.signif.entries==1)
   {
     print('Please provide the grid length *n*')
     return(-1)
   }
-  
+
   # fOKBV1=simplify2array(fOKBV)
   # B = dim(fOKBV2)[2]
-  
-  # if(dim(fOKBV1)[1]==1) 
+
+  # if(dim(fOKBV1)[1]==1)
   if(length(fOKBV[[1]])==1)
   {
     print('Please check source code for grid dimension == 1!')
     return(-1)
   }
-  
+
   weight = NULL
   ngrid=length(fOKBV[[1]])
   # fpred.ave = array(NA, dim=c(ngrid, num.signif.entries))
   fpred.ave = list()
-  
+
   # id.na = which(is.na(fOKBV1[,1,]))
-  
+
   if(ker.width.intrinsic != 0)
-  { 
+  {
     print("Using weights for aggregation")
     W.b = do.call(cbind,weights_intrinsic)
     W.tot=apply(W.b,1,sum, na.rm=TRUE)
     weight=W.b/W.tot # It divides each row of W.b by the corresponding element of the vector W.tot
   }
-  
-  
+
+
   # if(length(id.na)>0)
   # {
   #   for(i in (1:ngrid)[-id.na]) {
@@ -56,9 +56,9 @@ RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_sample
   #     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, k=i),
   #                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
   #   }
-  #     
-  #   return(fpred.ave) 
-  #   
+  #
+  #   return(fpred.ave)
+  #
   # }
   # if(length(id.na)==0)
   # {
@@ -67,10 +67,10 @@ RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_sample
   #     #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
   #     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, k=i),
   #                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
-  #     
+  #
   #   }
-  #   return(fpred.ave) 
-  #   
+  #   return(fpred.ave)
+  #
   # }
   for(i in (1:ngrid)){
     # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
@@ -78,23 +78,23 @@ RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_sample
     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, i=i),
                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight = weight[i,])
   }
-  
+
   return(fpred.ave)
 }
 
 
 
 RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
-                            # spdist, 
-                            suppressMes, 
-                            ker.width.intrinsic, 
-                            # mesh, 
-                            graph.distance.complete, 
-                            # assign.matrix, no.assg.grid, 
-                            data.grid.distance, 
-                            # is.observed, border.length, 
+                            # spdist,
+                            suppressMes,
+                            ker.width.intrinsic,
+                            # mesh,
+                            graph.distance.complete,
+                            # assign.matrix, no.assg.grid,
+                            data.grid.distance,
+                            # is.observed, border.length,
                             p, num.signif.entries, metric_ts)
-  # vario_model, method.analysis, tol, max_it, n_h, tolerance_intrinsic, X, X_new, X_tot, plot,ker.width.vario, 
+  # vario_model, method.analysis, tol, max_it, n_h, tolerance_intrinsic, X, X_new, X_tot, plot,ker.width.vario,
   # metric_manifold, metric_ts, model_ts, vario_model, distance
 {
   # This function implements the bootstrap step of Ordinary Kriging with Random Domain
@@ -111,7 +111,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
   # tol     = tolerance for the main loop of model_kriging
   # max_it  = maximum number of iterations for the main loop of model_kriging
   # n_h     = number of bins in the empirical variogram
-  # tolerance_intrinsic = Tolerance 
+  # tolerance_intrinsic = Tolerance
   # X       = Additional covariates for the locations used to create the model
   # X_new   = Additional covariates for the locations where to perform kriging
   # X_tot   = Additional covariates for all N_samples
@@ -126,7 +126,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
   # is.observed = If the i-th grid point is already observed ---> is.observed[i] contains the index of the point in the data matrix
   #               If the i-th grid point is unobserved       ---> is.observed[i] = 0
   # border.length = number of border points
-  # p       = dimension of the manifold matrices 
+  # p       = dimension of the manifold matrices
   # num.signif.entries = (p*(p+1))/2
   # t_step
   # method.analysis = {Local mean, Kriging} which method should be used
@@ -146,92 +146,92 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
   #          kervalues_krig = list of B components, each containing to be used for the aggregation of the kriging predictions (if aggregation_krig=="Weighted")
   #          variofit = list of B components, each containing the parameter of the variogram over the grid
   #                     (i.e., for each grid point, the parameter used to make the prediction at that points are given)
-  
+
   if(suppressMes)  oldw <- getOption("warn");  options(warn = -1)
   # Set parameters and initialize lists
   #*lists and parameters
   fmean=kervalues_mean=list() # kervalues_krig=fmean=vfit
-  # nk=rep(0,K)  
+  # nk=rep(0,K)
   #*data
   colnames(data_coords)=c('x','y')
   # colnames(data_val)= c(paste0('z',1:num.signif.entries))
   nsub = dim(data)[1]
   ngrid = dim(grid)[1]
-  
+
   #*distances
   graph.distance = graph.distance.complete
   # idx.start_sample = border.length+1;
   # idx.end_sample = border.length+N_samples
   # indexes_samples = idx.start_sample:idx.end_sample
-  
+
   # data_manifold_tot_array=matrix_to_matrixArray(data[,3:(2+num.signif.entries)], p=p)
-  
+
   # #------------------ Bootstrap step
   for(b in 1:B) # Repeat over the B bootstrap replicates
   {
     pFstat.predictTrK=gridk=kergrid_mean=list() #=kergrid_krig=vfitk
     if(suppressMes==F)
       print(paste("Repetition B = ", b, sep=''))
-    
+
     # Step 1: Extract centers
     ### ------------- 1. Create RDD
     rdd = create.rdd(K=K, method.rdd = 'Voronoi', data_coords = data_coords,
-                     # border.length = border.length, spdist = spdist, 
-                     graph.distance = graph.distance, 
+                     # border.length = border.length, spdist = spdist,
+                     graph.distance = graph.distance,
                      # mesh = mesh,
-                     nk_min = nk_min, grid = grid, 
+                     nk_min = nk_min, grid = grid,
                      # is.observed = is.observed, graph.distance.complete = graph.distance.complete, assign.matrix = assign.matrix,
                      data.grid.distance = data.grid.distance, suppressMes = suppressMes)
-    
+
     assign = rdd$assign
     centers = rdd$centers
-    assigng = rdd$assigng 
+    assigng = rdd$assigng
     nk = table(assigng)
     gridk = rdd$gridk
     graph.distance.grid.centers = rdd$graph.distance.grid.centers
-    
+
     # veclocmean = matrix(NA, nrow=K, ncol=num.signif.entries)
     # veclocmean = list()
-    
+
     # fpred[[b]]=matrix(NA,ngrid,num.signif.entries); colnames(fpred[[b]])=c(paste("Z",1:num.signif.entries))
     fmean[[b]]= list() # Lista di ngrid matrici p*p
-    
+
     if(ker.width.intrinsic>0) {
       kervalues_mean[[b]]=matrix(NA,ngrid,1); colnames(kervalues_mean[[b]])="Ker.val.mean"
     }
     # if(ker.width.vario>0) {
     #   kervalues_krig[[b]]=matrix(NA,ngrid,1); colnames(kervalues_krig[[b]])="Ker.val.krig"
     # }
-    
-    for(k in 1:K) 
+
+    for(k in 1:K)
     {
       ##### Centro
       center = centers[k,]
-      
+
       ##### Pesi
       weight.intrinsic = NULL
-      
+
       if(ker.width.intrinsic>0) #compute kergrid = weights for aggregation (tangent point and prediction)
       {
         # if(K==1) dist_mat = t(as.matrix(graph.distance.grid.centers[,which(assigng == k)]))
         # else dist_mat = graph.distance.grid.centers[,which(assigng == k)]
-        
+
         kergrid_mean[[k]]=kerfn(newdata=coordinates(gridk[[k]])[,1:2],center=c(center[1],center[2],k), ker.type = 'Gau', param = ker.width.intrinsic) # dist = spdist, distance.matrix = dist_mat
         kervalues_mean[[b]][which(assigng==k),1] = kergrid_mean[[k]]
-        
+
         weight.intrinsic = kerfn(newdata=data[assign==k,1:2], center=center, ker.type = 'Gau', param = ker.width.intrinsic)  # dist=spdist, distance.matrix = graph.distance[, which(assign==k)]
       }
-      
+
       # if(ker.width.vario>0) #compute kergrid = weights for aggregation (tangent point and prediction)
       # {
       #   # if(K==1) dist_mat = t(as.matrix(graph.distance.grid.centers[,which(assigng == k)]))
       #   # else dist_mat = graph.distance.grid.centers[,which(assigng == k)]
-      #   
+      #
       #   kergrid_krig[[k]]=kerfn(newdata=coordinates(gridk[[k]])[,1:2],center=c(center[1],center[2],k), ker.type = 'Gau', param = ker.width.vario) # dist = spdist,  distance.matrix = dist_mat
       #   kervalues_krig[[b]][which(assigng==k),1] = kergrid_krig[[k]]
-      #   
+      #
       #   }
-      
+
       ##### Dati
       if(nk[as.character(k)]>0)  #table(factor(assigng, levels=1:K))[as.character(k)]>0
       {
@@ -239,22 +239,22 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
         datak=data_val[,,assign==k] # extract data in k-th neighb.
         # # coordinates.datak=datak[,1:2]      # extract coordinates
         # datamat = matrix_to_matrixArray(datak[,-c(1,2)],p = p)
-        
+
         # --- Estimate local tangent point
-        # Sigma = intrinsic_mean(data = datamat, metric_manifold = metric_manifold, 
+        # Sigma = intrinsic_mean(data = datamat, metric_manifold = metric_manifold,
         #                        metric_ts = metric_ts, weight_intrinsic = weight.intrinsic)
-        # veclocmean[k,] = matrix_to_vec(Sigma) 
-        Sigma = intrinsic_mean(data = datak, metric_manifold = metric_manifold, 
+        # veclocmean[k,] = matrix_to_vec(Sigma)
+        Sigma = intrinsic_mean(data = datak, metric_manifold = metric_manifold,
                                metric_ts = metric_ts, weight = weight.intrinsic)
-        # veclocmean[[k]] = Sigma 
+        # veclocmean[[k]] = Sigma
         # --- Assign the local tangent point to each grid point & store results
         # fpred[[b]][which(assigng==k),]=matrix(rep(veclocmean[k,],nk[as.character(k)]), nrow = nk[as.character(k)], ncol=num.signif.entries, byrow = T)
         fmean[[b]][which(assigng==k)]= lapply(seq_len(nk[as.character(k)]), function(X) Sigma)
       }
-    } # for su K 
-    
-    # # Grid points excluded from the prediction (set by user) 
-    # if (length(no.assg.grid)!=0) {  
+    } # for su K
+
+    # # Grid points excluded from the prediction (set by user)
+    # if (length(no.assg.grid)!=0) {
     #   fpred[[b]][no.assg.grid,]=NA
     #   if(method.analysis == 'Kriging') {
     #     fmean[[b]][no.assg.grid,]=NA
@@ -267,12 +267,12 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
     #     kervalues_krig[[b]][no.assg.grid,]=NA
     #   }
     # }
-    
+
   } # for su B
-  # if (method.analysis == 'Local mean') 
+  # if (method.analysis == 'Local mean')
   list.ret = list(fmean=fmean, kervalues_mean=kervalues_mean) # ,kervalues_krig=kervalues_krig, variofit=vfit
-  
+
   if(suppressMes) options(warn = oldw)
-  
+
   return(list.ret)
 }

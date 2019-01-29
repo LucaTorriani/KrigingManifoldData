@@ -1423,7 +1423,6 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
     std::unique_ptr<distances::Distance> theDistance; // Used only if distance is not NULL
     std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_ptr;
     std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr; // Used only if distance is NULL
-    double max_dist; // Used only if distance is NULL
 
     if(distance_n.isNotNull()) {
       distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());

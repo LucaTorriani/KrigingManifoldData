@@ -1,3 +1,4 @@
+#' Bootstrap variance for method full_RDD
 #' @useDynLib Manifoldgstat
 #' @export
 full_RDD_bootstrapVar <- function(res_RDD_OOK, K,n, metric_manifold, dim_matrix)
@@ -16,13 +17,13 @@ full_RDD_bootstrapVar <- function(res_RDD_OOK, K,n, metric_manifold, dim_matrix)
   ngrid=dim(res.boot[[1]])[1]
   B=length(res.boot)
   boot.v <- rep(0,ngrid)
-  
+
   if(K==1)
     return(boot.v)
   if(K>1)
   {
     for(i in 1:ngrid)
-    {  
+    {
       if(!is.na(res.aggr[i,1]))
       {
         imat = matrix_to_matrixArray(map(res.boot, return_ith_row, i)%>%ldply, dim_matrix)
@@ -32,5 +33,5 @@ full_RDD_bootstrapVar <- function(res_RDD_OOK, K,n, metric_manifold, dim_matrix)
     }
   }
   return(Re(boot.v))
-  
+
 }
