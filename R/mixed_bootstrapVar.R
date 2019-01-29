@@ -1,7 +1,7 @@
 #' Bootstrap variance for method mixed_RDD
 #' @useDynLib Manifoldgstat
 #' @export
-boot.var.man <- function(res_RDD_OOK, K, metric_manifold)
+mixed_bootstrapVar <- function(res_RDD_OOK, K, metric_manifold)
 {
   # INPUT :
   # res_RDD_OOK = result of the function RDD_OOK

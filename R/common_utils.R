@@ -1,12 +1,12 @@
 
 ################################ RDD #####################################
 
-create.rdd = function(K, method.rdd='Voronoi', data_coords, 
-                      # border.length, spdist, 
+create.rdd = function(K, method.rdd='Voronoi', data_coords,
+                      # border.length, spdist,
                       graph.distance,
-                      # mesh, 
-                      nk_min,grid, 
-                      # is.observed, graph.distance.complete, assign.matrix, 
+                      # mesh,
+                      nk_min,grid,
+                      # is.observed, graph.distance.complete, assign.matrix,
                       data.grid.distance, suppressMes=T)
 {
   if(method.rdd!='Voronoi')
@@ -14,9 +14,9 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
     print('Error: only Voronoi RDD implemented so far')
     return(-1)
   }
-  
+
   N_samples = dim(data_coords)[1]
-  
+
   card_min=0
   first=T
   while(card_min < nk_min)  # If at least a neighborhood has too few points, repeat the RDD
@@ -25,7 +25,7 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
       print("Repeating sampling")
     ind = sort(sample(1:N_samples, size=K)) # Indices of the data matrix corresponding to the centers
     centers = cbind(data_coords$x[ind],data_coords$y[ind],ind) # Extract centers
-    
+
     # Assign data to centers
     assign = rep(0, N_samples)
     for(i in 1:N_samples){
@@ -39,16 +39,16 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
     first=F
     card_min=min(table(assign))
   }
-  
+
   if(is.null(grid))
   {
     list.ret = list(assign=assign, centers=centers)
     return(list.ret)
   }
   ngrid=dim(grid)[1]
-  
+
   ### ------------- 1.2 Assign grid points to centers
-  
+
   # data.grid.distance = loccoords(coords = cbind(data$x,data$y), locations = grid)
   # # coords = nsub*2 matrix with the coordinates of the observed data
   # # locations = ngrid*2 matrix with the coordinates od the prediction locations
@@ -64,20 +64,20 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
   # Besides the coordinates of the grid point we need two other informations:
   # The index of the grid point in the grid matrix and
   # The index of the grid point in the data matrix if it's an already observed point
-  
+
   # grid.new = data.frame(cbind(grid, 1:ngrid, is.observed))
   # colnames(grid.new)=c('x','y','grid.position','is.observed')
-  
+
   # assigng = factor(rep(0, ngrid), levels=c(0,1:K))
   assigng = rep(0, ngrid)  # *NEW*
-  
+
   # graph.distance.grid.centers : K*ngrid matrix (the element (k,i) is the distance on the graph between the k-th center and the i-th grid point)
   # (This matrix will be used to compute the kernel value if ker.width.intrinsic > 0)
-  
+
   # graph.distance.grid.centers = matrix(NA, K, ngrid) # kx411
   graph.distance.grid.centers = data.grid.distance[ind,]
   # triangles = mesh$T
-  
+
   for(i in 1:ngrid){
     # d = gridpoints2centers.distance(x=grid.new[i,], centers = centers,
     #                                 method = spdist,
@@ -89,20 +89,20 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
     d = data.grid.distance[ind,i]
     assigng[i]=assign2center(d)
   }
-  
+
   # nk.assigng = rep(0, K)
   # for(k in 1:K)
   #   nk.assigng[k] = length(which(assigng==k))
-  
+
   gridk = list()
   for(k in 1:K)
     gridk[[k]]=grid[assigng==k,]
-  
+
   list.ret = list(assign=assign, centers=centers,
                   assigng=assigng, gridk=gridk,
                   graph.distance.grid.centers=graph.distance.grid.centers)
   return(list.ret)
-  
+
 }
 
 # distance.on.graph.constrained = function(data, mesh, distance)
@@ -113,18 +113,18 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
 #   # distance = distance used to compute the edges' weights. "Eucldist" or "Geodist"
 #   # OUTPUT
 #   # graph.distance = nsub*nsub symmetric matrix (element (i,j) is the shortest length path between i and j on the graph defined by the mesh)
-#   
+#
 #   # Edges list : edge.num * 2 matrix (each row contains the indeces of the nodes i and j defining the edge e = {ij})
 #   edge.list = mesh$E
 #   edge.num = dim(edge.list)[1]
-#   
+#
 #   # Construct the graph (undirected)
 #   graph = graph_from_edgelist(edge.list, directed = FALSE)
-#   
+#
 #   # Given two linked nodes i and j the weigth of edge (i,j) is:
 #   # w(i,j) = euclidian distance (i, j)
 #   edge.weights = rep(0, edge.num)
-#   
+#
 #   for(l in 1:edge.num){
 #     node.i = edge.list[l,1]
 #     node.j = edge.list[l,2]
@@ -133,16 +133,16 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
 #     if(distance == "Eucldist") edge.weights[l] = dist(rbind(point.i,point.j), method = 'euclidean')
 #     else if (distance == "Geodist") edge.weights[l] = Geodist(point.i,point.j)
 #   }
-#   
-#   graph.distance = distances(graph, v = V(graph), to = V(graph), 
-#                              mode = c("all"), weights = edge.weights, 
+#
+#   graph.distance = distances(graph, v = V(graph), to = V(graph),
+#                              mode = c("all"), weights = edge.weights,
 #                              algorithm = c("automatic"))
 #   return(graph.distance)
 # }
 
 # grid2triangle.constrained = function(grid.matrix, data.matrix, mesh)
 # {
-#   # INPUT: 
+#   # INPUT:
 #   # grid : ngrid*2 matrix (the i-th row contains the coordinates of the i-th grid point)
 #   # data : nsub*2 matrix (the i-th row contains the coordinates of the i-th data point)
 #   # mesh : mesh obtaines with Delauny Triangulation (using create.MESH.2D function)
@@ -151,26 +151,26 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
 #   # no.assg.complete :indices of grid points that the function does not assign to any triangle
 #   triangles = mesh$T
 #   num.triangles = dim(triangles)[1]
-#   
+#
 #   ngrid = dim(grid.matrix)[1]
 #   assign.matrix = matrix(NA, ngrid, num.triangles)
-#   
+#
 #   for(j in 1:num.triangles){
 #     bnd.triangles = triangles[j,]
-#     assign.matrix[,j] = in.out(bnd = cbind(mesh$P[bnd.triangles,1],mesh$P[bnd.triangles,2]), 
+#     assign.matrix[,j] = in.out(bnd = cbind(mesh$P[bnd.triangles,1],mesh$P[bnd.triangles,2]),
 #                                x = cbind(as.numeric(grid.matrix[,1]),as.numeric(grid.matrix[,2]))) # togliere punti veri?
 #   }
-#   
+#
 #   check.complete = rep(NA, ngrid)
 #   for(i in 1:ngrid){
 #     check.complete[i] = length(which(assign.matrix[i,]==TRUE))
 #   }
 #   no.assg.complete = which(check.complete == 0)
-#   
+#
 #   output = list()
 #   output[[1]]=assign.matrix
 #   output[[2]]=no.assg.complete
-#   
+#
 #   return(output)
 # }
 
@@ -195,21 +195,21 @@ assign2center=function(distance.vector)
 # {
 #   # This function compute the distance between an observed point and each center
 #   # INPUT :
-#   # x : it's a 3-dimension vector (x[1] = x-coordinate, 
-#   #                                x[2] = y-coordinate, 
+#   # x : it's a 3-dimension vector (x[1] = x-coordinate,
+#   #                                x[2] = y-coordinate,
 #   #                                x[3] = it indicates the index of the row in the data matrix corresponding the observed point)
-#   # 
+#   #
 #   # centers : K*3 matrix (centers[k,1:2] = coordinates of the k-th center,
 #   #                       centers[k, 3] = indicates the row index in the data matrix of the k-th center)
 #   #
-#   # method : 'euclidean' or 'graph.distance' 
+#   # method : 'euclidean' or 'graph.distance'
 #   #
 #   # graph.distance : nsub*nsub matrix (graph.distance(i,j) = shortest path between i and j on the graph defined by Delaunay's Traingulation)
 #   x = as.numeric(x)
 #   if(method=='euclidean'){
 #     d = as.matrix(apply(centers[,1:2],1, Eucldist, x[1:2]))
 #   }
-#   
+#
 #   if(method=='graph.distance'){
 #     ncenters = dim(centers)[1]
 #     d = rep(NA, ncenters)
@@ -243,14 +243,14 @@ assign2center=function(distance.vector)
 #   # triangles : ntriangles*3 matrix (each row contains the 3 indices of the vertices defining the triangle)
 #   # OUTPUT :
 #   # d : K-dimensional vector (d[i] is the distance between the point x and the i-th center)
-#   
+#
 #   x = as.numeric(x)
 #   ncenters = dim(centers)[1]
-#   
+#
 #   if(method=='euclidean'){
 #     d = as.matrix(apply(centers[,1:2],1, Eucldist, x[1:2]))
-#   }   
-#   
+#   }
+#
 #   if(method=='graph.distance'){
 #     # If x[4] > 0 it means that the grid point where we want to do a prediction is an already observed location.
 #     # Therefore it's a vertex of the graph, the distance between the point and each center is computed directly as
@@ -293,9 +293,9 @@ assign2center=function(distance.vector)
 #                      d.P4 + graph.distance[ind.vertex[4],centers[i,3]])
 #         }
 #       }
-#       # If the grid point is unobserved it cannot happen that length(ind.triangle)>2, because otherwise it's a vertex of a triangle and 
+#       # If the grid point is unobserved it cannot happen that length(ind.triangle)>2, because otherwise it's a vertex of a triangle and
 #       # therefore it's a data point
-#       
+#
 #       # There are some grid points (for example grid points outside the convex.hull) which are not assigned to any triangle.
 #       # These grid points are not used to perform prediction and we don't prefict the response variable in these points
 #       if(length(ind.triangle)==0)
@@ -308,15 +308,15 @@ assign2center=function(distance.vector)
 kerfn= function(newdata,center,ker.type='Gau',param) # dist, distance.matrix = NULL
 {
   # This function compute the value of the kernel for a point given a reference center
-  # Input: 
+  # Input:
   # newdata = coordinates of the point. Used only if distance='euclidean'
   # center = coordinates of the reference center
   # dist = method to compute distances ('euclidean' or 'graph.distance')
-  # 
+  #
   # ker.type = type of kernel (only Gaussian kernel implemented so far)
   # param = parameters that define the kernel
-  # distance.matrix = 1. if the point is an observed location (data point) 
-  #                      distance.matrix = graph.distance nsub*nsub 
+  # distance.matrix = 1. if the point is an observed location (data point)
+  #                      distance.matrix = graph.distance nsub*nsub
   #                                        (the (i,j) element is the length of the shortest path between the observed points i and j)
   #                   2. if the point is an unobserved location (grid point)
   #                      distance.matrix = graph.distance.grid.centers K*ngrid
@@ -326,7 +326,7 @@ kerfn= function(newdata,center,ker.type='Gau',param) # dist, distance.matrix = N
   # value of the kernel function
   center = as.numeric(center)
   d = as.matrix(apply(newdata,1, Eucldist, center[1:2]))
-  
+
   # if(dist == 'euclidean'){
   #   d = as.matrix(apply(newdata,1, Eucldist, center[1:2]))
   # }
@@ -334,7 +334,7 @@ kerfn= function(newdata,center,ker.type='Gau',param) # dist, distance.matrix = N
   #   # d = k-th row of the distance matrix
   #   d = distance.matrix[as.integer(center[3]),]
   # }
-  # 
+  #
   if(ker.type!='Gau')
   {
     print('Error: only Gaussian kernel implemented so far (*Gau*)')
@@ -358,10 +358,6 @@ list_to_matrix = function(ll){
   return(vec_list %>% reduce(rbind))
 }
 
-
-### Arguments:
-# - arr: array of n pxp symmetric matrices (nxpxp or pxpxn)
-### Value: nx (p*(p+1)/2) matrix. The i-th row corresponds to matrix_to_vec(i-th matrix of the array)
 matrixArray_to_matrix = function(arr){
   A = NULL
   dim = find_dim_array(arr)$dim
@@ -372,7 +368,7 @@ matrixArray_to_matrix = function(arr){
     }
     else{
       A = rbind(A,matrix_to_vec(arr[,,i]))
-      
+
     }
   }
   return(A)
@@ -447,12 +443,10 @@ Geodist=function(c1,c2){
     tmp = 1
   }
   d=as.double(2*R*asin(tmp))
-  return (d)   
-  
+  return (d)
+
 }
 
 Eucldist = function (c1, c2) {
   return (dist(rbind(c1,c2)))
 }
-
-
