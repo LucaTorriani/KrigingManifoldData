@@ -12,6 +12,7 @@
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+#' @param data_grid_dist_mat Matrix of dimension \code{N*M} of distances between data points and grid points. If not provided it is computed using \code{distance}
 #' @param tolerance_map_cor tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}
 #' @return A list with a single field:
 #' \item{\code{prediction}}{vector of matrices predicted at the new locations}
@@ -71,10 +72,29 @@ kriging = function(GLS_model, coords, new_coords, model_ts= "Additive", vario_mo
                    metric_manifold="Frobenius",X_new = NULL, distance = "Geodist", tolerance_map_cor=1e-6) {
   coords = as.matrix(coords)
   new_coords = as.matrix(new_coords)
+  N = dim(coords)[1]
+  M = dim(new_coords)[1]
+
+  if(is.null(distance)) {
+    if (is.null(data_grid_dist_mat))
+      stop("If distance is NULL data_grid_dist_mat must be provided")
+    else {
+      # Controllo dimensioni matrici
+      if(dim(data_grid_dist_mat)[1]!=N || dim(data_grid_dist_mat)[2]!=M) stop("data_dist_mat must be an N*M matrix")
+    }
+  }
+  else {
+    if (!is.null(data_grid_dist_mat))
+      warning("Since distance is not NULL parameter data_grid_dist_mat will be discarded")
+    if ( distance == "Geodist" & dim(coords)[2] != 2){
+        stop("Geodist requires two coordinates")
+    }
+  }
+
   if(!is.null(X_new)) {X_new = as.matrix(X_new)}
   if(length(GLS_model$residuals) != dim(coords)[1]) stop("Dimension of residuals and coords must agree")
   if(metric_manifold == "Correlation" && (diag(GLS_model$Sigma) != rep(1, dim(GLS_model$Sigma)[1]))) stop("Sigma must be a correlation matrix")
-  result = .Call("get_kriging", coords, new_coords, GLS_model$Sigma, distance, metric_manifold, model_ts, vario_model,
+  result = .Call("get_kriging", coords, new_coords, GLS_model$Sigma, distance, data_grid_dist_mat, metric_manifold, model_ts, vario_model,
                  GLS_model$beta, GLS_model$gamma_matrix, GLS_model$fitted_par_vario, GLS_model$residuals, X_new, tolerance_map_cor)
 
   return (result)

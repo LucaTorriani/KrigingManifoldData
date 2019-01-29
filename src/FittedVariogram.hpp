@@ -144,7 +144,7 @@ public:
     @param card_h Number of distances where the covariogram must be computed. \f$ card\_h = h\_vec.size() \f$
     @return Vector of covariogram values at distances \f$ h \in  h\_vec \f$
   */
-  Vec get_covario_vec(const std::vector<double> & h_vec, unsigned int card_h) const;
+  Vec get_covario_vec(const Vec & h_vec, unsigned int card_h) const;
   /*!
     @brief Destructor
   */

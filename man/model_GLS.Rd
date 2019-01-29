@@ -67,6 +67,8 @@ be provided in signed decimal degrees),
 weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}}
 
 \item{tolerance_map_cor}{tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}}
+
+\item{data_dist_mat}{Matrix of dimension \code{N*N} of distances between data points. If not provided it is computed using \code{distance}}
 }
 \value{
 A list with the following fields:

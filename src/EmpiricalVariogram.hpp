@@ -19,9 +19,9 @@ class EmpiricalVariogram {
   /*! Number of bins */
   const unsigned int _n_h;
   /*! Number of data points used to compute the empirical variogram */
-  const unsigned int _N;
+  unsigned int _N;
   /*! Matrix of distances among the \f$N\f$ locations */
-  const std::shared_ptr<const MatrixXd> _distanceMatrix;
+  std::shared_ptr<const MatrixXd> _distanceMatrix;
 
   /*! Vector storing the variogram estimates. \f$\mbox{\_emp\_vario\_values[i]} = \hat{\gamma}\left(\mbox{\_hvec[i]}\right)\f$  */
   std::vector<double> _emp_vario_values;
@@ -46,13 +46,7 @@ public:
   /*!
     @brief Constructor
   */
-  EmpiricalVariogram (const std::shared_ptr<const MatrixXd>, unsigned int,  // EQUAL WEIGHTS
-                      const Coordinates&, const distances::Distance&);
-  /*!
-    @brief Constructor
-  */
-  EmpiricalVariogram (const std::shared_ptr<const MatrixXd>, unsigned int, unsigned int,  // KERNEL
-                      const Vec&, double);
+  EmpiricalVariogram (unsigned int);
 
   /*!
     @brief Update `_emp_vario_values`, `_hvec` and `_N_hvec` according to the new residuals \f$ \Delta \left(\boldsymbol{s_{i}}\right) i=1,\ldots,\_N \f$.
@@ -89,6 +83,9 @@ public:
     @brief Return `_hmax`
   */
   double get_hmax() const;
+  void set_distance_and_h_max(const std::shared_ptr<const Eigen::MatrixXd>, const Coordinates&, const distances::Distance&);
+  void set_distance_and_h_max(const std::shared_ptr<const Eigen::MatrixXd>, const double&);
+  void set_weights(unsigned int, const Vec&);
 };
 
 }

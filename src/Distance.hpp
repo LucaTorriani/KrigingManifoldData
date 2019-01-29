@@ -41,7 +41,7 @@ namespace distances{
       @param new_coord Vector of coordinates of the new location
       @return Vector of distances
     */
-    std::vector<double> create_distance_vector(const Coordinates & coordinates, const Vec & new_coord) const;
+    Vec create_distance_vector(const Coordinates & coordinates, const Vec & new_coord) const;
     /*!
       @brief Destructor
     */

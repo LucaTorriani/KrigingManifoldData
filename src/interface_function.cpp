@@ -16,6 +16,8 @@
 #include "MapFunctions.hpp"
 #include "Model.hpp"
 #include "IntrinsicMean.hpp"
+#include "ParallelTransport.hpp"
+
 
 /*! \file
  @brief Main functions to create the model and perform kriging, along with functions to compute the distance on the manifold and the intrinsic mean.
@@ -73,9 +75,9 @@ extern "C"{
    - `Sigma` Tangent point
 */
   RcppExport SEXP get_model (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
-    SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
+    SEXP s_distance, SEXP s_data_dist_mat, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
-    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax,  SEXP s_indexes_model, // RDD
+    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot,  SEXP s_indexes_model, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic, SEXP s_weight_extrinsic,  // Tangent point
     SEXP s_suppressMes, SEXP s_tolerance_map_cor) {
 
@@ -86,6 +88,7 @@ extern "C"{
       Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
       Rcpp::Nullable<double> max_sill_n (s_max_sill);
       Rcpp::Nullable<double> max_a_n (s_max_a);
+      Rcpp::Nullable<std::string> distance_n (s_distance);
 
       // Coordinates model
       std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -139,13 +142,34 @@ extern "C"{
         Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
       }
 
-      // Distance
-      distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
-      std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
-      std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+      // Emp vario
+      unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
+      variogram_evaluation::EmpiricalVariogram emp_vario(n_h);
 
-      // Distance Matrix
-      std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+      // Distance
+      std::unique_ptr<distances::Distance> theDistance; // Used only if distance is not NULL
+      std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_ptr;
+      std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr; // Used only if distance is NULL
+
+      if(distance_n.isNotNull()) {
+        distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+        std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+        // std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+        theDistance = distance_fac.create(distance_name);
+
+        // Distance Matrix
+        // std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+        distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+
+        // Emp vario
+        // emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
+      }
+      else {
+        distanceMatrix_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_data_dist_mat));
+
+        // Emp vario
+        // emp_vario.set_distance_and_h_max(distanceMatrix_ptr, max_dist);
+      }
 
       // Fitted vario parameters
       double max_a;
@@ -224,9 +248,8 @@ extern "C"{
         data_tspace_tot.clear();
 
         // Emp vario
-        unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
-        double hmax (Rcpp::as<double>(s_hmax));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_tot_ptr, n_h, N_tot, weight_vario, hmax);
+        emp_vario.set_weights(N_tot,weight_vario);
+        emp_vario.set_distance_and_h_max(distanceMatrix_tot_ptr, distanceMatrix_tot_ptr->maxCoeff()); // Sia che distance sia NULL che altrimenti
 
         // Design matrix tot
         std::shared_ptr<Eigen::MatrixXd> design_matrix_tot_ptr;
@@ -337,8 +360,15 @@ extern "C"{
         data_tspace.clear();
 
         // Emp vario
-        unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
+        Vec weight_vario(N);
+        weight_vario.setOnes(N);
+        emp_vario.set_weights(N, weight_vario);
+        if(distance_n.isNotNull()) {
+          emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
+        }
+        else {
+          emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
+        }
 
         // Model
         model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p, distance_Manifold_name);
@@ -449,12 +479,13 @@ extern "C"{
      - `prediction` Vector of matrices predicted at the new locations
   */
 RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s_Sigma,
-    SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
+    SEXP s_distance, SEXP s_data_grid_dist_mat, SEXP s_manifold_metric, SEXP s_ts_model, SEXP s_vario_model,
     SEXP s_beta, SEXP s_gamma_matrix, SEXP s_vario_parameters, SEXP s_residuals, SEXP s_X_new, SEXP s_tolerance_map_cor) {
 
     BEGIN_RCPP
 
     Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
+    Rcpp::Nullable<std::string> distance_n(s_distance);
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
 
     // Punto tangente
@@ -463,9 +494,17 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
     unsigned int p = Sigma.rows();
 
     // Distance
-    distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
-    std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
-    std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+    std::unique_ptr<distances::Distance> theDistance; // Used only if distance is not NULL
+    std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr; // Used only if distance is NULL
+
+    if(distance_n.isNotNull()) {
+      distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+      std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+      theDistance = distance_fac.create(distance_name);
+    }
+    else {
+      distanceDataGridMatrix_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_data_grid_dist_mat));
+    }
 
     // Map functions
     map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
@@ -520,7 +559,7 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
     std::vector<Eigen::MatrixXd> residuals_vec(N);
     for(size_t i=0; i<N; i++) residuals_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(list_residuals,i));
 
-    std::vector<double> distanceVector(N);
+    Vec distanceVector(N);
     Vec ci(N);
     Vec lambda_vec(N);
 
@@ -535,7 +574,8 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
     std::vector<Eigen::MatrixXd> manifold_prediction(M);
 
     for (size_t i=0; i<M; i++) {
-      distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+      if (distance_n.isNotNull()) distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+      else distanceVector = distanceDataGridMatrix_ptr->col(i);
       ci = the_variogram->get_covario_vec(distanceVector, N);
       lambda_vec = solver.solve(ci);
       tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
@@ -604,9 +644,9 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
      - `prediction` Vector of matrices predicted at the new locations
 */
 RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma,
-    SEXP s_distance, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
+    SEXP s_distance, SEXP s_data_dist_mat, SEXP s_data_grid_dist_mat, SEXP s_manifold_metric, SEXP s_ts_metric, SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h,
     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a,
-    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_hmax, SEXP s_indexes_model, // RDD
+    SEXP s_weight_vario, SEXP s_distance_matrix_tot, SEXP s_data_manifold_tot, SEXP s_coordinates_tot, SEXP s_X_tot, SEXP s_indexes_model, // RDD
     SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic, SEXP s_weight_extrinsic,
     SEXP s_new_coordinates, SEXP s_X_new,  // KRIGING
     SEXP s_suppressMes, SEXP s_tolerance_map_cor) {
@@ -619,6 +659,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
       Rcpp::Nullable<double> max_sill_n (s_max_sill);
       Rcpp::Nullable<double> max_a_n (s_max_a);
+      Rcpp::Nullable<std::string> distance_n (s_distance);
+
 
       // Coordinates model
       std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
@@ -676,13 +718,37 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         Sigma = intrinsic_mean_C(data_manifold, distance_Manifold_name, *theLogMap, *theExpMap, *theTplaneDist, tolerance_intrinsic, weights_intrinsic, weights_extrinsic);
       }
 
-      // Distance
-      distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
-      std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
-      std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+      // Emp vario
+      unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
+      variogram_evaluation::EmpiricalVariogram emp_vario(n_h);
 
-      // Distance Matrix
-      std::shared_ptr<const MatrixXd> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+      // Distance
+      std::unique_ptr<distances::Distance> theDistance; // Used only if distance is not NULL
+      std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_ptr;
+      std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr; // Used only if distance is NULL
+
+      if(distance_n.isNotNull()) {
+        distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+        std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+        // std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+        theDistance = distance_fac.create(distance_name);
+
+        // Distance Matrix
+        // std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+        distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+
+        // Emp vario
+        // emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
+      }
+      else {
+        distanceMatrix_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_data_dist_mat));
+
+        // Data grid dist mat
+        distanceDataGridMatrix_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_data_grid_dist_mat));
+
+        // Emp vario
+        // emp_vario.set_distance_and_h_max(distanceMatrix_ptr, max_dist);
+      }
 
       // Fitted vario parameters
       double max_a;
@@ -759,10 +825,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         data_manifold_tot.clear();
         data_tspace_tot.clear();
 
-        // Emp vario
-        unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
-        double hmax (Rcpp::as<double>(s_hmax));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_tot_ptr, n_h, N_tot, weight_vario, hmax);
+        emp_vario.set_weights(N_tot,weight_vario);
+        emp_vario.set_distance_and_h_max(distanceMatrix_tot_ptr, distanceMatrix_tot_ptr->maxCoeff()); // Sia che distance sia NULL che altrimenti
 
         // Design matrix tot
         std::shared_ptr<Eigen::MatrixXd> design_matrix_tot_ptr;
@@ -861,7 +925,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         }
         else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
 
-        std::vector<double> distanceVector(N);
+        Vec distanceVector(N);
 
         Vec ci(N);
         Vec lambda_vec(N);
@@ -886,7 +950,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         std::vector<Eigen::MatrixXd> manifold_prediction(M);
 
         for (size_t i=0; i<M; i++) {
-          distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+          if (distance_n.isNotNull()) distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+          else distanceVector = distanceDataGridMatrix_ptr->col(i);
           ci = the_variogram->get_covario_vec(distanceVector, N);
           lambda_vec = solver.solve(ci);
           tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
@@ -924,8 +989,15 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         data_tspace.clear();
 
         // Emp vario
-        unsigned int n_h (Rcpp::as<unsigned int>( s_n_h));
-        variogram_evaluation::EmpiricalVariogram emp_vario(distanceMatrix_ptr, n_h, coords, *(theDistance));
+        Vec weight_vario(N);
+        weight_vario.setOnes(N);
+        emp_vario.set_weights(N, weight_vario);
+        if(distance_n.isNotNull()) {
+          emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
+        }
+        else {
+          emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
+        }
 
         // Model
         model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p, distance_Manifold_name);
@@ -1014,7 +1086,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         }
         else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
 
-        std::vector<double> distanceVector(N);
+        Vec distanceVector(N);
 
         Vec ci(N);
         Vec lambda_vec(N);
@@ -1031,7 +1103,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         std::vector<Eigen::MatrixXd> manifold_prediction(M);
 
         for (size_t i=0; i<M; i++) {
-          distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+          if (distance_n.isNotNull()) distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+          else distanceVector = distanceDataGridMatrix_ptr->col(i);
           ci = the_variogram->get_covario_vec(distanceVector, N);
           lambda_vec = solver.solve(ci);
           tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
@@ -1283,4 +1356,277 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       return Rcpp::wrap(dist_vec);
       END_RCPP
 }
+
+// CREATE MODEL AND KRIGNG
+  RcppExport SEXP get_model_and_kriging_mixed (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma_data,
+     SEXP s_distance, SEXP s_data_dist_mat, SEXP s_data_grid_dist_mat, SEXP s_manifold_metric,  SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h, // SEXP s_ts_metric,
+     SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a, // SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
+     SEXP s_new_coordinates, SEXP s_Sigma_new, SEXP s_X_new, SEXP s_suppressMes) {
+
+    BEGIN_RCPP
+
+    // Rcpp::Nullable<Vec> weight_vario(s_weight_vario);
+    Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
+    Rcpp::Nullable<Eigen::MatrixXd> X_new(s_X_new);
+    Rcpp::Nullable<double> max_sill_n (s_max_sill);
+    Rcpp::Nullable<double> max_a_n (s_max_a);
+    Rcpp::Nullable<std::string> distance_n(s_distance);
+
+    // Coordinates
+    std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
+    Coordinates coords(coords_ptr);
+    unsigned int N = coords.get_N_station();
+
+    // Data manifold
+    std::vector<Eigen::MatrixXd> data_manifold(N);
+    for(size_t i=0; i<N; i++){
+      data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
+    }
+
+    unsigned int p = data_manifold[0].rows();
+
+    // Distance tplane
+    // std::string distance_Tplane_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
+    std::string distance_Tplane_name("Frobenius"); // Always Frobenius, since we consider the plane tangent in the identity
+    tplane_factory::TplaneFactory& tplane_fac (tplane_factory::TplaneFactory::Instance());
+    std::unique_ptr<distances_tplane::DistanceTplane> theTplaneDist = tplane_fac.create(distance_Tplane_name);
+
+    // Map functions
+    std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
+    map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
+    std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
+
+    // Tangent points
+    Rcpp::List Sigma_data(s_Sigma_data);
+    std::vector<Eigen::MatrixXd> Sigma_data_vec(N);
+    for(size_t i=0; i<N; i++) Sigma_data_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(Sigma_data,i));
+
+    // Data tangent space
+    std::vector<Eigen::MatrixXd> data_tspace(N);
+    for (size_t i=0; i<N; i++) {
+      theLogMap->set_members(Sigma_data_vec[i]);
+      data_tspace[i] = parallel_transport::transport_to_TI(Sigma_data_vec[i], theLogMap->map2tplane(data_manifold[i]));
+    }
+
+    std::shared_ptr<const Eigen::MatrixXd> big_matrix_data_tspace_ptr = std::make_shared<const Eigen::MatrixXd>(matrix_manipulation::VecMatrices2bigMatrix(data_tspace));
+    data_manifold.clear();
+    data_tspace.clear();
+
+    // Emp vario
+    unsigned int n_h (Rcpp::as<unsigned int>(s_n_h));
+    variogram_evaluation::EmpiricalVariogram emp_vario(n_h);
+    Vec weight_vario(N);
+    weight_vario.setOnes(N);
+    emp_vario.set_weights(N, weight_vario);
+
+    // Distance
+    std::unique_ptr<distances::Distance> theDistance; // Used only if distance is not NULL
+    std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_ptr;
+    std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr; // Used only if distance is NULL
+    double max_dist; // Used only if distance is NULL
+
+    if(distance_n.isNotNull()) {
+      distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
+      std::string distance_name( Rcpp::as<std::string> (s_distance)) ; //(Geodist, Eucldist)
+      // std::unique_ptr<distances::Distance> theDistance = distance_fac.create(distance_name);
+      theDistance = distance_fac.create(distance_name);
+
+      // Distance Matrix
+      // std::shared_ptr<const SpMat> distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+      distanceMatrix_ptr = theDistance->create_distance_matrix(coords, N);
+
+      // Emp vario
+      emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
+    }
+    else {
+      // Data dist mat
+      // Vec disance_vec(Rcpp::as<Vec> (s_data_dist_vec));
+      // std::vector<TripType> tripletList;
+      // tripletList.reserve((N*(N-1))/2);
+      // for (size_t i=0; i<(N-1); i++ ) {
+      //   for (size_t j=(i+1); j<N; j++ ) {
+      //     tripletList.push_back( TripType(i,j,disance_vec(N*i-(i+1)*i/2 + j-i -1)) );
+      //   }
+      // }
+      // SpMat distance_matrix(N, N);
+      // distance_matrix.setFromTriplets(tripletList.begin(), tripletList.end());
+      // distanceMatrix_ptr = std::make_shared<const SpMat> (distance_matrix);
+      std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_data_dist_mat));
+
+
+      // Data grid dist mat
+      distanceDataGridMatrix_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_data_grid_dist_mat));
+
+      // Emp vario
+      emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
+    }
+
+
+
+
+    // if(weight_vario.isNotNull()) {
+    //   Vec weight_vario(Rcpp::as<Vec> (s_weight_vario));
+    //   emp_vario.set_weight(weight_vario);
+    // }
+
+    // Fitted vario parameters
+    double max_a;
+    double max_sill;
+    if(max_a_n.isNotNull()) max_a = Rcpp::as<double> (s_max_a);
+    if(max_sill_n.isNotNull()) max_sill= Rcpp::as<double> (s_max_sill);
+
+    // Fitted vario
+    vario_factory::VariogramFactory & vf(vario_factory::VariogramFactory::Instance());
+    std::string variogram_type (Rcpp::as<std::string> (s_vario_model));
+    std::unique_ptr<variogram_evaluation::FittedVariogram> the_variogram = vf.create(variogram_type);
+
+    // Gamma matrix
+    Eigen::MatrixXd gamma_matrix(Eigen::MatrixXd::Identity(N,N));
+
+    // Design matrix
+    design_factory::DesignFactory& design_matrix_fac (design_factory::DesignFactory::Instance());
+    std::string model_name (Rcpp::as<std::string> (s_ts_model)); // (Additive, Coord1, Coord2, Intercept)
+    std::unique_ptr<design_matrix::DesignMatrix> theDesign_matrix = design_matrix_fac.create(model_name);
+
+    std::shared_ptr<Eigen::MatrixXd> design_matrix_ptr;
+    if(X.isNotNull()) {
+      Eigen::MatrixXd X(Rcpp::as<Eigen::MatrixXd> (s_X));
+      design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords, X));
+    }
+    else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
+
+    unsigned int n_covariates(design_matrix_ptr->cols());
+
+    // Model
+    model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p, distance_Manifold_name);
+    model.update_model(gamma_matrix);
+
+    Eigen::MatrixXd resMatrix(N, ((p+1)*p)/2);
+    Eigen::MatrixXd beta(n_covariates, ((p+1)*p)/2);
+    Eigen::MatrixXd beta_old(n_covariates, ((p+1)*p)/2);
+
+    beta = model.get_beta();
+    std::vector<Eigen::MatrixXd> beta_vec_matrices(n_covariates);
+    beta_vec_matrices= matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
+    std::vector<Eigen::MatrixXd> beta_old_vec_matrices(n_covariates);
+
+    unsigned int num_iter(0);
+    unsigned int max_iter(Rcpp::as<unsigned int> (s_max_it));
+    double tolerance(Rcpp::as<double> (s_tolerance));
+    std::vector<MatrixXd> resVec(N);
+
+    double tol = tolerance+1;
+    std::vector<double> emp_vario_values;
+
+    max_iter = 10;
+    while (num_iter < max_iter && tol > tolerance) {
+      resMatrix = model.get_residuals();
+      resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p, distance_Manifold_name);
+
+      emp_vario.update_emp_vario(resVec, *(theTplaneDist));
+
+      emp_vario_values = emp_vario.get_emp_vario_values();
+      if(!max_sill_n.isNotNull()) max_sill = 1.15 * (*std::max_element(emp_vario_values.begin(), emp_vario_values.end()));
+      if(!max_a_n.isNotNull()) max_a = 1.15 * emp_vario.get_hmax();
+      the_variogram -> evaluate_par_fitted_E(emp_vario, max_sill, max_a);
+
+      gamma_matrix = the_variogram->compute_gamma_matrix(distanceMatrix_ptr, N);
+      beta_old_vec_matrices = beta_vec_matrices;
+
+      model.update_model(gamma_matrix);
+      beta = model.get_beta();
+      beta_vec_matrices = matrix_manipulation::bigMatrix2VecMatrices(beta, p, distance_Manifold_name);
+
+      tol=0.0;
+      for (size_t i=0; i<n_covariates; i++) {
+        tol += theTplaneDist->compute_distance(beta_old_vec_matrices[i], beta_vec_matrices[i]);
+      }
+
+      num_iter++;
+    }
+    if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+
+    Vec fit_parameters (the_variogram->get_parameters());
+
+    bool suppressMes(Rcpp::as<bool> (s_suppressMes));
+    if (!suppressMes) {
+      if(fit_parameters(1)==max_sill-fit_parameters(0)) Rcpp::Rcout << "Parameter sill bounded from above" << "\n";
+      if(fit_parameters(2)==max_a) Rcpp::Rcout << "Parameter a bounded from above" << "\n";
+    }
+
+    unsigned int n_hh(1000);
+    Vec hh(n_hh);
+    std::vector<double> h_vario_values(emp_vario.get_card_h());
+    h_vario_values = emp_vario.get_hvec();
+
+    hh.setLinSpaced(n_hh, 0, *std::max_element(h_vario_values.begin(), h_vario_values.end()));
+
+    Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
+
+    // KRIGING
+
+    // New coordinates
+    std::shared_ptr<const Eigen::MatrixXd> new_coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_new_coordinates));
+    unsigned int M = new_coords_ptr->rows();
+    Coordinates new_coords(new_coords_ptr);
+
+    // New tangent points
+    Rcpp::List Sigma_new(s_Sigma_new);
+    std::vector<Eigen::MatrixXd> Sigma_new_vec(M);
+    for(size_t i=0; i<M; i++) Sigma_new_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(Sigma_new,i));
+
+    // Map functions
+    map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
+    std::unique_ptr<map_functions::exponentialMap> theExpMap = expmap_fac.create(distance_Manifold_name);
+
+    // New Design matrix
+    std::shared_ptr<Eigen::MatrixXd> new_design_matrix_ptr;
+    if(X_new.isNotNull()) {
+      Eigen::MatrixXd X_new(Rcpp::as<Eigen::MatrixXd> (s_X_new));
+      new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords, X_new));
+    }
+    else new_design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(new_coords));
+
+    Vec distanceVector(N);
+
+    Vec ci(N);
+    Vec lambda_vec(N);
+
+    Eigen::LDLT<Eigen::MatrixXd> solver(N);
+    solver.compute(gamma_matrix);
+
+    unsigned int num_cov(beta_vec_matrices.size());
+    Eigen::MatrixXd tmp(p,p);
+    auto weighted_sum_beta = [&beta_vec_matrices, &num_cov, &tmp, p] (const Vec& design_matrix_row) { tmp.setZero(p,p); for (size_t j=0; j<num_cov; j++) tmp = tmp + beta_vec_matrices[j]*design_matrix_row(j); return tmp;};
+    auto weighted_sum_residuals = [&resVec, &N, &tmp, p] (const Vec& lambda_vec) { tmp.setZero(p,p); for (size_t j=0; j<N; j++) tmp = tmp + resVec[j]*lambda_vec(j); return tmp;};
+
+    Eigen::MatrixXd tplane_prediction(p,p);
+    std::vector<Eigen::MatrixXd> manifold_prediction(M);
+
+    for (size_t i=0; i<M; i++) {
+      if (distance_n.isNotNull()) distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
+      else distanceVector = distanceDataGridMatrix_ptr->col(i);
+      ci = the_variogram->get_covario_vec(distanceVector, N);
+      lambda_vec = solver.solve(ci);
+      tplane_prediction = weighted_sum_beta(new_design_matrix_ptr->row(i)) + weighted_sum_residuals(lambda_vec);
+      theExpMap->set_members(Sigma_new_vec[i]);
+      manifold_prediction[i] = theExpMap->map2manifold(parallel_transport::transport_from_TI(Sigma_new_vec[i], tplane_prediction));
+    }
+
+    Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
+                             Rcpp::Named("fit_vario_values") = fit_vario_values,
+                             Rcpp::Named("hh") = hh,
+                             Rcpp::Named("gamma_matrix") = gamma_matrix,
+                             Rcpp::Named("residuals") = resVec,
+                             Rcpp::Named("emp_vario_values") = emp_vario_values,
+                             Rcpp::Named("h_vec") = h_vario_values,
+                             Rcpp::Named("fitted_par_vario") = fit_parameters,
+                             Rcpp::Named("iterations") = num_iter,
+                             // Rcpp::Named("Sigma") = Sigma,
+                             Rcpp::Named("prediction") = manifold_prediction);
+
+    return Rcpp::wrap(result);
+    END_RCPP
+    }
+
 }

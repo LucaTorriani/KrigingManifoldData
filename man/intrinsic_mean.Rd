@@ -10,7 +10,7 @@ intrinsic_mean(data, metric_manifold = "Frobenius",
   tolerance_map_cor = 1e-06)
 }
 \arguments{
-\item{data}{list or array [\code{n,n,B}] of \code{B} symmetric positive definite matrices of dimension \code{nxn}}
+\item{data}{list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}}
 
 \item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"}
 

@@ -30,6 +30,8 @@ be provided in signed decimal degrees}
 \item{distance}{type of distance between coordinates. It must be either "Eucldist" or "Geodist"}
 
 \item{tolerance_map_cor}{tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}}
+
+\item{data_grid_dist_mat}{Matrix of dimension \code{N*M} of distances between data points and grid points. If not provided it is computed using \code{distance}}
 }
 \value{
 A list with a single field:

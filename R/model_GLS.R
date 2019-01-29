@@ -12,6 +12,7 @@
 #' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
 #' @param n_h number of bins in the emprical variogram
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+#' @param data_dist_mat Matrix of dimension \code{N*N} of distances between data points. If not provided it is computed using \code{distance}
 #' @param max_it max number of iterations for the main loop
 #' @param tolerance tolerance for the main loop
 #' @param weight_intrinsic vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
@@ -72,11 +73,23 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
       || (metric_manifold!="Correlation" && metric_ts =="Correlation"))
     stop("Either metric_manifold and metric_ts are both Correlation, or none of them")
 
-
-  if ( distance == "Geodist" & dim(coords)[2] != 2){
-    stop("Geodist requires two coordinates")
-  }
-  coords = as.matrix(coords)
+    coords = as.matrix(coords)
+    N = dim(coords)[1]
+    if(is.null(distance)) {
+      if (is.null(data_dist_mat))
+        stop("If distance is NULL data_dist_mat must be provided")
+      else {
+        # Controllo dimensioni matrici
+        if(dim(data_dist_mat)[1]!=N || dim(data_dist_mat)[2]!=N) stop("data_dist_mat must be an N*N matrix")
+      }
+    }
+    else {
+      if (!is.null(data_dist_mat))
+        warning("Since distance is not NULL parameter data_dist_mat will be discarded")
+      if ( distance == "Geodist" & dim(coords)[2] != 2){
+          stop("Geodist requires two coordinates")
+      }
+    }
 
   if(is.array(data_manifold)) {
     data_manifold = alply(data_manifold,3)
@@ -99,7 +112,7 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
     if(is.null(weight_intrinsic)) weight_intrinsic = rep(1, length(data_manifold))
   }
   else{
-    if(metric_manifold == "Correlation" && (diag(Sigma) != rep(1, dim(Sigma)[1]))) 
+    if(metric_manifold == "Correlation" && (diag(Sigma) != rep(1, dim(Sigma)[1])))
       stop("Sigma must be a correlation matrix")
   }
 
@@ -129,14 +142,14 @@ model_GLS = function(data_manifold, coords, X = NULL, Sigma = NULL, metric_manif
 
     if(length(param_weighted_vario) != 7) stop("Param_weight_vario must be a list with length 7")
 
-    result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+    result =.Call("get_model",data_manifold, coords,X, Sigma, distance, data_dist_mat, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, param_weighted_vario$weight_vario, param_weighted_vario$distance_matrix_tot,
                   param_weighted_vario$data_manifold_tot, param_weighted_vario$coords_tot, param_weighted_vario$X_tot,
                   param_weighted_vario$h_max, param_weighted_vario$indexes_model, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, suppressMes, tolerance_map_cor)
   }
 
   else {
-    result =.Call("get_model",data_manifold, coords,X, Sigma, distance, metric_manifold, metric_ts, model_ts, vario_model,
+    result =.Call("get_model",data_manifold, coords,X, Sigma, distance, data_dist_mat, metric_manifold, metric_ts, model_ts, vario_model,
                   n_h, max_it, tolerance, max_sill, max_a, weight_vario = NULL, distance_matrix_tot = NULL, data_manifold_tot = NULL,
                   coords_tot = NULL, X_tot = NULL, h_max = NULL, indexes_model=NULL, weight_intrinsic, tolerance_intrinsic, weight_extrinsic, suppressMes, tolerance_map_cor)
 
