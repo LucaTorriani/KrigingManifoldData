@@ -78,7 +78,7 @@ RDD_OOK_aggr_man_mixed=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_
     # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
     #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, i=i),
-                                   metric_manifold = metric_manifold, metric_ts = metric_ts, weight = weight[i,])
+                                   metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
   }
 
   return(fpred.ave)
@@ -247,7 +247,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
         #                        metric_ts = metric_ts, weight_intrinsic = weight.intrinsic)
         # veclocmean[k,] = matrix_to_vec(Sigma)
         Sigma = intrinsic_mean(data = datak, metric_manifold = metric_manifold,
-                               metric_ts = metric_ts, weight = weight.intrinsic)
+                               metric_ts = metric_ts, weight_intrinsic = weight.intrinsic)
         # veclocmean[[k]] = Sigma
         # --- Assign the local tangent point to each grid point & store results
         # fpred[[b]][which(assigng==k),]=matrix(rep(veclocmean[k,],nk[as.character(k)]), nrow = nk[as.character(k)], ncol=num.signif.entries, byrow = T)

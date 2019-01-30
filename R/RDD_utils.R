@@ -233,7 +233,7 @@ RDD_OOK_boot_man = function(data, K, grid, nk_min, B,
         if (method.analysis == 'Local mean') {
           # --- Estimate local tangent point
           Sigma = intrinsic_mean(data = datamat, metric_manifold = metric_manifold,
-                                 metric_ts = metric_ts, weight = weight.intrinsic)
+                                 metric_ts = metric_ts, weight_intrinsic = weight.intrinsic)
           veclocmean[k,] = matrix_to_vec(Sigma)
 
           # --- Assign the local tangent point to each grid point & store results
