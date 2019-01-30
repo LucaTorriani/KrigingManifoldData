@@ -652,6 +652,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
     SEXP s_suppressMes, SEXP s_tolerance_map_cor) {
 
       BEGIN_RCPP
+      Rcpp::Rcout << "QUI0" << "\n";
+
       Rcpp::Nullable<Eigen::MatrixXd> X(s_X);
       Rcpp::Nullable<Eigen::MatrixXd> X_tot(s_X_tot);
       Rcpp::Nullable<Eigen::MatrixXd> Sigma_n(s_Sigma);
@@ -1125,6 +1127,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         }
 
         if (distance_Manifold_name == "Correlation") { Sigma = Sigma.transpose() * Sigma; };
+        Rcpp::Rcout << "QUI6" << "\n";
 
         Rcpp::List result = Rcpp::List::create(Rcpp::Named("beta") = beta_vec_matrices,
                                  Rcpp::Named("fit_vario_values") = fit_vario_values,
