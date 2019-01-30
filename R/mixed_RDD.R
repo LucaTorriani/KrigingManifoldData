@@ -24,7 +24,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
   # This function implements RDD-OOK procedure, by using the functions RDD_OOK_boot_man and RDD_OOK_aggr_man
   if(K==1)
   {
-    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
+    resBootstrap=RDD_OOK_boot_man_mixed(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
                                   # spdist=spdist,
                                   suppressMes=suppressMes,
                                   ker.width.intrinsic = 0,
@@ -44,7 +44,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
   }
   if(K>1)
   {
-    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=B,
+    resBootstrap=RDD_OOK_boot_man_mixed(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=B,
                                   # spdist=spdist,
                                   suppressMes=suppressMes,
                                   ker.width.intrinsic = ker.width.intrinsic,
@@ -59,14 +59,14 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     # metric_manifold = metric_manifold, metric_ts = metric_ts, model_ts = model_ts,
     # vario_model = vario_model, distance = distance
     if (aggregation_mean== "Equal") ker.width.intrinsic=0
-    resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
+    resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
                                    ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
 
   }
 
-  fmean = resRDD_OOK$resAggregated 
+  fmean = resRDD_OOK$resAggregated
 
-  model_pred = model_kriging (data_manifold = data_val, coords = data_coords, X = NULL, Sigma_data = fmean[1:N_samples], metric_manifold = metric_manifold,
+  model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = NULL, Sigma_data = fmean[1:N_samples], metric_manifold = metric_manifold,
                               model_ts = model_ts, vario_model = vario_model, # metric_ts = "Frobenius",
                               n_h=15, distance = distance, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
