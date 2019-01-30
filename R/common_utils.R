@@ -407,6 +407,7 @@ find_dim_array = function(arr){
 # - matr: nx(p*(p+1)/2) matrix
 # - p: dimension of the matrices
 ### Value: array of n pxp symmetric matrices (pxpxn). The i-th matrix is vec_to_matrix(i-th row of matr)
+#' @export
 matrix_to_matrixArray = function(matr, p){
   arr = array(dim = c(p,p, dim(matr)[1]))
   for(i in 1:dim(matr)[1]){
