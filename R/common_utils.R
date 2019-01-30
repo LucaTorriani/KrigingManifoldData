@@ -357,7 +357,7 @@ list_to_matrix = function(ll){
   vec_list = map(ll, matrix_to_vec)
   return(vec_list %>% reduce(rbind))
 }
-
+#' @export
 matrixArray_to_matrix = function(arr){
   A = NULL
   dim = find_dim_array(arr)$dim
@@ -418,6 +418,7 @@ matrix_to_matrixArray = function(matr, p){
 ### Arguments:
 # - d: n*(n+1)/2 vector
 ### Value: nxn matrix (in Sym(p)). The symmetric matrix obtained putting, row-wise, in the upper triangular part (diagonal included) the elements of d
+#' @export
 vec_to_matrix = function(d){
   n = (sqrt(8*length(d)+1)-1)/2
   D = matrix(0,n,n)
