@@ -1,3 +1,5 @@
+#' @useDynLib Manifoldgstat
+
 return_ith_list_element = function(lista,i) {
   return(lista[[i]])
 }

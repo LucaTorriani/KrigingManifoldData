@@ -1,3 +1,5 @@
+#' @useDynLib Manifoldgstat
+
 return_ith_row = function(mat, i){
   return (mat[i,])
 }
@@ -151,7 +153,7 @@ RDD_OOK_boot_man = function(data, K, grid, nk_min, B,
   # idx.start_sample = border.length+1;
   # idx.end_sample = border.length+N_samples
   # indexes_samples = idx.start_sample:idx.end_sample
-  data_manifold_tot_array=Manifoldgstat::matrix_to_matrixArray(data[,3:(2+num.signif.entries)], p=p)
+  data_manifold_tot_array=matrix_to_matrixArray(data[,3:(2+num.signif.entries)], p=p)
 
   # #------------------ Bootstrap step
   for(b in 1:B) # Repeat over the B bootstrap replicates
