@@ -7,11 +7,12 @@
 model_kriging(data_manifold, coords, X = NULL, Sigma = NULL,
   metric_manifold = "Frobenius", metric_ts = "Frobenius",
   model_ts = "Additive", vario_model = "Gaussian", n_h = 15,
-  distance = "Geodist", max_it = 100, tolerance = 1e-06,
-  weight_intrinsic = NULL, tolerance_intrinsic = 1e-06,
-  max_sill = NULL, max_a = NULL, param_weighted_vario = NULL,
-  new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE,
-  weight_extrinsic = NULL, tolerance_map_cor = 1e-06)
+  distance = NULL, data_dist_mat = NULL, data_grid_dist_mat = NULL,
+  max_it = 100, tolerance = 1e-06, weight_intrinsic = NULL,
+  tolerance_intrinsic = 1e-06, max_sill = NULL, max_a = NULL,
+  param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE,
+  suppressMes = FALSE, weight_extrinsic = NULL,
+  tolerance_map_cor = 1e-06)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
@@ -35,6 +36,10 @@ be provided in signed decimal degrees}
 \item{n_h}{number of bins in the emprical variogram}
 
 \item{distance}{type of distance between coordinates. It must be either "Eucldist" or "Geodist"}
+
+\item{data_dist_mat}{Matrix of dimension \code{N*N} of distances between data points. If not provided it is computed using \code{distance}}
+
+\item{data_grid_dist_mat}{Matrix of dimension \code{N*M} of distances between data points and grid points. If not provided it is computed using \code{distance}}
 
 \item{max_it}{max number of iterations for the main loop}
 
@@ -70,10 +75,6 @@ be provided in signed decimal degrees),
 weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}}
 
 \item{tolerance_map_cor}{tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}}
-
-\item{data_dist_mat}{Matrix of dimension \code{N*N} of distances between data points. If not provided it is computed using \code{distance}}
-
-\item{data_grid_dist_mat}{Matrix of dimension \code{N*M} of distances between data points and grid points. If not provided it is computed using \code{distance}}
 }
 \value{
 list with the following fields:
