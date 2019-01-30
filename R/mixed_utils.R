@@ -2,7 +2,7 @@ return_ith_list_element = function(lista,i) {
   return(lista[[i]])
 }
 
-RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_samples=NULL, p, num.signif.entries=1)
+RDD_OOK_aggr_man_mixed=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_samples=NULL, p, num.signif.entries=1)
 {
   # This functions aggregates the results of bootstrap in OKBV
   # Input:
@@ -84,7 +84,7 @@ RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_sample
 
 
 
-RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
+RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
                             # spdist,
                             suppressMes,
                             ker.width.intrinsic,

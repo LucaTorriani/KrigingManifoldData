@@ -63,6 +63,16 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                                    ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
 
   }
+
+  fmean = resRDD_OOK$resAggregated 
+
+  model_pred = model_kriging (data_manifold = data_val, coords = data_coords, X = NULL, Sigma_data = fmean[1:N_samples], metric_manifold = metric_manifold,
+                              model_ts = model_ts, vario_model = vario_model, # metric_ts = "Frobenius",
+                              n_h=15, distance = distance, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
+                              # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
+                              max_sill = NULL, max_a = NULL,
+                              new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, plot = TRUE, suppressMes = FALSE)
+
   return(list(resBootstrap = resBootstrap,
               resAggregated = resAggregated  ))
 }

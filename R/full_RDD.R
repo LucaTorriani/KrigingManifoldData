@@ -26,7 +26,7 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
   # This function implements RDD-OOK procedure, by using the functions RDD_OOK_boot_man and RDD_OOK_aggr_man
   if(K==1)
   {
-    resBootstrap=RDD_OOK_boot_man(data=data, K=K, grid=grid, nk_min=nk_min, B=1,
+    resBootstrap=RDD_OOK_boot_man_mixed(data=data, K=K, grid=grid, nk_min=nk_min, B=1,
                                   # spdist=spdist,
                                   suppressMes=suppressMes, tol=tol, max_it = max_it,
                                   n_h=n_h, tolerance_intrinsic=tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, plot=plot,
@@ -53,7 +53,7 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
   }
   if(K>1)
   {
-    resBootstrap=RDD_OOK_boot_man(data=data, K=K, grid=grid, nk_min=nk_min, B=B,
+    resBootstrap=RDD_OOK_boot_man_mixed(data=data, K=K, grid=grid, nk_min=nk_min, B=B,
                                   # spdist=spdist,
                                   suppressMes=suppressMes, tol=tol, max_it = max_it,
                                   n_h=n_h, tolerance_intrinsic =tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, plot=plot,
@@ -71,7 +71,7 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
 
     if(method.analysis == 'Local mean') {
       if (aggregation_mean== "Equal") ker.width.intrinsic=0
-      resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_mean,
+      resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_mean,
                                      ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
     }
 
@@ -79,11 +79,11 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
     if(method.analysis == 'Kriging')
     {
       if (aggregation_kriging== "Equal") ker.width.vario = 0
-      resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_krig,
+      resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_krig,
                                      ker.width.intrinsic=  ker.width.vario, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
 
       if (aggregation_mean== "Equal") ker.width.intrinsic = 0
-      resLocalMean=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
+      resLocalMean=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
                                     ker.width.intrinsic =  ker.width.intrinsic, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
 
 
