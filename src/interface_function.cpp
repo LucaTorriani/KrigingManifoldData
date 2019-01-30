@@ -726,6 +726,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       std::unique_ptr<distances::Distance> theDistance; // Used only if distance is not NULL
       std::shared_ptr<const Eigen::MatrixXd> distanceMatrix_ptr;
       std::shared_ptr<const Eigen::MatrixXd> distanceDataGridMatrix_ptr; // Used only if distance is NULL
+      Rcpp::Rcout << "Before distance" << "\n";
 
       if(distance_n.isNotNull()) {
         distance_factory::DistanceFactory& distance_fac (distance_factory::DistanceFactory::Instance());
@@ -749,6 +750,8 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         // Emp vario
         // emp_vario.set_distance_and_h_max(distanceMatrix_ptr, max_dist);
       }
+      Rcpp::Rcout << "After distance" << "\n";
+
 
       // Fitted vario parameters
       double max_a;
@@ -777,6 +780,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       else design_matrix_ptr = std::make_shared<Eigen::MatrixXd> (theDesign_matrix->compute_design_matrix(coords));
 
       unsigned int n_covariates(design_matrix_ptr->cols());
+      Rcpp::Rcout << "QUI1" << "\n";
 
       // KERNEL
       if(weight_vario.isNotNull()) {
@@ -998,8 +1002,10 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         // else {
         //   emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
         // }
+        Rcpp::Rcout << "Before" << "\n";
+        Rcpp::Rcout << distanceMatrix_ptr->maxCoeff() << "\n";
         emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
-
+        Rcpp::Rcout << "After" << "\n";
 
         // Model
         model_fit::Model model(big_matrix_data_tspace_ptr, design_matrix_ptr, p, distance_Manifold_name);
@@ -1024,6 +1030,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
 
         double tol = tolerance+1;
         std::vector<double> emp_vario_values;
+        Rcpp::Rcout << "QUI2" << "\n";
 
         while (num_iter < max_iter && tol > tolerance) {
           resMatrix = model.get_residuals();
@@ -1050,6 +1057,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
           num_iter++;
         }
         if(num_iter == max_iter) Rcpp::warning("Reached max number of iterations");
+        Rcpp::Rcout << "QUI3" << "\n";
 
         Vec fit_parameters (the_variogram->get_parameters());
 
@@ -1069,6 +1077,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         Vec fit_vario_values = the_variogram->get_vario_vec(hh, n_hh);
 
         // KRIGING
+        Rcpp::Rcout << "QUI4" << "\n";
 
         // // Map functions
         // map_factory::ExpMapFactory& expmap_fac (map_factory::ExpMapFactory::Instance());
@@ -1103,6 +1112,7 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
 
         Eigen::MatrixXd tplane_prediction(p,p);
         std::vector<Eigen::MatrixXd> manifold_prediction(M);
+        Rcpp::Rcout << "QUI5" << "\n";
 
         for (size_t i=0; i<M; i++) {
           if (distance_n.isNotNull()) distanceVector = theDistance->create_distance_vector(coords, new_coords_ptr->row(i));
