@@ -103,7 +103,7 @@
 #'
 model_kriging = function(data_manifold, coords,  X = NULL, Sigma = NULL, metric_manifold = "Frobenius",
                              metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
-                             n_h=15, distance = "Geodist", max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
+                             n_h=15, distance = NULL, data_dist_mat=NULL, data_grid_dist_mat=NULL, max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
                              tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL,
                             new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE,  weight_extrinsic=NULL, tolerance_map_cor=1e-6){
   if ((metric_manifold=="Correlation" && metric_ts !="Correlation")

@@ -92,7 +92,7 @@
 
 model_kriging_mixed = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
                          model_ts = "Additive", vario_model = "Gaussian", # metric_ts = "Frobenius",
-                         n_h=15, distance = "Geodist", data_dist_mat=NULL,
+                         n_h=15, distance = NULL, data_dist_mat=NULL,
                          data_grid_dist_mat=NULL, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                          # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                          max_sill=NULL, max_a=NULL,

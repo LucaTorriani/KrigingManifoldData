@@ -68,7 +68,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
 
   model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = NULL, Sigma_data = fmean[1:N_samples], metric_manifold = metric_manifold,
                               model_ts = model_ts, vario_model = vario_model, # metric_ts = "Frobenius",
-                              n_h=15, distance = distance, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
+                              n_h=15, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                               max_sill = NULL, max_a = NULL,
                               new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, plot = TRUE, suppressMes = FALSE)
