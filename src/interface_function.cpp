@@ -750,9 +750,9 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         // emp_vario.set_distance_and_h_max(distanceMatrix_ptr, max_dist);
       }
 
-      Rcpp::Rcout << *distanceMatrix_ptr(1,3) << "\n";
-      Rcpp::Rcout << *distanceMatrix_ptr(4,11) << "\n";
-      Rcpp::Rcout << *distanceMatrix_ptr(23,58) << "\n";
+      Rcpp::Rcout << (*distanceMatrix_ptr)(1,3) << "\n";
+      Rcpp::Rcout << (*distanceMatrix_ptr)(4,11) << "\n";
+      Rcpp::Rcout << (*distanceMatrix_ptr)(23,58) << "\n";
 
       // Fitted vario parameters
       double max_a;
