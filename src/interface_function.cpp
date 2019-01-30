@@ -992,13 +992,13 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
         Vec weight_vario(N);
         weight_vario.setOnes(N);
         emp_vario.set_weights(N, weight_vario);
-        if(distance_n.isNotNull()) {
-          emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
-        }
-        else {
-          emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
-        }
-        // emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
+        // if(distance_n.isNotNull()) {
+        //   emp_vario.set_distance_and_h_max(distanceMatrix_ptr, coords, *(theDistance));
+        // }
+        // else {
+        //   emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
+        // }
+        emp_vario.set_distance_and_h_max(distanceMatrix_ptr, distanceMatrix_ptr->maxCoeff());
 
 
         // Model
