@@ -145,8 +145,8 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
   # nk=rep(0,K)
   #*data
   # colnames(data)=c('x','y',paste0('z',1:num.signif.entries))
-  colnames(data)=c('x','y')
-  nsub = dim(data)[1]
+  colnames(data_coords)=c('x','y')
+  nsub = dim(data_coords)[1]
   ngrid = dim(grid)[1]
 
   #*distances
@@ -285,12 +285,12 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
           
           # veclocmean[k,] = matrix_to_vec(model.man$Sigma)
           # pFstat.predictTrK[[k]]= list_to_matrix(model.man$prediction)
-          # vfitk[[k]]=as.numeric(model.man$fitted_par_vario)
+          vfitk[[k]]=as.numeric(model.man$fitted_par_vario)
           # 
           # vfit[[b]][which(assigng==k),]=matrix(rep(vfitk[[k]],nk[as.character(k)]),nrow = nk[as.character(k)], ncol = 3,byrow = T)
           # fmean[[b]][which(assigng==k),]=matrix(rep(veclocmean[k,],nk[as.character(k)]), nrow = nk[as.character(k)], ncol=num.signif.entries, byrow = T)
           # fpred[[b]][which(assigng==k),]=pFstat.predictTrK[[k]]
-          fpred[[b]][which(assigng==k),]=model.man$prediction
+          fpred[[b]][which(assigng==k)]=model.man$prediction
           fmean[[b]][which(assigng==k)]= lapply(seq_len(nk[as.character(k)]), function(X) model.man$Sigma)
           vfit[[b]][which(assigng==k),]=matrix(rep(vfitk[[k]],nk[as.character(k)]),nrow = nk[as.character(k)], ncol = 3,byrow = T)
         }

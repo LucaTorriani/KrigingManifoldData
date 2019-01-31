@@ -1,7 +1,7 @@
 #' Perform full_RDD
 #' @useDynLib Manifoldgstat
 #' @export
-full_RDD = function(data_coords, data_grid, K, grid, nk_min=1, B=100,
+full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                     # spdist='euclidean',
                     suppressMes=F,
                     tol=1e-12, max_it=100, n_h=15, tolerance_intrinsic =10^(-6), X=NULL, X_new=NULL, X_tot=NULL, plot=FALSE,
