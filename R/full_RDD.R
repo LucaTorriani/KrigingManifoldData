@@ -14,7 +14,7 @@ full_RDD = function(data_coords, data_grid, K, grid, nk_min=1, B=100,
                     N_samples, p, num.signif.entries,
                     aggregation_mean, aggregation_kriging, method.analysis = 'Local mean',
                     metric_manifold, metric_ts, model_ts,
-                    vario_model, distance)
+                    vario_model, distance = NULL)
 
 {
   if(aggregation_mean != "Weighted" && aggregation_mean != "Equal") stop("aggregation_mean expected to be: Equal or Weighted")
