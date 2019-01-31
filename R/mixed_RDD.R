@@ -61,7 +61,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     # vario_model = vario_model, distance = distance
     if (aggregation_mean== "Equal") ker.width.intrinsic=0
     resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
-                                   ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
+                                   ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples) # p=p,  num.signif.entries = num.signif.entries 
 
   }
 
@@ -73,7 +73,8 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                               max_sill = NULL, max_a = NULL,
                               new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, plot = TRUE, suppressMes = FALSE)
-
+  
   return(list(resBootstrap = resBootstrap,
-              resAggregated = resAggregated  ))
+              resAggregated = resAggregated,
+              model_pred = model_pred))
 }

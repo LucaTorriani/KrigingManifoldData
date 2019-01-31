@@ -4,85 +4,85 @@ return_ith_list_element = function(lista,i) {
   return(lista[[i]])
 }
 
-RDD_OOK_aggr_man_mixed=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_samples=NULL, p, num.signif.entries=1)
-{
-  # This functions aggregates the results of bootstrap in OKBV
-  # Input:
-  # fOKBV = result of OKBV, as returned by the first element of output of OKBV()
-  # weight_intrinsic = weights to aggregate the results
-  # ker.width.intrinsic
-  # N_samples = sample size
-  # p = dimension of the matrices on the manifold
-  # num_signif_entries = (p*(p+1))/2
-  # Output:
-  # Average prediction (on the grid used to produce fOKBV)
-  #
-
-  if(num.signif.entries==1)
-  {
-    print('Please provide the grid length *n*')
-    return(-1)
-  }
-
-  # fOKBV1=simplify2array(fOKBV)
-  # B = dim(fOKBV2)[2]
-
-  # if(dim(fOKBV1)[1]==1)
-  if(length(fOKBV[[1]])==1)
-  {
-    print('Please check source code for grid dimension == 1!')
-    return(-1)
-  }
-
-  weight = NULL
-  ngrid=length(fOKBV[[1]])
-  # fpred.ave = array(NA, dim=c(ngrid, num.signif.entries))
-  fpred.ave = list()
-
-  # id.na = which(is.na(fOKBV1[,1,]))
-
-  if(ker.width.intrinsic != 0)
-  {
-    print("Using weights for aggregation")
-    W.b = do.call(cbind,weights_intrinsic)
-    W.tot=apply(W.b,1,sum, na.rm=TRUE)
-    weight=W.b/W.tot # It divides each row of W.b by the corresponding element of the vector W.tot
-  }
-
-
-  # if(length(id.na)>0)
-  # {
-  #   for(i in (1:ngrid)[-id.na]) {
-  #     # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
-  #     #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
-  #     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, k=i),
-  #                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
-  #   }
-  #
-  #   return(fpred.ave)
-  #
-  # }
-  # if(length(id.na)==0)
-  # {
-  #   for(i in (1:ngrid)){
-  #     # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
-  #     #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
-  #     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, k=i),
-  #                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
-  #
-  #   }
-  #   return(fpred.ave)
-  #
-  # }
-  for(i in (1:ngrid)){
-    # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
-    #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
-    fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, i=i),
-                                   metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
-  }
-
-  return(fpred.ave)
-}
+# RDD_OOK_aggr_man_mixed=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_samples=NULL) # p, num.signif.entries=1
+# {
+#   # This functions aggregates the results of bootstrap in OKBV
+#   # Input:
+#   # fOKBV = result of OKBV, as returned by the first element of output of OKBV()
+#   # weight_intrinsic = weights to aggregate the results
+#   # ker.width.intrinsic
+#   # N_samples = sample size
+#   # p = dimension of the matrices on the manifold
+#   # num_signif_entries = (p*(p+1))/2
+#   # Output:
+#   # Average prediction (on the grid used to produce fOKBV)
+#   #
+# 
+#   # if(num.signif.entries==1)
+#   # {
+#   #   print('Please provide the grid length *n*')
+#   #   return(-1)
+#   # }
+# 
+#   # fOKBV1=simplify2array(fOKBV)
+#   # B = dim(fOKBV2)[2]
+# 
+#   # if(dim(fOKBV1)[1]==1)
+#   if(length(fOKBV[[1]])==1)
+#   {
+#     print('Please check source code for grid dimension == 1!')
+#     return(-1)
+#   }
+# 
+#   weight = NULL
+#   ngrid=length(fOKBV[[1]])
+#   # fpred.ave = array(NA, dim=c(ngrid, num.signif.entries))
+#   fpred.ave = list()
+# 
+#   # id.na = which(is.na(fOKBV1[,1,]))
+# 
+#   if(ker.width.intrinsic != 0)
+#   {
+#     print("Using weights for aggregation")
+#     W.b = do.call(cbind,weights_intrinsic)
+#     W.tot=apply(W.b,1,sum, na.rm=TRUE)
+#     weight=W.b/W.tot # It divides each row of W.b by the corresponding element of the vector W.tot
+#   }
+# 
+# 
+#   # if(length(id.na)>0)
+#   # {
+#   #   for(i in (1:ngrid)[-id.na]) {
+#   #     # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
+#   #     #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
+#   #     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, k=i),
+#   #                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
+#   #   }
+#   #
+#   #   return(fpred.ave)
+#   #
+#   # }
+#   # if(length(id.na)==0)
+#   # {
+#   #   for(i in (1:ngrid)){
+#   #     # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
+#   #     #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
+#   #     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, k=i),
+#   #                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
+#   #
+#   #   }
+#   #   return(fpred.ave)
+#   #
+#   # }
+#   for(i in (1:ngrid)){
+#     # fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
+#     #                                             metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
+#     fpred.ave[[i]]= intrinsic_mean(data= map(fOKBV,return_ith_list_element, i=i),
+#                                    metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,])
+#   }
+# 
+#   return(fpred.ave)
+# }
 
 
 
@@ -95,9 +95,10 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
                             # assign.matrix, no.assg.grid,
                             data.grid.distance,
                             # is.observed, border.length,
-                            p, num.signif.entries, metric_ts)
-  # vario_model, method.analysis, tol, max_it, n_h, tolerance_intrinsic, X, X_new, X_tot, plot,ker.width.vario,
-  # metric_manifold, metric_ts, model_ts, vario_model, distance
+                            p, num.signif.entries, metric_ts,
+                            vario_model, method.analysis, tol, max_it, 
+                            n_h, tolerance_intrinsic, X, X_new, X_tot, plot, # ker.width.vario,
+                            metric_manifold, metric_ts, model_ts, vario_model, distance)
 {
   # This function implements the bootstrap step of Ordinary Kriging with Random Domain
   # Decompositions for object data

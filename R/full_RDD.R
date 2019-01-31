@@ -1,7 +1,7 @@
 #' Perform full_RDD
 #' @useDynLib Manifoldgstat
 #' @export
-full_RDD = function(data, K, grid, nk_min=1, B=100,
+full_RDD = function(data_coords, data_grid, K, grid, nk_min=1, B=100,
                     # spdist='euclidean',
                     suppressMes=F,
                     tol=1e-12, max_it=100, n_h=15, tolerance_intrinsic =10^(-6), X=NULL, X_new=NULL, X_tot=NULL, plot=FALSE,
@@ -26,7 +26,7 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
   # This function implements RDD-OOK procedure, by using the functions RDD_OOK_boot_man and RDD_OOK_aggr_man
   if(K==1)
   {
-    resBootstrap=RDD_OOK_boot_man(data=data, K=K, grid=grid, nk_min=nk_min, B=1,
+    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
                                   # spdist=spdist,
                                   suppressMes=suppressMes, tol=tol, max_it = max_it,
                                   n_h=n_h, tolerance_intrinsic=tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, plot=plot,
@@ -43,9 +43,11 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
                                   vario_model = vario_model, distance = distance)
 
 
-    resAggregated=simplify2array(resBootstrap$fpred)[,,1]
+    # resAggregated=simplify2array(resBootstrap$fpred)[,,1]
+    resAggregated=resBootstrap$fpred[[1]]
     if(method.analysis == 'Kriging'){
-      resLocalMean=simplify2array(resBootstrap$fmean)[,,1]
+      # resLocalMean=simplify2array(resBootstrap$fmean)[,,1]
+      resLocalMean=resBootstrap$fmean[[1]]
       return(list(resBootstrap = resBootstrap,
                   resAggregated = resAggregated,
                   resLocalMean = resLocalMean))
@@ -53,7 +55,7 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
   }
   if(K>1)
   {
-    resBootstrap=RDD_OOK_boot_man(data=data, K=K, grid=grid, nk_min=nk_min, B=B,
+    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=B,
                                   # spdist=spdist,
                                   suppressMes=suppressMes, tol=tol, max_it = max_it,
                                   n_h=n_h, tolerance_intrinsic =tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, plot=plot,
@@ -71,7 +73,7 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
 
     if(method.analysis == 'Local mean') {
       if (aggregation_mean== "Equal") ker.width.intrinsic=0
-      resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_mean,
+      resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
                                      ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
     }
 
@@ -80,11 +82,11 @@ full_RDD = function(data, K, grid, nk_min=1, B=100,
     {
       if (aggregation_kriging== "Equal") ker.width.vario = 0
       resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_krig,
-                                     ker.width.intrinsic=  ker.width.vario, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
+                                     ker.width.intrinsic=  ker.width.vario, N_samples = N_samples) #  p=p, num.signif.entries = num.signif.entries
 
       if (aggregation_mean== "Equal") ker.width.intrinsic = 0
       resLocalMean=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
-                                    ker.width.intrinsic =  ker.width.intrinsic, N_samples = N_samples, p=p, num.signif.entries = num.signif.entries )
+                                    ker.width.intrinsic =  ker.width.intrinsic, N_samples = N_samples) #  p=p, num.signif.entries = num.signif.entries
 
 
       return(list(resBootstrap = resBootstrap,
