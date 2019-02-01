@@ -74,7 +74,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                               n_h=15, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=data.grid.distance, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                               max_sill = NULL, max_a = NULL,
-                              new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, plot = TRUE, suppressMes = FALSE)
+                              new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, plot = plot, suppressMes = FALSE)
 
   return(list(resBootstrap = resBootstrap,
               resAggregated = resAggregated,
