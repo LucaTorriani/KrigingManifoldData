@@ -34,7 +34,8 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                                   # assign.matrix=assign.matrix, no.assg.grid=no.assg.grid,
                                   data.grid.distance = data.grid.distance,
                                   # is.observed=is.observed, border.length= border.length,
-                                  p=p,num.signif.entries=num.signif.entries, metric_ts=metric_ts)
+                                  p=p,num.signif.entries=num.signif.entries, metric_ts=metric_ts,
+                                  metric_manifold = metric_manifold)
     # tol=tol, max_it = max_it, n_h=n_h, tolerance_intrinsic=tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, plot=plot,
     # ker.width.vario = 0, method.analysis = method.analysis, metric_manifold = metric_manifold, metric_ts = metric_ts, model_ts = model_ts,
     # vario_model = vario_model, distance = distance
@@ -61,7 +62,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     # vario_model = vario_model, distance = distance
     if (aggregation_mean== "Equal") ker.width.intrinsic=0
     resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
-                                   ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples) # p=p,  num.signif.entries = num.signif.entries 
+                                   ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples) # p=p,  num.signif.entries = num.signif.entries
 
   }
 
@@ -73,7 +74,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                               max_sill = NULL, max_a = NULL,
                               new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, plot = TRUE, suppressMes = FALSE)
-  
+
   return(list(resBootstrap = resBootstrap,
               resAggregated = resAggregated,
               model_pred = model_pred))
