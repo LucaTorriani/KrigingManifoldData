@@ -5,7 +5,7 @@
 # res.boot = res_RDD_OOK$resBootstrap$fmean 
 # res.boot = res_RDD_OOK$resBootstrap$fpred
 # res.aggr = res_RDD_OOK$resAggregated
-bootstrapVar <- function(res.boot, res.aggregated, K, metric_manifold)
+bootstrapVar <- function(res.boot, res.aggr, K, metric_manifold)
 {
   # INPUT :
   # res_RDD_OOK = result of the function RDD_OOK

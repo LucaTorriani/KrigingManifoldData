@@ -343,7 +343,7 @@ kerfn= function(newdata,center,ker.type='Gau',param) # dist, distance.matrix = N
   return(exp(-1/(2*eps^2)*(d^2)))
 }
 
-RDD_OOK_aggr_man_mixed=function(fOKBV,weights_intrinsic, ker.width.intrinsic, N_samples=NULL) # p, num.signif.entries=1
+RDD_OOK_aggr_man_mixed=function(fOKBV,weights_intrinsic, ker.width.intrinsic) # p, num.signif.entries=1
 {
   # This functions aggregates the results of bootstrap in OKBV
   # Input:
