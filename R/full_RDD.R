@@ -81,11 +81,11 @@ full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     if(method.analysis == 'Kriging')
     {
       if (aggregation_kriging== "Equal") ker.width.vario = 0
-      resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_krig,
+      resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_krig,
                                      ker.width.intrinsic=  ker.width.vario) #  p=p, num.signif.entries = num.signif.entries
 
       if (aggregation_mean== "Equal") ker.width.intrinsic = 0
-      resLocalMean=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
+      resLocalMean=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
                                     ker.width.intrinsic =  ker.width.intrinsic) #  p=p, num.signif.entries = num.signif.entries
 
 
