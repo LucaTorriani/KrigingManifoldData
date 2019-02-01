@@ -63,7 +63,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     # vario_model = vario_model, distance = distance
     if (aggregation_mean== "Equal") ker.width.intrinsic=0
     resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
-                                   ker.width.intrinsic=  ker.width.intrinsic, N_samples = N_samples) # p=p,  num.signif.entries = num.signif.entries
+                                   ker.width.intrinsic=  ker.width.intrinsic) # p=p,  num.signif.entries = num.signif.entries
 
   }
 
