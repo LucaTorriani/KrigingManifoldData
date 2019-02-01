@@ -67,7 +67,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
 
   }
 
-  fmean = resBootstrap$resAggregated
+  fmean = resAggregated
 
   model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = NULL, Sigma_data = fmean[1:N_samples], metric_manifold = metric_manifold,
                               model_ts = model_ts, vario_model = vario_model, # metric_ts = "Frobenius",
