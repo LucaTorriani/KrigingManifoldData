@@ -98,7 +98,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
                             num.signif.entries, metric_ts,
                             vario_model, method.analysis, tol, max_it,
                             n_h, tolerance_intrinsic, X, X_new, X_tot, plot, # ker.width.vario,
-                            metric_manifold, model_ts, vario_model, distance)
+                            metric_manifold, model_ts, distance)
 {
   # This function implements the bootstrap step of Ordinary Kriging with Random Domain
   # Decompositions for object data
