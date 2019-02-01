@@ -1147,7 +1147,6 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
  RcppExport SEXP intrinsic_mean (SEXP s_data, SEXP s_N, SEXP s_manifold_metric, SEXP s_ts_metric,
   SEXP s_tolerance, SEXP s_weight_intrinsic, SEXP s_weight_extrinsic, SEXP s_tolerance_map_cor) {
     BEGIN_RCPP
-    Rcpp::Rcout << "QUI0" << "\n";
     std::string distance_Manifold_name = Rcpp::as<std::string> (s_manifold_metric) ; //(Frobenius, SquareRoot, LogEuclidean)
     // Data
     unsigned int N(Rcpp::as<unsigned int> (s_N));
@@ -1165,14 +1164,11 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       }
     }
     unsigned int p = data[0].rows();
-    Rcpp::Rcout << "QUI1" << "\n";
-
 
     // Distance tplane
     std::string distance_Tplane_name = Rcpp::as<std::string> (s_ts_metric) ; //(Frobenius, FrobeniusScaled)
     tplane_factory::TplaneFactory& tplane_fac (tplane_factory::TplaneFactory::Instance());
     std::unique_ptr<distances_tplane::DistanceTplane> theTplaneDist = tplane_fac.create(distance_Tplane_name);
-    Rcpp::Rcout << "QUI2" << "\n";
 
     // Map functions
     map_factory::LogMapFactory& logmap_fac (map_factory::LogMapFactory::Instance());
@@ -1185,18 +1181,13 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       theLogMap->set_tolerance(tolerance_map_cor);
       theExpMap->set_tolerance(tolerance_map_cor);
     }
-    Rcpp::Rcout << "QUI3" << "\n";
-
     // Tolerance
     double tolerance (Rcpp::as<double> (s_tolerance));
 
     // Weights
     Vec weight_intrinsic(Rcpp::as<Vec> (s_weight_intrinsic));
-    Rcpp::Rcout << "QUI4" << "\n";
-    Rcpp::Rcout << weight_intrinsic << "\n";
     Vec weight_extrinsic(Rcpp::as<Vec> (s_weight_extrinsic));
     double sum_weight_intrinsic(weight_intrinsic.sum());
-    Rcpp::Rcout << "Prima ciclo" << "\n";
 
     if (distance_Manifold_name == "Correlation") {
       Eigen::MatrixXd Result = matrix_manipulation::Chol_decomposition(extrinsic_mean(data, weight_extrinsic));
@@ -1293,8 +1284,6 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
 
       return Rcpp::wrap(Result);
     }
-    Rcpp::Rcout << "Fine ciclo" << "\n";
-
 
     END_RCPP
 }
