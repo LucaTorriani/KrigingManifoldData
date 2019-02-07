@@ -271,7 +271,7 @@ void GaussVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     if(tmp==0) tmp = 1e-6;
     _parameters(0)= tmp;
     _parameters(1)= tmp;
-    _parameters(2) = 1.0/3*hvec[0]; // ?
+    _parameters(2) = 1.0/3*hvec[1]; // ?
     Rcpp::warning("Only 2 empirical variogram values in the cell");
   }
   else if (card_h==3) {
@@ -374,7 +374,7 @@ void ExpVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     if(tmp==0) tmp = 1e-6;
     _parameters(0)= tmp;
     _parameters(1)= tmp;
-    _parameters(2) = 1.0/3*hvec[0]; // ?
+    _parameters(2) = 1.0/3*hvec[1]; // ?
     Rcpp::warning("Only 2 empirical variogram values in the cell");
   }
   else if (card_h==3) {
@@ -481,7 +481,7 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     _parameters(0)= emp_vario_values[0];
     if (_parameters(0) == 0) _parameters(0) = 1e-6;
     _parameters(1)= _parameters(0);
-    _parameters(2) = 1.0/3*hvec[0];  // ?
+    _parameters(2) = hvec[0];  // ?
     Rcpp::warning("Only 1 empirical variogram value in the cell");
   }
   else if (card_h==2){
@@ -489,7 +489,7 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     if(tmp==0) tmp = 1e-6;
     _parameters(0)= tmp;
     _parameters(1)= tmp;
-    _parameters(2) = 1.0/3*hvec[0]; // ?
+    _parameters(2) = hvec[1]; // ?
     Rcpp::warning("Only 2 empirical variogram values in the cell");
   }
   else if (card_h==3) {
@@ -505,12 +505,12 @@ void SphVariogram::get_init_par(const EmpiricalVariogram & emp_vario) {
     if (_parameters(0) == 0) _parameters(0) = 1e-6;
     _parameters(1) = std::max(sill-_parameters(0), _parameters(0)*1e-3);
 
-    double tol = 0.0505*sill;
+    double tol = 0.01*sill;
     size_t i = 0;
-    while (std::abs(emp_vario_values[i]-0.95*sill) > tol) {
+    while (std::abs(emp_vario_values[i]-sill) > tol) {
       i++;
     }
-    _parameters(2) = 1.0/3*hvec[i];
+    _parameters(2) = hvec[i];
     Rcpp::warning("Only 3 empirical variogram values in the cell");
   }
   else {
