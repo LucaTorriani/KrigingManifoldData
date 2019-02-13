@@ -97,7 +97,7 @@ model_kriging_mixed = function(data_manifold, coords, X = NULL, Sigma_data, metr
                          data_grid_dist_mat=NULL, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                          # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                          max_sill=NULL, max_a=NULL,
-                         new_coords, Sigma_new, X_new = NULL, create_pdf_vario = TRUE, suppressMes = FALSE){
+                         new_coords, Sigma_new, X_new = NULL, create_pdf_vario = TRUE, pdf_parameters=NULL, suppressMes = FALSE){
   coords = as.matrix(coords)
   new_coords = as.matrix(new_coords)
   N = dim(coords)[1]
