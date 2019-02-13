@@ -10,7 +10,8 @@ model_kriging(data_manifold, coords, X = NULL, Sigma = NULL,
   distance = NULL, data_dist_mat = NULL, data_grid_dist_mat = NULL,
   max_it = 100, tolerance = 1e-06, weight_intrinsic = NULL,
   tolerance_intrinsic = 1e-06, max_sill = NULL, max_a = NULL,
-  param_weighted_vario = NULL, new_coords, X_new = NULL, plot = TRUE,
+  param_weighted_vario = NULL, new_coords, X_new = NULL,
+  create_pdf_vario = TRUE, pdf_parameters = NULL,
   suppressMes = FALSE, weight_extrinsic = NULL,
   tolerance_map_cor = 1e-06)
 }
@@ -67,7 +68,9 @@ be provided in signed decimal degrees),
 
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
 
-\item{plot}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted}
+\item{create_pdf_vario}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted in a pdf file}
+
+\item{pdf_parameters}{list with the fields \code{test_nr} and \code{sample_draw}. Additional parameters to name the pdf}
 
 \item{suppressMes}{boolean. If \code{TRUE} warning messagges are not printed}
 
@@ -114,7 +117,7 @@ result = model_kriging (data_manifold = data_manifold_model, coords = coords_mod
                         max_it = 100, tolerance = 10e-7,new_coords = coords_model)
 result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
-                            max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
+                            max_it = 100, tolerance = 10e-7, new_coords = coords_tot, create_pdf_vario = FALSE)
 x.min=min(coords_tot[,1])
 x.max=max(coords_tot[,1])
 y.min=min(coords_tot[,2])

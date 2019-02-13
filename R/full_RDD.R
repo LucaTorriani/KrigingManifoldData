@@ -4,7 +4,7 @@
 full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                     # spdist='euclidean',
                     suppressMes=F,
-                    tol=1e-12, max_it=100, n_h=15, tolerance_intrinsic =10^(-6), X=NULL, X_new=NULL, X_tot=NULL, plot=FALSE,
+                    tol=1e-12, max_it=100, n_h=15, tolerance_intrinsic =10^(-6), X=NULL, X_new=NULL, X_tot=NULL, # plot=FALSE,
                     ker.width.intrinsic = 0, ker.width.vario = 1.5,
                     # mesh,
                     graph.distance.complete,
@@ -29,7 +29,7 @@ full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
                                   # spdist=spdist,
                                   suppressMes=suppressMes, tol=tol, max_it = max_it,
-                                  n_h=n_h, tolerance_intrinsic=tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, plot=plot,
+                                  n_h=n_h, tolerance_intrinsic=tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, # plot=plot,
                                   ker.width.intrinsic = 0,
                                   ker.width.vario = 0,
                                   # mesh=mesh,
@@ -58,7 +58,7 @@ full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=B,
                                   # spdist=spdist,
                                   suppressMes=suppressMes, tol=tol, max_it = max_it,
-                                  n_h=n_h, tolerance_intrinsic =tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, plot=plot,
+                                  n_h=n_h, tolerance_intrinsic =tolerance_intrinsic, X=X, X_new=X_new, X_tot=X_tot, # plot=plot,
                                   ker.width.intrinsic = ker.width.intrinsic,
                                   ker.width.vario = ker.width.vario,
                                   # mesh=mesh,
@@ -73,7 +73,7 @@ full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
 
     if(method.analysis == 'Local mean') {
       if (aggregation_mean== "Equal") ker.width.intrinsic=0
-      resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
+      resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
                                      ker.width.intrinsic=  ker.width.intrinsic)
     }
 
@@ -81,11 +81,11 @@ full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     if(method.analysis == 'Kriging')
     {
       if (aggregation_kriging== "Equal") ker.width.vario = 0
-      resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_krig,
+      resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fpred, weights_intrinsic = resBootstrap$kervalues_krig,
                                      ker.width.intrinsic=  ker.width.vario) #  p=p, num.signif.entries = num.signif.entries
 
       if (aggregation_mean== "Equal") ker.width.intrinsic = 0
-      resLocalMean=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
+      resLocalMean=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
                                     ker.width.intrinsic =  ker.width.intrinsic) #  p=p, num.signif.entries = num.signif.entries
 
 

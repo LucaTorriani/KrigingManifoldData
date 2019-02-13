@@ -13,7 +13,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                        N_samples, p, num.signif.entries,
                        aggregation_mean, metric_ts,
                        tol=1e-12, max_it=100, n_h=15, tolerance_intrinsic =10^(-6),
-                       X=NULL, X_new=NULL, X_tot=NULL, plot=FALSE,
+                       X=NULL, X_new=NULL, X_tot=NULL, create_pdf_vario=FALSE, pdf_parameters=NULL,
   # ker.width.vario = 1.5, aggregation_kriging, method.analysis = 'Local mean',
                        metric_manifold, model_ts, vario_model, distance)
 
@@ -25,7 +25,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
   # This function implements RDD-OOK procedure, by using the functions RDD_OOK_boot_man and RDD_OOK_aggr_man
   if(K==1)
   {
-    resBootstrap=RDD_OOK_boot_man_mixed(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
+    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
                                   # spdist=spdist,
                                   suppressMes=suppressMes,
                                   ker.width.intrinsic = 0,
@@ -74,7 +74,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                               n_h=15, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=data.grid.distance, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                               max_sill = NULL, max_a = NULL,
-                              new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, plot = plot, suppressMes = FALSE)
+                              new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, create_pdf_vario = create_pdf_vario, pdf_parameters=pdf_parameters, suppressMes = FALSE)
 
   return(list(resBootstrap = resBootstrap,
               resAggregated = resAggregated,

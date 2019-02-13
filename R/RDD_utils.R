@@ -17,28 +17,28 @@ return_ith_row = function(mat, i){
 #   # Output:
 #   # Average prediction (on the grid used to produce fOKBV)
 #   #
-# 
+#
 #   # if(num.signif.entries==1)
 #   # {
 #   #   print('Please provide the grid length *n*')
 #   #   return(-1)
 #   # }
-# 
+#
 #   fOKBV1=simplify2array(fOKBV)
 #   # B = dim(fOKBV2)[2]
-# 
+#
 #   if(dim(fOKBV1)[1]==1)
 #   {
 #     print('Please check source code for grid dimension == 1!')
 #     return(-1)
 #   }
-# 
+#
 #   weight = NULL
 #   ngrid=dim(fOKBV1)[1]
 #   fpred.ave = array(NA, dim=c(ngrid, num.signif.entries))
-# 
+#
 #   id.na = which(is.na(fOKBV1[,1,]))
-# 
+#
 #   if(ker.width.intrinsic != 0)
 #   {
 #     print("Using weights for aggregation")
@@ -46,16 +46,16 @@ return_ith_row = function(mat, i){
 #     W.tot=apply(W.b,1,sum, na.rm=TRUE)
 #     weight=W.b/W.tot # It divides each row of W.b by the corresponding element of the vector W.tot
 #   }
-# 
+#
 #   if(length(id.na)>0)
 #   {
 #     for(i in (1:ngrid)[-id.na]) {
 #       fpred.ave[i,]= matrix_to_vec(intrinsic_mean(data=matrix_to_matrixArray(t(fOKBV1[i,,]),p = p),
 #                                                   metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
 #     }
-# 
+#
 #     return(fpred.ave)
-# 
+#
 #   }
 #   if(length(id.na)==0)
 #   {
@@ -64,9 +64,9 @@ return_ith_row = function(mat, i){
 #                                                   metric_manifold = metric_manifold, metric_ts = metric_ts, weight_intrinsic = weight[i,]))
 #     }
 #     return(fpred.ave)
-# 
+#
 #   }
-# 
+#
 #   return(-1)
 # }
 
@@ -75,7 +75,7 @@ return_ith_row = function(mat, i){
 RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
                             # spdist,
                             suppressMes, tol, max_it,
-                            n_h, tolerance_intrinsic, X, X_new, X_tot, plot,
+                            n_h, tolerance_intrinsic, X, X_new, X_tot, # plot,
                             ker.width.intrinsic,
                             ker.width.vario,
                             # mesh,
@@ -106,7 +106,6 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
   # X       = Additional covariates for the locations used to create the model
   # X_new   = Additional covariates for the locations where to perform kriging
   # X_tot   = Additional covariates for all N_samples
-  # plot    = boolean. If TRUE the variogram plot is displayed
   # ker.width.intrinsic = parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, no kernel is used)
   # ker.width.vario = parameter controlling the width of the Gaussian kernel for the computation of the empirical variogram (if 0, no kernel is used)
   # mesh    = contains the parameters defining the computed Delaunay triagulation
@@ -154,7 +153,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
   # idx.start_sample = border.length+1;
   # idx.end_sample = border.length+N_samples
   # indexes_samples = idx.start_sample:idx.end_sample
-  
+
   # data_manifold_tot_array=matrix_to_matrixArray(data[,3:(2+num.signif.entries)], p=p)
 
   # #------------------ Bootstrap step
@@ -242,7 +241,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
           # veclocmean[k,] = matrix_to_vec(Sigma)
           Sigma = intrinsic_mean(data = datak, metric_manifold = metric_manifold,
                                  metric_ts = metric_ts, weight_intrinsic = weight.intrinsic)
-          
+
 
           # --- Assign the local tangent point to each grid point & store results
           # fpred[[b]][which(assigng==k),]=matrix(rep(veclocmean[k,],nk[as.character(k)]), nrow = nk[as.character(k)], ncol=num.signif.entries, byrow = T)
@@ -281,12 +280,12 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
                                     max_it = max_it, tolerance = tol,
                                     weight_intrinsic = weight.intrinsic, tolerance_intrinsic = tolerance_intrinsic,
                                     param_weighted_vario = param_weighted_vario,
-                                    new_coords = data.frame(gridk[[k]]), X_new, plot=plot)
-          
+                                    new_coords = data.frame(gridk[[k]]), X_new, create_pdf_vario=FALSE)
+
           # veclocmean[k,] = matrix_to_vec(model.man$Sigma)
           # pFstat.predictTrK[[k]]= list_to_matrix(model.man$prediction)
           vfitk[[k]]=as.numeric(model.man$fitted_par_vario)
-          # 
+          #
           # vfit[[b]][which(assigng==k),]=matrix(rep(vfitk[[k]],nk[as.character(k)]),nrow = nk[as.character(k)], ncol = 3,byrow = T)
           # fmean[[b]][which(assigng==k),]=matrix(rep(veclocmean[k,],nk[as.character(k)]), nrow = nk[as.character(k)], ncol=num.signif.entries, byrow = T)
           # fpred[[b]][which(assigng==k),]=pFstat.predictTrK[[k]]

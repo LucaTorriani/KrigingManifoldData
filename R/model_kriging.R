@@ -31,7 +31,8 @@
 #' \code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot})
 #' @param new_coords matrix of coordinates for the new locations where to perform kriging
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
-#' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
+#' @param create_pdf_vario boolean. If \code{TRUE} the empirical and fitted variograms are plotted in a pdf file
+#' @param pdf_parameters list with the fields \code{test_nr} and \code{sample_draw}. Additional parameters to name the pdf
 #' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
 #' @param weight_extrinsic vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
 #' weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}
@@ -71,7 +72,7 @@
 #'                         max_it = 100, tolerance = 10e-7,new_coords = coords_model)
 #' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
 #'                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
-#'                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
+#'                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, create_pdf_vario = FALSE)
 #' x.min=min(coords_tot[,1])
 #' x.max=max(coords_tot[,1])
 #' y.min=min(coords_tot[,2])
@@ -105,7 +106,7 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma = NULL, metric_
                              metric_ts = "Frobenius", model_ts = "Additive", vario_model = "Gaussian",
                              n_h=15, distance = NULL, data_dist_mat=NULL, data_grid_dist_mat=NULL, max_it = 100, tolerance = 1e-6, weight_intrinsic = NULL,
                              tolerance_intrinsic = 1e-6, max_sill=NULL, max_a=NULL, param_weighted_vario = NULL,
-                            new_coords, X_new = NULL, plot = TRUE, suppressMes = FALSE,  weight_extrinsic=NULL, tolerance_map_cor=1e-6){
+                            new_coords, X_new = NULL, create_pdf_vario = TRUE, pdf_parameters=NULL, suppressMes = FALSE,  weight_extrinsic=NULL, tolerance_map_cor=1e-6){
   if ((metric_manifold=="Correlation" && metric_ts !="Correlation")
       || (metric_manifold!="Correlation" && metric_ts =="Correlation"))
     stop("Either metric_manifold and metric_ts are both Correlation, or none of them")
@@ -210,9 +211,12 @@ model_kriging = function(data_manifold, coords,  X = NULL, Sigma = NULL, metric_
   empirical_variogram = list(emp_vario_values = result$emp_vario_values, h = result$h_vec)
   fitted_variogram = list(fit_vario_values = result$fit_vario_values, hh = result$hh)
 
-  if(plot){
+  if(create_pdf_vario){
+    if (is.null(pdf_parameters)) pdf("Variogram-Method-SingleCell.pdf", width=14, height=7)
+    else pdf(paste0("Variogram-Method-SingleCell-Test_nr-", pdf_parameters$test_nr,"-Sample_draw-", pdf_parameters$sample_draw,".pdf"), width=14, height=7)
     plot_variogram(empirical_variogram = empirical_variogram, fitted_variogram = fitted_variogram, model = vario_model,
                    distance = distance)
+    dev.off()
   }
 
   result_list = result[-c(2,3)]

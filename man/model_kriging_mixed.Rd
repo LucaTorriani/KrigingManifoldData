@@ -9,7 +9,8 @@ model_kriging_mixed(data_manifold, coords, X = NULL, Sigma_data,
   vario_model = "Gaussian", n_h = 15, distance = NULL,
   data_dist_mat = NULL, data_grid_dist_mat = NULL, max_it = 100,
   tolerance = 1e-06, max_sill = NULL, max_a = NULL, new_coords,
-  Sigma_new, X_new = NULL, plot = TRUE, suppressMes = FALSE)
+  Sigma_new, X_new = NULL, create_pdf_vario = TRUE,
+  suppressMes = FALSE)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}}
@@ -49,9 +50,11 @@ be provided in signed decimal degrees}
 
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
 
-\item{plot}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted}
+\item{create_pdf_vario}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted in a pdf file}
 
 \item{suppressMes}{boolean. If \code{TRUE} warning messagges are not printed}
+
+\item{pdf_parameters}{list with the fields \code{test_nr}, \code{K} and \code{sample_draw}. Additional parameters to name the pdf}
 }
 \value{
 list with the following fields:
@@ -90,7 +93,7 @@ result = model_kriging_mixed (data_manifold = data_manifold_model, coords = coor
                         max_it = 100, tolerance = 10e-7,new_coords = coords_model)
 result_tot = model_kriging_mixed (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
-                            max_it = 100, tolerance = 10e-7, new_coords = coords_tot, plot = FALSE)
+                            max_it = 100, tolerance = 10e-7, new_coords = coords_tot, create_pdf_vario = FALSE)
 
 x.min=min(coords_tot[,1])
 x.max=max(coords_tot[,1])

@@ -97,7 +97,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
                             # is.observed, border.length,
                             num.signif.entries, metric_ts,
                             vario_model, method.analysis, tol, max_it,
-                            n_h, tolerance_intrinsic, X, X_new, X_tot, plot, # ker.width.vario,
+                            n_h, tolerance_intrinsic, X, X_new, X_tot, # ker.width.vario,
                             metric_manifold, model_ts, distance)
 {
   # This function implements the bootstrap step of Ordinary Kriging with Random Domain
@@ -118,7 +118,6 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
   # X       = Additional covariates for the locations used to create the model
   # X_new   = Additional covariates for the locations where to perform kriging
   # X_tot   = Additional covariates for all N_samples
-  # plot    = boolean. If TRUE the variogram plot is displayed
   # ker.width.intrinsic = parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, no kernel is used)
   # ker.width.vario = parameter controlling the width of the Gaussian kernel for the computation of the empirical variogram (if 0, no kernel is used)
   # mesh    = contains the parameters defining the computed Delaunay triagulation

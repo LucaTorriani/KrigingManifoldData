@@ -9,8 +9,8 @@ mixed_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   data.grid.distance, N_samples, p, num.signif.entries, aggregation_mean,
   metric_ts, tol = 1e-12, max_it = 100, n_h = 15,
   tolerance_intrinsic = 10^(-6), X = NULL, X_new = NULL,
-  X_tot = NULL, plot = FALSE, metric_manifold, model_ts, vario_model,
-  distance)
+  X_tot = NULL, create_pdf_vario = FALSE, pdf_parameters = NULL,
+  metric_manifold, model_ts, vario_model, distance)
 }
 \description{
 Perform mixed_RDD

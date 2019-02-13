@@ -7,9 +7,9 @@
 full_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   suppressMes = F, tol = 1e-12, max_it = 100, n_h = 15,
   tolerance_intrinsic = 10^(-6), X = NULL, X_new = NULL,
-  X_tot = NULL, plot = FALSE, ker.width.intrinsic = 0,
-  ker.width.vario = 1.5, graph.distance.complete, data.grid.distance,
-  N_samples, p, num.signif.entries, aggregation_mean, aggregation_kriging,
+  X_tot = NULL, ker.width.intrinsic = 0, ker.width.vario = 1.5,
+  graph.distance.complete, data.grid.distance, N_samples, p,
+  num.signif.entries, aggregation_mean, aggregation_kriging,
   method.analysis = "Local mean", metric_manifold, metric_ts, model_ts,
   vario_model, distance = NULL)
 }
