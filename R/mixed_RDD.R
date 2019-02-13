@@ -25,7 +25,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
   # This function implements RDD-OOK procedure, by using the functions RDD_OOK_boot_man and RDD_OOK_aggr_man
   if(K==1)
   {
-    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
+    resBootstrap=RDD_OOK_boot_man_mixed(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=1,
                                   # spdist=spdist,
                                   suppressMes=suppressMes,
                                   ker.width.intrinsic = 0,
@@ -62,7 +62,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     # metric_manifold = metric_manifold, metric_ts = metric_ts, model_ts = model_ts,
     # vario_model = vario_model, distance = distance
     if (aggregation_mean== "Equal") ker.width.intrinsic=0
-    resAggregated=RDD_OOK_aggr_man_mixed(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
+    resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
                                    ker.width.intrinsic=  ker.width.intrinsic) # p=p,  num.signif.entries = num.signif.entries
 
   }
