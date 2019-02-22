@@ -1517,7 +1517,6 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
     double tol = tolerance+1;
     std::vector<double> emp_vario_values;
 
-    max_iter = 10;
     while (num_iter < max_iter && tol > tolerance) {
       resMatrix = model.get_residuals();
       resVec = matrix_manipulation::bigMatrix2VecMatrices(resMatrix, p, distance_Manifold_name);
