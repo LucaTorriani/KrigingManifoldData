@@ -24,7 +24,8 @@
 #' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram:
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
 #' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
-#' \code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
+#' \code{data_manifold_tot} (list or array
+#' [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
 #' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees),
 #' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL),
@@ -51,7 +52,8 @@
 #' it performs kriging on the new locations.
 #' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
 #' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
-#' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
+#' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals
+#' \code{(residuals = data_ts - fitted)}
 #' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 #' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
 #' absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.
@@ -67,12 +69,16 @@
 #' coords_tot <- Manifoldgstat::gridCov
 #' Sigma <- matrix(c(2,1,1,1), 2,2)
 #'
-#' result = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
-#'                         metric_ts = "Frobenius", model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
-#'                         max_it = 100, tolerance = 10e-7,new_coords = coords_model)
-#' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model, Sigma = Sigma, metric_manifold = "Frobenius",
-#'                             metric_ts = "Frobenius",, model_ts = "Coord1", vario_model = "Spherical", n_h = 15, distance = "Eucldist",
-#'                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, create_pdf_vario = FALSE)
+#' result = model_kriging (data_manifold = data_manifold_model, coords = coords_model,
+#'                         Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius",
+#'                         model_ts = "Coord1", vario_model = "Spherical", n_h = 15,
+#'                         distance = "Eucldist", max_it = 100, tolerance = 10e-7,
+#'                         new_coords = coords_model)
+#' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model,
+#'                             Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius",
+#'                             model_ts = "Coord1", vario_model = "Spherical", n_h = 15,
+#'                             distance = "Eucldist", max_it = 100, tolerance = 10e-7,
+#'                             new_coords = coords_tot, create_pdf_vario = FALSE)
 #' x.min=min(coords_tot[,1])
 #' x.max=max(coords_tot[,1])
 #' y.min=min(coords_tot[,2])

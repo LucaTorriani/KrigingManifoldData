@@ -13,13 +13,15 @@
 #' @description Evaluate the intrinsic mean of a given set of symmetric positive definite matrices
 #' @examples
 #' data_manifold_tot <- Manifoldgstat::fieldCov
-#' Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius", metric_ts = "Frobenius")
+#' Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius",
+#'              metric_ts = "Frobenius")
 #' print(Sigma)
 #' @useDynLib Manifoldgstat
 #' @export
 
 intrinsic_mean = function(data, metric_manifold = "Frobenius", metric_ts = "Frobenius",
-                     tolerance = 1e-6, weight_intrinsic= NULL, weight_extrinsic= weight_intrinsic, tolerance_map_cor=1e-6){
+                     tolerance = 1e-6, weight_intrinsic= NULL, weight_extrinsic= weight_intrinsic,
+                      tolerance_map_cor=1e-6){
   if( is.array(data)){
     data = alply(data,3)
   }
