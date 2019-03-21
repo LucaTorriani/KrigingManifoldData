@@ -1,5 +1,4 @@
 #' Perform full_RDD
-#' Create a GLS model
 #'
 #' @param data_coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
@@ -8,7 +7,7 @@
 #' @param grid prediction grid
 #' @param nk_min minimum number of observations within a neighborhood
 #' @param B number of \texit{divide} iterations to perform
-#' @param suppressMes {\code{TRUE}, \code{FALSE}} controls the level of interaction and warnings given
+#' @param suppressMes \{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given
 #' @param tol tolerance for the main loop of model_kriging
 #' @param max_it maximum number of iterations for the main loop of model_kriging
 #' @param n_h number of bins in the empirical variogram

@@ -6,11 +6,73 @@
 \usage{
 mixed_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   suppressMes = F, ker.width.intrinsic = 0, graph.distance.complete,
-  data.grid.distance, N_samples, p, num.signif.entries, aggregation_mean,
-  metric_ts, tol = 1e-12, max_it = 100, n_h = 15,
+  data.grid.distance, N_samples, p, aggregation_mean, metric_ts,
+  tol = 1e-12, max_it = 100, n_h = 15,
   tolerance_intrinsic = 10^(-6), X = NULL, X_new = NULL,
-  X_tot = NULL, create_pdf_vario = FALSE, pdf_parameters = NULL,
-  metric_manifold, model_ts, vario_model, distance)
+  create_pdf_vario = FALSE, pdf_parameters = NULL, metric_manifold,
+  model_ts, vario_model, distance)
+}
+\arguments{
+\item{data_coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
+be provided in signed decimal degrees}
+
+\item{data_val}{array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
+
+\item{K}{number of neighborhood (i.e., centers) to sample at each iteration}
+
+\item{grid}{prediction grid}
+
+\item{nk_min}{minimum number of observations within a neighborhood}
+
+\item{B}{number of \texit{divide} iterations to perform}
+
+\item{suppressMes}{\{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given}
+
+\item{ker.width.intrinsic}{parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, no
+kernel is used)}
+
+\item{graph.distance.complete}{\code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)}
+
+\item{data.grid.distance}{\code{N*dim(grid)[1]} distance matrix between locations where the datum has been observed and locations where}
+
+\item{N_samples}{number of samples}
+
+\item{p}{dimension of the manifold matrices}
+
+\item{aggregation_mean}{"Weighted" ...}
+
+\item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
+
+\item{tol}{tolerance for the main loop of model_kriging}
+
+\item{max_it}{maximum number of iterations for the main loop of model_kriging}
+
+\item{n_h}{number of bins in the empirical variogram}
+
+\item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided}
+
+\item{X}{matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL}
+
+\item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
+
+\item{create_pdf_vario}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted in a pdf file}
+
+\item{pdf_parameters}{list with the fields \code{test_nr} and \code{sample_draw}. Additional parameters to name the pdf}
+
+\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
+
+\item{model_ts}{type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"}
+
+\item{vario_model}{type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"}
+
+\item{distance}{type of distance between coordinates. It must be either "Eucldist" or "Geodist"}
+}
+\value{
+it returns a list with the following fields
+\itemize{
+      \item \code{resBootstrap}{...}
+      \item \code{resAggregated}{...}
+}
 }
 \description{
 Perform mixed_RDD

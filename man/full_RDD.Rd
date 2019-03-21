@@ -2,8 +2,7 @@
 % Please edit documentation in R/full_RDD.R
 \name{full_RDD}
 \alias{full_RDD}
-\title{Perform full_RDD
-Create a GLS model}
+\title{Perform full_RDD}
 \usage{
 full_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   suppressMes = F, tol = 1e-12, max_it = 100, n_h = 15,
@@ -27,7 +26,7 @@ be provided in signed decimal degrees}
 
 \item{B}{number of \texit{divide} iterations to perform}
 
-\item{suppressMes}{{\code{TRUE}, \code{FALSE}} controls the level of interaction and warnings given}
+\item{suppressMes}{\{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given}
 
 \item{tol}{tolerance for the main loop of model_kriging}
 
@@ -90,5 +89,4 @@ According to the analysis chosen:
 }
 \description{
 Perform full_RDD
-Create a GLS model
 }
