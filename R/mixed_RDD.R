@@ -31,6 +31,7 @@
 #' \itemize{
 #'       \item \code{resBootstrap}{...}
 #'       \item \code{resAggregated}{...}
+#'       \item \code{model_pred}{...}
 #' }
 #' @useDynLib Manifoldgstat
 #' @export
