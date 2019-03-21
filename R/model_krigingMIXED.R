@@ -88,7 +88,6 @@
 #' for(i in 1:250)
 #' { car::ellipse(c(rGrid[i,1],rGrid[i,2]) , (result$prediction[[i]]),radius=radius, center.cex=.5, col='red')}
 #' rect(x.min, y.min, x.max, y.max)
-#' @useDynLib Manifoldgstat
 
 
 model_kriging_mixed = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
