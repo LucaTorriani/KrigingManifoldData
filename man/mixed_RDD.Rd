@@ -72,6 +72,7 @@ it returns a list with the following fields
 \itemize{
       \item \code{resBootstrap}{...}
       \item \code{resAggregated}{...}
+      \item \code{model_pred}{...}
 }
 }
 \description{
