@@ -10,7 +10,7 @@ model_kriging_mixed(data_manifold, coords, X = NULL, Sigma_data,
   data_dist_mat = NULL, data_grid_dist_mat = NULL, max_it = 100,
   tolerance = 1e-06, max_sill = NULL, max_a = NULL, new_coords,
   Sigma_new, X_new = NULL, create_pdf_vario = TRUE,
-  suppressMes = FALSE)
+  pdf_parameters = NULL, suppressMes = FALSE)
 }
 \arguments{
 \item{data_manifold}{list or array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{nxn}}
@@ -52,9 +52,9 @@ be provided in signed decimal degrees}
 
 \item{create_pdf_vario}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted in a pdf file}
 
-\item{suppressMes}{boolean. If \code{TRUE} warning messagges are not printed}
-
 \item{pdf_parameters}{list with the fields \code{test_nr}, \code{K} and \code{sample_draw}. Additional parameters to name the pdf}
+
+\item{suppressMes}{boolean. If \code{TRUE} warning messagges are not printed}
 }
 \value{
 list with the following fields:

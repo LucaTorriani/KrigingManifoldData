@@ -2,17 +2,93 @@
 % Please edit documentation in R/full_RDD.R
 \name{full_RDD}
 \alias{full_RDD}
-\title{Perform full_RDD}
+\title{Perform full_RDD
+Create a GLS model}
 \usage{
 full_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   suppressMes = F, tol = 1e-12, max_it = 100, n_h = 15,
   tolerance_intrinsic = 10^(-6), X = NULL, X_new = NULL,
-  X_tot = NULL, ker.width.intrinsic = 0, ker.width.vario = 1.5,
+  ker.width.intrinsic = 0, ker.width.vario = 1.5,
   graph.distance.complete, data.grid.distance, N_samples, p,
-  num.signif.entries, aggregation_mean, aggregation_kriging,
-  method.analysis = "Local mean", metric_manifold, metric_ts, model_ts,
-  vario_model, distance = NULL)
+  aggregation_mean, aggregation_kriging, method.analysis = "Local mean",
+  metric_manifold, metric_ts, model_ts, vario_model, distance = NULL)
+}
+\arguments{
+\item{data_coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
+be provided in signed decimal degrees}
+
+\item{data_val}{array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
+
+\item{K}{number of neighborhood (i.e., centers) to sample at each iteration}
+
+\item{grid}{prediction grid}
+
+\item{nk_min}{minimum number of observations within a neighborhood}
+
+\item{B}{number of \texit{divide} iterations to perform}
+
+\item{suppressMes}{{\code{TRUE}, \code{FALSE}} controls the level of interaction and warnings given}
+
+\item{tol}{tolerance for the main loop of model_kriging}
+
+\item{max_it}{maximum number of iterations for the main loop of model_kriging}
+
+\item{n_h}{number of bins in the empirical variogram}
+
+\item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided}
+
+\item{X}{matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL}
+
+\item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
+
+\item{ker.width.intrinsic}{parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, no
+kernel is used)}
+
+\item{ker.width.vario}{parameter controlling the width of the Gaussian kernel for the computation of the empirical variogram (if 0,
+no kernel is used)}
+
+\item{graph.distance.complete}{\code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)}
+
+\item{data.grid.distance}{\code{N*dim(grid)[1]} distance matrix between locations where the datum has been observed and locations where
+the datum has to be predicted}
+
+\item{N_samples}{number of samples}
+
+\item{p}{dimension of the manifold matrices}
+
+\item{aggregation_mean}{"Weighted" ...}
+
+\item{aggregation_kriging}{"Weighted" if the prediction must be aggregated using different weights, "Equal" to use equal weights}
+
+\item{method.analysis}{"Local mean" to predict just with the mean, "Kriging" to predict via Kriging procedure}
+
+\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
+
+\item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
+
+\item{model_ts}{type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"}
+
+\item{vario_model}{type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"}
+
+\item{distance}{type of distance between coordinates. It must be either "Eucldist" or "Geodist"}
+}
+\value{
+According to the analysis chosen:
+\itemize{
+  \item If \code{method.analysis} = "Local mean" it returns a list with the following fields
+    \itemize{
+      \item \code{resBootstrap}{...}
+      \item \code{resAggregated}{...}
+    }
+  \item If \code{method.analysis} = "Kriging" it returns a list with the following fields
+    \itemize{
+      \item \code{resBootstrap}{...}
+      \item \code{resAggregated}{...}
+      \item \code{resLocalMean}{...}
+    }
+}
 }
 \description{
 Perform full_RDD
+Create a GLS model
 }

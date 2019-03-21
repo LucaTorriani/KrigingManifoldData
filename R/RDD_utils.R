@@ -75,7 +75,7 @@ return_ith_row = function(mat, i){
 RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
                             # spdist,
                             suppressMes, tol, max_it,
-                            n_h, tolerance_intrinsic, X, X_new, X_tot, # plot,
+                            n_h, tolerance_intrinsic, X, X_new,  # plot,
                             ker.width.intrinsic,
                             ker.width.vario,
                             # mesh,
@@ -83,7 +83,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
                             # assign.matrix, no.assg.grid,
                             data.grid.distance,
                             # is.observed, border.length,
-                            p, num.signif.entries,
+                            p, #num.signif.entries,
                             method.analysis,
                             metric_manifold, metric_ts, model_ts,
                             vario_model, distance) # *NEW*
@@ -258,7 +258,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
             indexes_model = which(assign==k)
 
             param_weighted_vario = list(weight_vario = weight.vario, distance_matrix_tot = graph.distance,
-                                        data_manifold_tot= data_manifold_tot_array, coords_tot = data[,1:2], X_tot = X_tot, h_max = h_max, indexes_model = indexes_model)
+                                        data_manifold_tot= data_manifold_tot_array, coords_tot = data[,1:2], X_tot = X, h_max = h_max, indexes_model = indexes_model)
           }
 
           # model.man = model_kriging(datamat, coords = datak[,c(1,2)],
@@ -272,7 +272,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
           #                           param_weighted_vario = param_weighted_vario,
           #                           new_coords = data.frame(gridk[[k]]), X_new, plot=plot)
           model.man = model_kriging(datak, coords = data_coords[assign==k,],
-                                    X, Sigma = NULL, metric_manifold = metric_manifold,
+                                    X[indexes_model,], Sigma = NULL, metric_manifold = metric_manifold,
                                     metric_ts = metric_ts, model_ts = model_ts,
                                     vario_model = vario_model, n_h = n_h, distance = NULL,
                                     data_dist_mat=graph.distance[which(assign==k),which(assign==k)],

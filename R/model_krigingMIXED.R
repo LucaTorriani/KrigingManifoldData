@@ -89,7 +89,7 @@
 #' { car::ellipse(c(rGrid[i,1],rGrid[i,2]) , (result$prediction[[i]]),radius=radius, center.cex=.5, col='red')}
 #' rect(x.min, y.min, x.max, y.max)
 #' @useDynLib Manifoldgstat
-#' @export
+
 
 model_kriging_mixed = function(data_manifold, coords, X = NULL, Sigma_data, metric_manifold = "Frobenius",
                          model_ts = "Additive", vario_model = "Gaussian", # metric_ts = "Frobenius",
