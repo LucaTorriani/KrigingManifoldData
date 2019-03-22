@@ -312,7 +312,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
     # }
 
   } # for su B
-  if (method.analysis == 'Local mean') list.ret = list(fpred=fpred, kervalues_mean=kervalues_mean,kervalues_krig=kervalues_krig, variofit=vfit)
+  if (method.analysis == 'Local mean') list.ret = list(fmean=fmean, kervalues_mean=kervalues_mean)
   if (method.analysis == 'Kriging') list.ret = list(fmean=fmean, fpred=fpred, kervalues_mean=kervalues_mean,kervalues_krig=kervalues_krig, variofit=vfit)
 
   if(suppressMes) options(warn = oldw)
