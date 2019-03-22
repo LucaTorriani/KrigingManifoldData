@@ -13,7 +13,7 @@
 #' @param data.grid.distance \code{N*dim(grid)[1]} distance matrix between locations where the datum has been observed and locations where
 #' @param N_samples number of samples
 #' @param p dimension of the manifold matrices
-#' @param aggregation_mean "Weighted" ...
+#' @param aggregation_mean "Weighted" if the prediction obtained using the intrinsic mean, must be aggregated using different weights, "Equal" to use equal weights
 #' @param metric_ts metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
 #' @param tol tolerance for the main loop of model_kriging
 #' @param max_it maximum number of iterations for the main loop of model_kriging

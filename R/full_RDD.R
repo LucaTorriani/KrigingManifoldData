@@ -23,8 +23,8 @@
 #' the datum has to be predicted
 #' @param N_samples number of samples
 #' @param p dimension of the manifold matrices
-#' @param aggregation_mean "Weighted" ...
-#' @param aggregation_kriging "Weighted" if the prediction must be aggregated using different weights, "Equal" to use equal weights
+#' @param aggregation_mean "Weighted" if the prediction obtained using the intrinsic mean, must be aggregated using different weights, "Equal" to use equal weights
+#' @param aggregation_kriging "Weighted" if the prediction obtained using Kriging, must be aggregated using different weights, "Equal" to use equal weights
 #' @param method.analysis "Local mean" to predict just with the mean, "Kriging" to predict via Kriging procedure
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
 #' @param metric_ts metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
