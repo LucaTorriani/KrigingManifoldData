@@ -55,9 +55,9 @@ the datum has to be predicted}
 
 \item{p}{dimension of the manifold matrices}
 
-\item{aggregation_mean}{"Weighted" ...}
+\item{aggregation_mean}{"Weighted" if the prediction obtained using the intrinsic mean, must be aggregated using different weights, "Equal" to use equal weights}
 
-\item{aggregation_kriging}{"Weighted" if the prediction must be aggregated using different weights, "Equal" to use equal weights}
+\item{aggregation_kriging}{"Weighted" if the prediction obtained using Kriging, must be aggregated using different weights, "Equal" to use equal weights}
 
 \item{method.analysis}{"Local mean" to predict just with the mean, "Kriging" to predict via Kriging procedure}
 

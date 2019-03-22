@@ -39,7 +39,7 @@ kernel is used)}
 
 \item{p}{dimension of the manifold matrices}
 
-\item{aggregation_mean}{"Weighted" ...}
+\item{aggregation_mean}{"Weighted" if the prediction obtained using the intrinsic mean, must be aggregated using different weights, "Equal" to use equal weights}
 
 \item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
 
