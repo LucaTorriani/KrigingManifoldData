@@ -1,6 +1,5 @@
 #' #' Bootstrap variance for method full_RDD
-#' #' @useDynLib Manifoldgstat
-#' #' @export
+
 #' full_RDD_bootstrapVar <- function(res_RDD_OOK, K,n, metric_manifold, dim_matrix)
 #' {
 #'   # INPUT :

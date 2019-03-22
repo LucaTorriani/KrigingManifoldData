@@ -2,10 +2,22 @@
 % Please edit documentation in R/bootstrapVar.R
 \name{bootstrapVar}
 \alias{bootstrapVar}
-\title{Bootstrap variance}
+\title{Compute the bootstrap variance}
 \usage{
 bootstrapVar(res.boot, res.aggr, K, metric_manifold)
 }
+\arguments{
+\item{res.boot}{A list of length \code{B}. Each field contains the predictions for the corresponding iteration}
+
+\item{res.aggr}{A list as long as the number of the prediction. Each field a single prediction}
+
+\item{K}{number of neighbourhood used in the anaysis}
+
+\item{metric_manifold}{metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"}
+}
+\value{
+It returns a vector, as long as the number of predictions, containing the the variance at the predicted locations
+}
 \description{
-Bootstrap variance
+Compute the bootstrap variance
 }

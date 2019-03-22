@@ -24,7 +24,7 @@ be provided in signed decimal degrees}
 
 \item{nk_min}{minimum number of observations within a neighborhood}
 
-\item{B}{number of \texit{divide} iterations to perform}
+\item{B}{number of \emph{divide} iterations to perform}
 
 \item{suppressMes}{\{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given}
 
@@ -76,14 +76,28 @@ According to the analysis chosen:
 \itemize{
   \item If \code{method.analysis} = "Local mean" it returns a list with the following fields
     \itemize{
-      \item \code{resBootstrap}{...}
-      \item \code{resAggregated}{...}
+      \item \code{resBootstrap} {On its turn it is a list consisting of}
+         \itemize{
+          \item \code{fmean} {It is a list with length \code{B}. Each field contains, for each new location, its prediction (at iteration \code{b}) obtained 
+                            as intrinsic mean of the data inside the tile it belongs to}
+          \item \code{kervalues_mean} {Weights used for aggregating \code{fmean}}
+         }
+      \item \code{resAggregated}{Predictions, for each new location, obtained aggregating \code{fmean} using \code{kervalues_mean} as weights}
     }
   \item If \code{method.analysis} = "Kriging" it returns a list with the following fields
     \itemize{
-      \item \code{resBootstrap}{...}
-      \item \code{resAggregated}{...}
-      \item \code{resLocalMean}{...}
+      \item \code{resBootstrap} {On its turn it is a list consisting of}
+         \itemize{
+          \item \code{fmean} {It is a list with length \code{B}. Each field contains, for each new location, its prediction (at iteration \code{b}) obtained 
+                            as intrinsic mean of the data inside the tile it belongs to}
+          \item \code{fpred} {It is a list with length \code{B}. Each field contains, for each new location, the prediction (at iteration \code{b}) 
+                             obtained using Kriging}
+          \item \code{kervalues_mean} {Weights used for aggregating \code{fmean}}
+          \item \code{kervalues_krig} {Weights used for aggregating \code{fpred}}
+          \item \code{variofit} {It is a list with length \code{B}. Each field contains, for each tile, the parameters of the fitted variogram}
+         }
+      \item \code{resAggregated} {Predictions, for each new location, obtained aggregating \code{fpred} using \code{kervalues_krig} as weights}
+      \item \code{resLocalMean} {Predictions, for each new location, obtained aggregating \code{fmean} using \code{kervalues_mean} as weights}
     }
 }
 }

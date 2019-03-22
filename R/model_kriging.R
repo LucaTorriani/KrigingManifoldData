@@ -19,12 +19,12 @@
 #' @param weight_intrinsic vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
 #' a vector of ones is used. Not needed if Sigma is provided
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
-#' @param max_sill maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
+#' @param max_sill max value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
 #' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
 #' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram:
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
 #' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
-#' \code{data_manifold_tot} (list or array
+#' \code{data_manifold_tot} (list or array \cr
 #' [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
 #' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees),
@@ -37,7 +37,7 @@
 #' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
 #' @param weight_extrinsic vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
 #' weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}
-#' @param tolerance_map_cor tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}
+#' @param tolerance_map_cor tolerance to use in the maps.\cr Required only if \code{metric_manifold== "Correlation"}
 #' @return list with the following fields:
 #' \item{\code{beta}}{ vector of the beta matrices of the fitted model}
 #' \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
@@ -52,7 +52,7 @@
 #' it performs kriging on the new locations.
 #' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
 #' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
-#' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals
+#' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \cr
 #' \code{(residuals = data_ts - fitted)}
 #' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 #' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
@@ -70,15 +70,16 @@
 #' Sigma <- matrix(c(2,1,1,1), 2,2)
 #'
 #' result = model_kriging (data_manifold = data_manifold_model, coords = coords_model,
-#'                         Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius",
-#'                         model_ts = "Coord1", vario_model = "Spherical", n_h = 15,
-#'                         distance = "Eucldist", max_it = 100, tolerance = 10e-7,
-#'                         new_coords = coords_model)
+#'                         Sigma = Sigma, metric_manifold = "Frobenius", 
+#'                         metric_ts = "Frobenius", model_ts = "Coord1",
+#'                         vario_model = "Spherical", n_h = 15, distance = "Eucldist", 
+#'                         max_it = 100, tolerance = 10e-7, new_coords = coords_model)
 #' result_tot = model_kriging (data_manifold = data_manifold_model, coords = coords_model,
-#'                             Sigma = Sigma, metric_manifold = "Frobenius", metric_ts = "Frobenius",
-#'                             model_ts = "Coord1", vario_model = "Spherical", n_h = 15,
-#'                             distance = "Eucldist", max_it = 100, tolerance = 10e-7,
-#'                             new_coords = coords_tot, create_pdf_vario = FALSE)
+#'                             metric_ts = "Frobenius", Sigma = Sigma,  
+#'                             metric_manifold = "Frobenius", model_ts = "Coord1", 
+#'                             vario_model = "Spherical", n_h = 15, distance = "Eucldist", 
+#'                             max_it = 100, tolerance = 10e-7, new_coords = coords_tot, 
+#'                             create_pdf_vario = FALSE)
 #' x.min=min(coords_tot[,1])
 #' x.max=max(coords_tot[,1])
 #' y.min=min(coords_tot[,2])
@@ -87,23 +88,35 @@
 #' radius = 0.02
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='', xlab='', ylab='', main = "Real Values")
-#' for(i in 1:dimgrid)
-#' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , data_manifold_tot[,,i],radius=radius, center.cex=.5, col='navyblue')}}
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max),
+#'       pch='', xlab='', ylab='', main = "Real Values")
+#' for(i in 1:dimgrid){
+#'  if(i %% 3 == 0) 
+#'     car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , data_manifold_tot[,,i], 
+#'                                  radius=radius, center.cex=.5, col='navyblue')
+#' }
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' for(i in 1:250)
-#' { car::ellipse(c(coords_model[i,1],coords_model[i,2]) , data_manifold_model[,,i],radius=radius, center.cex=.5, col='green')}
+#' { car::ellipse(c(coords_model[i,1],coords_model[i,2]) , data_manifold_model[,,i], 
+#'                radius=radius, center.cex=.5, col='green')}
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='', xlab='', ylab='',main = "Predicted values")
-#' for(i in 1:dimgrid)
-#' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]) , (result_tot$prediction[[i]]),radius=radius, center.cex=.5, col='navyblue' )}}
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), 
+#'       pch='',  xlab='', ylab='',main = "Predicted values")
+#'       
+#' for(i in 1:dimgrid){
+#'   if(i %% 3 == 0) 
+#'      car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), result_tot$prediction[[i]],
+#'                                  radius=radius, center.cex=.5, col='navyblue' )
+#' }
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' for(i in 1:250)
-#' { car::ellipse(c(rGrid[i,1],rGrid[i,2]) , (result$prediction[[i]]),radius=radius, center.cex=.5, col='red')}
+#' { car::ellipse(c(rGrid[i,1],rGrid[i,2]), result$prediction[[i]],radius=radius,  
+#'                center.cex=.5, col='red')
+#' }
 #' rect(x.min, y.min, x.max, y.max)
 #' @useDynLib Manifoldgstat
 #' @export

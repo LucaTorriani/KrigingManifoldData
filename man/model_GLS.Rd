@@ -45,19 +45,20 @@ a vector of ones is used. Not needed if Sigma is provided}
 
 \item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided}
 
-\item{max_sill}{maximum value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}}
+\item{max_sill}{max value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}}
 
 \item{max_a}{maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}}
 
 \item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram:
 \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
-\code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
-\code{data_manifold_tot} (list or array [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}),
+\code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), \code{data_manifold_tot}
+(list or array \cr [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}),
 \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 be provided in signed decimal degrees),
 \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL),
 \code{h_max} (maximum value of distance for which the variogram is computed)
-\code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot}). Required only in the case \code{metric_manifold = "Correlation"}}
+\code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot}). \cr
+Required only in the case \code{metric_manifold = "Correlation"}}
 
 \item{plot}{boolean. If \code{TRUE} the empirical and fitted variograms are plotted}
 
@@ -66,7 +67,8 @@ be provided in signed decimal degrees),
 \item{weight_extrinsic}{vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
 weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}}
 
-\item{tolerance_map_cor}{tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}}
+\item{tolerance_map_cor}{tolerance to use in the maps. \cr Required only if
+\code{metric_manifold== "Correlation"}}
 
 \item{data_dist_mat}{Matrix of dimension \code{N*N} of distances between data points. If not provided it is computed using \code{distance}}
 }
@@ -87,7 +89,8 @@ Given the coordinates and corresponding manifold values, this function creates a
 \details{
 The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the \code{beta} coefficients
 is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the \code{beta} are obtained as a result of a
-weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \code{(residuals = data_ts - fitted)}
+weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals
+\cr\code{(residuals = data_ts - fitted)}
 are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
 computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
 absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.

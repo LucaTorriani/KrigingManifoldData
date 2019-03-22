@@ -8,7 +8,8 @@
 #' a vector of ones is used
 #' @param weight_extrinsic vector of length \code{B} to weight the matrices in the computation of the extrinsic mean. If NULL
 #' weight_intrinsic are used
-#' @param tolerance_map_cor tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}
+#' @param tolerance_map_cor tolerance to use in the maps. \cr
+#' Required only if \code{metric_manifold== "Correlation"}
 #' @return A matrix representing the intrinsic mean of the \code{data}
 #' @description Evaluate the intrinsic mean of a given set of symmetric positive definite matrices
 #' @examples

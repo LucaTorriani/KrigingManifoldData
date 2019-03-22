@@ -24,7 +24,8 @@ a vector of ones is used}
 \item{weight_extrinsic}{vector of length \code{B} to weight the matrices in the computation of the extrinsic mean. If NULL
 weight_intrinsic are used}
 
-\item{tolerance_map_cor}{tolerance to use in the maps. Required only if \code{metric_manifold== "Correlation"}}
+\item{tolerance_map_cor}{tolerance to use in the maps. \cr
+Required only if \code{metric_manifold== "Correlation"}}
 }
 \value{
 A matrix representing the intrinsic mean of the \code{data}
@@ -34,6 +35,7 @@ Evaluate the intrinsic mean of a given set of symmetric positive definite matric
 }
 \examples{
 data_manifold_tot <- Manifoldgstat::fieldCov
-Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius", metric_ts = "Frobenius")
+Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius",
+             metric_ts = "Frobenius")
 print(Sigma)
 }

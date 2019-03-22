@@ -1,4 +1,9 @@
-#' Bootstrap variance 
+#' Compute the bootstrap variance 
+#' @param res.boot A list of length \code{B}. Each field contains the predictions for the corresponding iteration
+#' @param res.aggr A list as long as the number of the prediction. Each field a single prediction
+#' @param K number of neighbourhood used in the anaysis
+#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
+#' @return It returns a vector, as long as the number of predictions, containing the the variance at the predicted locations
 #' @useDynLib Manifoldgstat
 #' @export
 

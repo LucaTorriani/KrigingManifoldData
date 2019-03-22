@@ -2,8 +2,8 @@
 #'
 #' @param GLS_model the object returned by \code{model_GLS}, or a list containing the fields:
 #' \code{Sigma} (tangent point), \code{beta} (vector of the beta matrices of the fitted model),
-#' \code{gamma_matrix} (\code{N*N} covariogram matrix), \code{residuals} (vector of the \code{N} residual matrices),
-#' \code{fitted_par_vario} (estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range})
+#' \code{gamma_matrix} (\code{N*N} covariogram matrix), \code{residuals} (vector of the \code{N} residual
+#' matrices), \cr \code{fitted_par_vario} (estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range})
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
 #' @param new_coords matrix of coordinates for the new locations where to perform kriging
@@ -13,8 +13,7 @@
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
 #' @param data_grid_dist_mat Matrix of dimension \code{N*M} of distances between data points and grid points. If not provided it is computed using \code{distance}
-#' @param tolerance_map_cor tolerance to use in the maps.
-#' Required only if \code{metric_manifold=="Correlation"}
+#' @param tolerance_map_cor tolerance to use in the maps. \cr Required only if \code{metric_manifold=="Correlation"}
 #' @return A list with a single field:
 #' \item{\code{prediction}}{vector of matrices predicted at the new locations}
 #' @description Given the GLS model kriging prediction on new location is performed.
@@ -49,29 +48,33 @@
 #' radius = 0.02
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), pch='',
-#       'xlab='', ylab='', main = "Real Values")
-#' for(i in 1:dimgrid)
-#' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), data_manifold_tot[,,i],
-#                                   'radius=radius, center.cex=.5, col='navyblue')}}
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max), xlim=c(x.min, x.max), 
+#'      pch='', xlab='', ylab='', main = "Real Values")
+#' for(i in 1:dimgrid){
+#'   if(i %% 3 == 0) 
+#'      car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), data_manifold_tot[,,i],
+#'                     radius=radius, center.cex=.5, col='navyblue')
+#' }
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' for(i in 1:250)
-#' { car::ellipse(c(coords_model[i,1],coords_model[i,2]), data_manifold_model[,,i], radius=radius,
-#                 'center.cex=.5, col='green')}
+#' { car::ellipse(c(coords_model[i,1],coords_model[i,2]), data_manifold_model[,,i], 
+#'                radius=radius, center.cex=.5, col='green')}
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' par(cex=1.25)
-#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), pch='',
-#'      xlab='', ylab='',main = "Predicted values")
-#' for(i in 1:dimgrid)
-#' { if(i %% 3 == 0) { car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), (result_tot$prediction[[i]]),
-#'                                  radius=radius, center.cex=.5, col='navyblue' )}}
+#' plot(0,0, asp=1, col=fields::tim.colors(100), ylim=c(y.min,y.max),xlim=c(x.min, x.max), 
+#'      pch='', xlab='', ylab='',main = "Predicted values")
+#' for(i in 1:dimgrid){
+#'   if(i %% 3 == 0) 
+#'      car::ellipse(c(coords_tot[i,1],coords_tot[i,2]), result_tot$prediction[[i]],
+#'                    radius=radius, center.cex=.5, col='navyblue' )
+#' }
 #' rect(x.min, y.min, x.max, y.max)
 #'
 #' for(i in 1:250)
-#' { car::ellipse(c(coords_model[i,1],coords_model[i,2]), (result$prediction[[i]]), radius=radius,
-#                 'center.cex=.5, col='red')}
+#' { car::ellipse(c(coords_model[i,1],coords_model[i,2]), result$prediction[[i]], 
+#'                  radius=radius, center.cex=.5, col='red')}
 #' rect(x.min, y.min, x.max, y.max)
 #' @useDynLib Manifoldgstat
 #' @export
