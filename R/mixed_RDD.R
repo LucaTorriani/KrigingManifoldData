@@ -33,6 +33,22 @@
 #'       \item \code{resAggregated}{...}
 #'       \item \code{model_pred}{...}
 #' }
+#' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
+#' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
+#' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \cr
+#' \code{(residuals = data_ts - fitted)}
+#' are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
+#' computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
+#' absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.
+#' Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
+#' the estimates are mapped to the manifold.
+#' @description It employs a \emph{divide} et \emph{impera} strategy only to provide an estimate of a "fictional" field of tangent 
+#' points, used to encode the information regarding the drift. To this end in the \emph{divide} step, the domain is randomly 
+#' decomposed and in each subdomain a tangent point (assigned to each location in that subregion) is estimated as the 
+#' intrinsic mean of the data belonging toit. This is repeated \code{K} times with different partitions of the domain and the 
+#' results are then aggregated in the \emph{impera} stage by means of the intrinsic mean. Eventually, 
+#' exploiting this "fictional" field of tangent points and the concept of parallel transport, a kriging analysis over the whole 
+#' domain is performed to predict the field values at new locations.
 #' @useDynLib Manifoldgstat
 #' @export
 #'

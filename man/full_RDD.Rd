@@ -102,5 +102,10 @@ According to the analysis chosen:
 }
 }
 \description{
-Perform full_RDD
+It uses a repetition of simple and local analyses, instead of an unique global and complex one, 
+through a \emph{divide} et \emph{impera} strategy. In the \emph{divide} step, the domain is randomly decomposed in subdomains where local 
+tangent-space models are estimated in order to predict at new locations (in each subregion is performed exactly the analysis described 
+in the description of \code{model_kriging} function). This is repeated \code{K} times with different 
+partitions of the domain. Then, in the \emph{impera} step, the results of these iterations are aggregated, by means of the intrinsic mean,
+to provide a final prediction.
 }

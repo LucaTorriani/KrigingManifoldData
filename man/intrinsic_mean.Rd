@@ -39,3 +39,7 @@ Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius",
              metric_ts = "Frobenius")
 print(Sigma)
 }
+\references{
+X. Pennec, P. Fillard, and N. Ayache. A riemannian framework for tensor computing.
+International Journal of computer vision, 66(1):41-66, 2006.
+}

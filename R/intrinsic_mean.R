@@ -12,6 +12,8 @@
 #' Required only if \code{metric_manifold== "Correlation"}
 #' @return A matrix representing the intrinsic mean of the \code{data}
 #' @description Evaluate the intrinsic mean of a given set of symmetric positive definite matrices
+#' @references X. Pennec, P. Fillard, and N. Ayache. A riemannian framework for tensor computing.
+#' International Journal of computer vision, 66(1):41-66, 2006.
 #' @examples
 #' data_manifold_tot <- Manifoldgstat::fieldCov
 #' Sigma <-intrinsic_mean(data_manifold_tot, metric_manifold = "Frobenius",
