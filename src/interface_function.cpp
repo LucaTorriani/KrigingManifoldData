@@ -338,7 +338,7 @@ extern "C"{
                              Rcpp::Named("fit_vario_values") = fit_vario_values,
                              Rcpp::Named("hh") = hh,
                              Rcpp::Named("gamma_matrix") = gamma_matrix,
-                             Rcpp::Named("residuals") = resVec,
+                             Rcpp::Named("residuals") = resVec_k,
                              Rcpp::Named("emp_vario_values") = emp_vario_values,
                              Rcpp::Named("h_vec") = h_vario_values,
                              Rcpp::Named("fitted_par_vario") = fit_parameters,
