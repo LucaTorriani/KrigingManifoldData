@@ -16,13 +16,13 @@ intrinsic_mean(data, metric_manifold = "Frobenius",
 
 \item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
 
-\item{tolerance}{tolerance for the computation of the intrinsic_mean}
+\item{tolerance}{tolerance for the computation of the intrinsic mean}
 
 \item{weight_intrinsic}{vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
 a vector of ones is used}
 
 \item{weight_extrinsic}{vector of length \code{B} to weight the matrices in the computation of the extrinsic mean. If NULL
-weight_intrinsic are used}
+\code{weight_intrinsic} is used}
 
 \item{tolerance_map_cor}{tolerance to use in the maps. \cr
 Required only if \code{metric_manifold== "Correlation"}}

@@ -1,10 +1,9 @@
 #' Distance on the manifold
 #'
-#' @param data1 list or array [\code{p,p,B1}] of \code{B1} symmetric positive definite matrices of dimension \code{p*p}. Or a single \code{p*p} matrix
-#' @param data2 list or array [\code{p,p,B2}] of \code{B2} symmetric positive definite matrices of dimension \code{p*p}.
-#' Or a single \code{p*p} matrix.
+#' @param data1 Either a list/array [\code{p,p,B1}] of \code{B1} symmetric positive definite matrices of dimension \code{p*p}, or a single \code{p*p} matrix
+#' @param data2 Either a list/array [\code{p,p,B2}] of \code{B2} symmetric positive definite matrices of dimension \code{p*p}, or a single \code{p*p} matrix.
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
-#' @return A double or a vector of distances
+#' @return A vector of distances, or a double if \code{data1} and \code{data2} are single matrices.
 #' @description Compute the manifold distance between symmetric positive definite matrices
 #' @details If \code{B2}=\code{B1} then the result is a vector of length \code{B1=B2} containing in position \code{i} the manifold distance beetween \code{data1[,,i]} and \code{data2[,,i]}.
 #' Instead if \code{B2}=1 and \code{B1}!=1 the result is a vector of length \code{B1} containing in position \code{i} the manifold distance between \code{data1[,,i]} and \code{data2[,,1]}

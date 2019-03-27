@@ -6,7 +6,7 @@
 \usage{
 mixed_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   suppressMes = F, ker.width.intrinsic = 0, graph.distance.complete,
-  data.grid.distance, N_samples, p, aggregation_mean, metric_ts,
+  data.grid.distance, N_samples, aggregation_mean, metric_ts,
   tol = 1e-12, max_it = 100, n_h = 15,
   tolerance_intrinsic = 10^(-6), X = NULL, X_new = NULL,
   create_pdf_vario = FALSE, pdf_parameters = NULL, metric_manifold,
@@ -18,38 +18,37 @@ be provided in signed decimal degrees}
 
 \item{data_val}{array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
 
-\item{K}{number of neighborhood (i.e., centers) to sample at each iteration}
+\item{K}{number of cells the domain is subdivided in}
 
-\item{grid}{prediction grid}
+\item{grid}{prediction grid, i.e. \code{M*2} or \code{M*3} matrix of coordinates where to predict}
 
-\item{nk_min}{minimum number of observations within a neighborhood}
+\item{nk_min}{minimum number of observations within a cell}
 
-\item{B}{number of \texit{divide} iterations to perform}
+\item{B}{number of \emph{divide} iterations to perform}
 
 \item{suppressMes}{\{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given}
 
-\item{ker.width.intrinsic}{parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, no
-kernel is used)}
+\item{ker.width.intrinsic}{parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, 
+a "step kernel" is used, giving weight 1 to all the data within the cell and 0 to those outside of it)}
 
 \item{graph.distance.complete}{\code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)}
 
-\item{data.grid.distance}{\code{N*dim(grid)[1]} distance matrix between locations where the datum has been observed and locations where}
+\item{data.grid.distance}{\code{N*M} distance matrix between locations where the datum has been observed and locations where
+the datum has to be predicted}
 
-\item{N_samples}{number of samples}
+\item{N_samples}{number of data N}
 
-\item{p}{dimension of the manifold matrices}
-
-\item{aggregation_mean}{"Weighted" if the prediction obtained using the intrinsic mean, must be aggregated using different weights, "Equal" to use equal weights}
+\item{aggregation_mean}{"Weighted" to aggregate the mean predictions using kernel-based weights, "Equal" to use equal weights}
 
 \item{metric_ts}{metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"}
 
-\item{tol}{tolerance for the main loop of model_kriging}
+\item{tol}{tolerance for the main loop of \code{model_kriging}}
 
-\item{max_it}{maximum number of iterations for the main loop of model_kriging}
+\item{max_it}{maximum number of iterations for the main loop of \code{model_kriging}}
 
 \item{n_h}{number of bins in the empirical variogram}
 
-\item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided}
+\item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean}
 
 \item{X}{matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL}
 
@@ -70,28 +69,21 @@ kernel is used)}
 \value{
 it returns a list with the following fields
 \itemize{
-      \item \code{resBootstrap}{...}
-      \item \code{resAggregated}{...}
-      \item \code{model_pred}{...}
+      \item \code{resBootstrap} {list of length \code{B}. Each field contains a tangent point estimate (at iteration \code{b}) for each new location, obtained 
+                            as the intrinsic mean of the data within the tile it belongs to}
+      \item \code{resAggregated} {field of tangent points computed, for each location (both those where data are measured and where they must be predicted), aggregating the corresponding \code{resBootstrap}}
+      \item \code{model_pred} {Predictions, for each new location, obtained fitting a global model on the common Hilbert space and parallely transporting the results back on the manifold}
 }
 }
 \description{
-It employs a \emph{divide} et \emph{impera} strategy only to provide an estimate of a "fictional" field of tangent 
-points, used to encode the information regarding the drift. To this end in the \emph{divide} step, the domain is randomly 
+Perform kriging prediction using MixedRDD procedure
+}
+\details{
+It employs a \emph{divide} et \emph{impera} strategy to provide an estimate of a "fictional" field of tangent 
+points, used to encode the information regarding the drift of the field. To this end in the \emph{divide} step, the domain is randomly 
 decomposed and in each subdomain a tangent point (assigned to each location in that subregion) is estimated as the 
-intrinsic mean of the data belonging toit. This is repeated \code{K} times with different partitions of the domain and the 
+intrinsic mean of the data belonging to it. This is repeated \code{B} times with different partitions of the domain and the 
 results are then aggregated in the \emph{impera} stage by means of the intrinsic mean. Eventually, 
 exploiting this "fictional" field of tangent points and the concept of parallel transport, a kriging analysis over the whole 
 domain is performed to predict the field values at new locations.
-}
-\details{
-The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
-is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
-weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \cr
-\code{(residuals = data_ts - fitted)}
-are updated accordingly. The parameters of the variogram fitted to the residuals (and used in the evaluation of the \code{gamma_matrix}) are
-computed using Gauss-Newton with backtrack method to solve the associated non-linear least square problem. The stopping criteria is based on the
-absolute value of the variogram residuals' norm if \code{ker.width.vario=0}, while it is based on its increment otherwise.
-Once the model is computed, simple kriging on the tangent space is performed in correspondence of the new locations and eventually
-the estimates are mapped to the manifold.
 }

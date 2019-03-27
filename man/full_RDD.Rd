@@ -8,9 +8,9 @@ full_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   suppressMes = F, tol = 1e-12, max_it = 100, n_h = 15,
   tolerance_intrinsic = 10^(-6), X = NULL, X_new = NULL,
   ker.width.intrinsic = 0, ker.width.vario = 1.5,
-  graph.distance.complete, data.grid.distance, N_samples, p,
-  aggregation_mean, aggregation_kriging, method.analysis = "Local mean",
-  metric_manifold, metric_ts, model_ts, vario_model, distance = NULL)
+  graph.distance.complete, data.grid.distance, aggregation_mean,
+  aggregation_kriging, method.analysis = "Local mean", metric_manifold,
+  metric_ts, model_ts, vario_model, distance = NULL)
 }
 \arguments{
 \item{data_coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
@@ -18,46 +18,42 @@ be provided in signed decimal degrees}
 
 \item{data_val}{array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}}
 
-\item{K}{number of neighborhood (i.e., centers) to sample at each iteration}
+\item{K}{number of cells the domain is subdivided in}
 
-\item{grid}{prediction grid}
+\item{grid}{prediction grid, i.e. \code{M*2} or \code{M*3} matrix of coordinates where to predict}
 
-\item{nk_min}{minimum number of observations within a neighborhood}
+\item{nk_min}{minimum number of observations within a cell}
 
 \item{B}{number of \emph{divide} iterations to perform}
 
 \item{suppressMes}{\{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given}
 
-\item{tol}{tolerance for the main loop of model_kriging}
+\item{tol}{tolerance for the main loop of \code{model_kriging}}
 
-\item{max_it}{maximum number of iterations for the main loop of model_kriging}
+\item{max_it}{maximum number of iterations for the main loop of \code{model_kriging}}
 
 \item{n_h}{number of bins in the empirical variogram}
 
-\item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided}
+\item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean}
 
 \item{X}{matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL}
 
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
 
-\item{ker.width.intrinsic}{parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, no
-kernel is used)}
+\item{ker.width.intrinsic}{parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, 
+a "step kernel" is used, giving weight 1 to all the data within the cell and 0 to those outside of it)}
 
-\item{ker.width.vario}{parameter controlling the width of the Gaussian kernel for the computation of the empirical variogram (if 0,
-no kernel is used)}
+\item{ker.width.vario}{parameter controlling the width of the Gaussian kernel for the computation of the empirical variogram (if 0, 
+a "step kernel" is used, giving weight 1 to all the data within the cell and 0 to those outside of it)}
 
 \item{graph.distance.complete}{\code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)}
 
-\item{data.grid.distance}{\code{N*dim(grid)[1]} distance matrix between locations where the datum has been observed and locations where
+\item{data.grid.distance}{\code{N*M} distance matrix between locations where the datum has been observed and locations where
 the datum has to be predicted}
 
-\item{N_samples}{number of samples}
+\item{aggregation_mean}{"Weighted" to aggregate the mean predictions using kernel-based weights, "Equal" to use equal weights}
 
-\item{p}{dimension of the manifold matrices}
-
-\item{aggregation_mean}{"Weighted" if the prediction obtained using the intrinsic mean, must be aggregated using different weights, "Equal" to use equal weights}
-
-\item{aggregation_kriging}{"Weighted" if the prediction obtained using Kriging, must be aggregated using different weights, "Equal" to use equal weights}
+\item{aggregation_kriging}{"Weighted" to aggregate the Kriging predictions using kernel-based weights, "Equal" to use equal weights}
 
 \item{method.analysis}{"Local mean" to predict just with the mean, "Kriging" to predict via Kriging procedure}
 
@@ -76,25 +72,25 @@ According to the analysis chosen:
 \itemize{
   \item If \code{method.analysis} = "Local mean" it returns a list with the following fields
     \itemize{
-      \item \code{resBootstrap} {On its turn it is a list consisting of}
+      \item \code{resBootstrap} {A list consisting of}
          \itemize{
-          \item \code{fmean} {It is a list with length \code{B}. Each field contains, for each new location, its prediction (at iteration \code{b}) obtained 
-                            as intrinsic mean of the data inside the tile it belongs to}
+          \item \code{fmean} {list of length \code{B}. Each field contains the prediction (at iteration \code{b}) for each new location, obtained 
+                            as the intrinsic mean of the data within the tile it belongs to}
           \item \code{kervalues_mean} {Weights used for aggregating \code{fmean}}
          }
-      \item \code{resAggregated}{Predictions, for each new location, obtained aggregating \code{fmean} using \code{kervalues_mean} as weights}
+      \item \code{resAggregated} {Predictions, for each new location, obtained aggregating \code{fmean} using \code{kervalues_mean} as weights}
     }
   \item If \code{method.analysis} = "Kriging" it returns a list with the following fields
     \itemize{
-      \item \code{resBootstrap} {On its turn it is a list consisting of}
+      \item \code{resBootstrap} {A list consisting of}
          \itemize{
-          \item \code{fmean} {It is a list with length \code{B}. Each field contains, for each new location, its prediction (at iteration \code{b}) obtained 
-                            as intrinsic mean of the data inside the tile it belongs to}
-          \item \code{fpred} {It is a list with length \code{B}. Each field contains, for each new location, the prediction (at iteration \code{b}) 
-                             obtained using Kriging}
+          \item \code{fmean} {list of length \code{B}. Each field contains the prediction (at iteration \code{b}) for each new location, obtained 
+                            as the intrinsic mean of the data within the tile it belongs to}
+          \item \code{fpred} {list of length \code{B}. Each field contains the prediction (at iteration \code{b}) for each new location, obtained 
+                            through kriging}
           \item \code{kervalues_mean} {Weights used for aggregating \code{fmean}}
           \item \code{kervalues_krig} {Weights used for aggregating \code{fpred}}
-          \item \code{variofit} {It is a list with length \code{B}. Each field contains, for each tile, the parameters of the fitted variogram}
+          \item \code{variofit} {list of length \code{B}. Each field contains, for each datum, the parameters of the variogram fitted in the tile it belongs to}
          }
       \item \code{resAggregated} {Predictions, for each new location, obtained aggregating \code{fpred} using \code{kervalues_krig} as weights}
       \item \code{resLocalMean} {Predictions, for each new location, obtained aggregating \code{fmean} using \code{kervalues_mean} as weights}
@@ -102,10 +98,12 @@ According to the analysis chosen:
 }
 }
 \description{
-It uses a repetition of simple and local analyses, instead of an unique global and complex one, 
-through a \emph{divide} et \emph{impera} strategy. In the \emph{divide} step, the domain is randomly decomposed in subdomains where local 
-tangent-space models are estimated in order to predict at new locations (in each subregion is performed exactly the analysis described 
-in the description of \code{model_kriging} function). This is repeated \code{K} times with different 
+Perform kriging prediction using FullRDD procedure
+}
+\details{
+It uses a repetition of local analyses, through a \emph{divide} et \emph{impera} strategy. In the \emph{divide} step, the domain
+is randomly decomposed in subdomains where local tangent-space models are estimated in order to predict at new locations (in each subregion is 
+performed exactly the analysis described in the \code{model_kriging} function). This is repeated \code{B} times with different 
 partitions of the domain. Then, in the \emph{impera} step, the results of these iterations are aggregated, by means of the intrinsic mean,
 to provide a final prediction.
 }

@@ -83,7 +83,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
                             # assign.matrix, no.assg.grid,
                             data.grid.distance,
                             # is.observed, border.length,
-                            p, #num.signif.entries,
+                            #p, num.signif.entries,
                             method.analysis,
                             metric_manifold, metric_ts, model_ts,
                             vario_model, distance) # *NEW*

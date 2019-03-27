@@ -3,11 +3,11 @@
 #' @param data list or array [\code{p,p,B}] of \code{B} symmetric positive definite matrices of dimension \code{p*p}
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
 #' @param metric_ts metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
-#' @param tolerance tolerance for the computation of the intrinsic_mean
+#' @param tolerance tolerance for the computation of the intrinsic mean
 #' @param weight_intrinsic vector of length \code{B} to weight the matrices in the computation of the intrinsic mean. If NULL
 #' a vector of ones is used
 #' @param weight_extrinsic vector of length \code{B} to weight the matrices in the computation of the extrinsic mean. If NULL
-#' weight_intrinsic are used
+#' \code{weight_intrinsic} is used
 #' @param tolerance_map_cor tolerance to use in the maps. \cr
 #' Required only if \code{metric_manifold== "Correlation"}
 #' @return A matrix representing the intrinsic mean of the \code{data}

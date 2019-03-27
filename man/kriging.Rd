@@ -17,7 +17,7 @@ matrices), \cr \code{fitted_par_vario} (estimates of \emph{nugget}, \emph{sill-n
 \item{coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 be provided in signed decimal degrees}
 
-\item{new_coords}{matrix of coordinates for the new locations where to perform kriging}
+\item{new_coords}{matrix of coordinates for the M new locations where to perform kriging}
 
 \item{model_ts}{type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"}
 
@@ -38,7 +38,7 @@ A list with a single field:
 \item{\code{prediction}}{vector of matrices predicted at the new locations}
 }
 \description{
-Given the GLS model kriging prediction on new location is performed.
+Given the GLS model, kriging prediction on new location(s) is performed.
 }
 \details{
 The model provided is used to perform simple kriging on the tangent space in correspondence of the new locations.

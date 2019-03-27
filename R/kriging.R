@@ -6,7 +6,7 @@
 #' matrices), \cr \code{fitted_par_vario} (estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range})
 #' @param coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
 #' be provided in signed decimal degrees
-#' @param new_coords matrix of coordinates for the new locations where to perform kriging
+#' @param new_coords matrix of coordinates for the M new locations where to perform kriging
 #' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
 #' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
 #' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
@@ -16,7 +16,7 @@
 #' @param tolerance_map_cor tolerance to use in the maps. \cr Required only if \code{metric_manifold=="Correlation"}
 #' @return A list with a single field:
 #' \item{\code{prediction}}{vector of matrices predicted at the new locations}
-#' @description Given the GLS model kriging prediction on new location is performed.
+#' @description Given the GLS model, kriging prediction on new location(s) is performed.
 #' @details The model provided is used to perform simple kriging on the tangent space in correspondence of the new locations.
 #' The estimates are then mapped to the manifold to produce the actual prediction.
 #' @references D. Pigoli, A. Menafoglio & P. Secchi (2016):

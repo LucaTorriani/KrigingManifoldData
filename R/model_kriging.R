@@ -21,22 +21,23 @@
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
 #' @param max_sill max value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
 #' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
-#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram:
+#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram (significant only within an RDD procedure). 
+#' Indeed in this case the N_tot data regarding the whole domain must be provided to the algorithm, not only the N in the cell under consideration. Therefore 
+#' the list must contain the following fields:
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
-#' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
-#' \code{data_manifold_tot} (list or array \cr
-#' [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
-#' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
-#' be provided in signed decimal degrees),
-#' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL),
-#' \code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot})
-#' @param new_coords matrix of coordinates for the new locations where to perform kriging
+#' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), \code{data_manifold_tot}
+#' (list or array \cr [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}),
+#' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates),
+#' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns of additional covariates for the tangent space model, possibly NULL),
+#' \code{h_max} (maximum value of distance for which the variogram is computed), 
+#' \code{indexes_model} (indexes of the N_tot data corresponding to the N data in the cell). 
+#' @param new_coords matrix of coordinates for the M new locations where to perform kriging
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param create_pdf_vario boolean. If \code{TRUE} the empirical and fitted variograms are plotted in a pdf file
 #' @param pdf_parameters list with the fields \code{test_nr} and \code{sample_draw}. Additional parameters to name the pdf
 #' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
 #' @param weight_extrinsic vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
-#' weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}
+#' weight_intrinsic are used. Needed only if \code{Sigma} is not provided and \code{metric_manifold== "Correlation"}
 #' @param tolerance_map_cor tolerance to use in the maps.\cr Required only if \code{metric_manifold== "Correlation"}
 #' @return list with the following fields:
 #' \item{\code{beta}}{ vector of the beta matrices of the fitted model}
@@ -49,7 +50,7 @@
 #' \item{\code{Sigma}}{ tangent point}
 #' \item{\code{prediction}}{ vector of matrices predicted at the new locations}
 #' @description Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then
-#' it performs kriging on the new locations.
+#' performs kriging on the new locations.
 #' @details The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients
 #' is obtained assuming spatially uncorrelated errors. Then, in the main the loop, new estimates of the beta are obtained as a result of a
 #' weighted least square problem where the weight matrix is the inverse of \code{gamma_matrix}. The residuals \cr

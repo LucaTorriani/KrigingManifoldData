@@ -55,17 +55,18 @@ a vector of ones is used. Not needed if Sigma is provided}
 
 \item{max_a}{maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}}
 
-\item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram:
+\item{param_weighted_vario}{List of 7 elements to be provided to consider Kernel weights for the variogram (significant only within an RDD procedure). 
+Indeed in this case the N_tot data regarding the whole domain must be provided to the algorithm, not only the N in the cell under consideration. Therefore 
+the list must contain the following fields:
 \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
-\code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations),
-\code{data_manifold_tot} (list or array \cr
-[\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p},
-\code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
-be provided in signed decimal degrees),
-\code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL),
-\code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot})}
+\code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), \code{data_manifold_tot}
+(list or array \cr [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}),
+\code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates),
+\code{X_tot} (matrix with N_tot rows and unrestricted number of columns of additional covariates for the tangent space model, possibly NULL),
+\code{h_max} (maximum value of distance for which the variogram is computed), 
+\code{indexes_model} (indexes of the N_tot data corresponding to the N data in the cell).}
 
-\item{new_coords}{matrix of coordinates for the new locations where to perform kriging}
+\item{new_coords}{matrix of coordinates for the M new locations where to perform kriging}
 
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
 
@@ -76,7 +77,7 @@ be provided in signed decimal degrees),
 \item{suppressMes}{boolean. If \code{TRUE} warning messagges are not printed}
 
 \item{weight_extrinsic}{vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
-weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}}
+weight_intrinsic are used. Needed only if \code{Sigma} is not provided and \code{metric_manifold== "Correlation"}}
 
 \item{tolerance_map_cor}{tolerance to use in the maps.\cr Required only if \code{metric_manifold== "Correlation"}}
 }
@@ -94,7 +95,7 @@ list with the following fields:
 }
 \description{
 Given the coordinates and corresponding manifold values, this function firstly creates a GLS model on the tangent space, and then
-it performs kriging on the new locations.
+performs kriging on the new locations.
 }
 \details{
 The manifold values are mapped on the tangent space and then a GLS model is fitted to them. A first estimate of the beta coefficients

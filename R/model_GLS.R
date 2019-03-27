@@ -16,24 +16,24 @@
 #' @param max_it max number of iterations for the main loop
 #' @param tolerance tolerance for the main loop
 #' @param weight_intrinsic vector of length \code{N} to weight the locations in the computation of the intrinsic mean. If NULL
-#' a vector of ones is used. Not needed if Sigma is provided
+#' a vector of ones is used. Not needed if \code{Sigma} is provided
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean. Not needed if Sigma is provided
-#' @param max_sill max value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
-#' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
-#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram:
+#' @param max_sill max value allowed for \emph{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
+#' @param max_a maximum value for \emph{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
+#' @param param_weighted_vario List of 7 elements to be provided to consider Kernel weights for the variogram (significant only within an RDD procedure). 
+#' Indeed in this case the N_tot data regarding the whole domain must be provided to the algorithm, not only the N in the cell under consideration. Therefore 
+#' the list must contain the following fields:
 #' \code{weight_vario} (vector of length \code{N_tot} to weight the locations in the computation of the empirical variogram),
 #' \code{distance_matrix_tot} (\code{N_tot*N_tot} matrix of distances between the locations), \code{data_manifold_tot}
 #' (list or array \cr [\code{p,p,N_tot}] of \code{N_tot} symmetric positive definite matrices of dimension \code{p*p}),
-#' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
-#' be provided in signed decimal degrees),
-#' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly NULL),
-#' \code{h_max} (maximum value of distance for which the variogram is computed)
-#' \code{indexes_model} (indexes corresponding to \code{coords} in \code{coords_tot}). \cr
-#' Required only in the case \code{metric_manifold = "Correlation"}
+#' \code{coords_tot} (\code{N_tot*2} or \code{N_tot*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates),
+#' \code{X_tot} (matrix with N_tot rows and unrestricted number of columns of additional covariates for the tangent space model, possibly NULL),
+#' \code{h_max} (maximum value of distance for which the variogram is computed), 
+#' \code{indexes_model} (indexes of the N_tot data corresponding to the N data in the cell). 
 #' @param plot boolean. If \code{TRUE} the empirical and fitted variograms are plotted
 #' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
 #' @param weight_extrinsic vector of length \code{N} to weight the locations in the computation of the extrinsic mean. If NULL
-#' weight_intrinsic are used. Needed only if Sigma is not provided and \code{metric_manifold== "Correlation"}
+#' weight_intrinsic are used. Needed only if \code{Sigma} is not provided and \code{metric_manifold== "Correlation"}
 #' @param tolerance_map_cor tolerance to use in the maps. \cr Required only if
 #' \code{metric_manifold== "Correlation"}
 #' @return A list with the following fields:
