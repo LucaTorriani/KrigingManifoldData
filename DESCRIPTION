@@ -6,18 +6,20 @@ Authors@R: c(person("Ilaria", "Sartori", role = c("aut", "cre"),
 	email = "ilaria.sartori@mail.polimi.it"),
 	person("Luca", "Torriani", role = c("aut"),
 	email = "luca1.torriani@mail.polimi.it"))
-Description: Predictive analysis for manifold-valued data. This package provides 
+Description: Predictive analysis for manifold-valued data. This package provides
 		a C++ implementation of functions to create a model for spatial dependent
 		manifold-valued data, in order to perform kriging.
-		In each location, specified by a vector of coordinates ([lat,long], [x,y] or 
-		[x,y,z]), the datum is supposed to be a symmetric positive definite matrix. 
-		The user is provided with three main functions: model_kriging, full_RDD, 
-		mixed_RDD, each designed to deliver kriging predictions following the 
-		corresponding algorithm (GlobalModel, FullRDD and MixedRDD), as 
-		presented in the reference dissertation. They exploit, to different extents, 
-		tangent space approximations, Random Domain Decomposition and 
+		In each location, specified by a vector of coordinates ([lat,long], [x,y] or
+		[x,y,z]), the datum is supposed to be a symmetric positive definite matrix.
+		The user is provided with three main functions: model_kriging, full_RDD,
+		mixed_RDD, each designed to deliver kriging predictions following the
+		corresponding algorithm (GlobalModel, FullRDD and MixedRDD), as
+		presented in the reference dissertation. They exploit, to different extents,
+		tangent space approximations, Random Domain Decomposition and
 		advanced differential geometry concepts like parallel transport.
-Reference: 
+Reference: Ilaria Sartori Luca Torriani (2019): Mixed Random Domain
+					 Decomposition: an innovative approach for kriging prediction of
+					 manifold valued data, Master Degree Thesis
 Depends: R (>= 3.2.0), Rcpp (>= 0.12.16), RcppEigen (>= 0.3.3.4.0), plyr(>= 1.8.4)
 LinkingTo: Rcpp, RcppEigen
 NeedsCompilation: yes
