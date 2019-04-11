@@ -250,12 +250,13 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
 
         if(method.analysis == 'Kriging') {
           param_weighted_vario = NULL
+          indexes_model = which(assign==k)
+          
           if (ker.width.vario > 0) {
 
             weight.vario = kerfn(newdata=data[,1:2], center=center, ker.type = 'Gau', param = ker.width.vario) #  dist=spdist, distance.matrix = graph.distance[,indexes_samples]
             h_max = max(graph.distance)
 
-            indexes_model = which(assign==k)
 
             param_weighted_vario = list(weight_vario = weight.vario, distance_matrix_tot = graph.distance,
                                         data_manifold_tot= data_manifold_tot_array, coords_tot = data[,1:2], X_tot = X, h_max = h_max, indexes_model = indexes_model)
