@@ -8,9 +8,10 @@ mixed_RDD(data_coords, data_val, K, grid, nk_min = 1, B = 100,
   suppressMes = F, ker.width.intrinsic = 0, graph.distance.complete,
   data.grid.distance, N_samples, aggregation_mean, metric_ts,
   tol = 1e-12, max_it = 100, n_h = 15,
-  tolerance_intrinsic = 10^(-6), X = NULL, X_new = NULL,
-  create_pdf_vario = FALSE, pdf_parameters = NULL, metric_manifold,
-  model_ts, vario_model, distance)
+  tolerance_intrinsic = 10^(-6), max_sill = NULL, max_a = NULL,
+  X = NULL, X_new = NULL, create_pdf_vario = FALSE,
+  pdf_parameters = NULL, metric_manifold, model_ts, vario_model,
+  distance)
 }
 \arguments{
 \item{data_coords}{\code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
@@ -50,6 +51,10 @@ the datum has to be predicted}
 
 \item{tolerance_intrinsic}{tolerance for the computation of the intrinsic mean}
 
+\item{max_sill}{max value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}}
+
+\item{max_a}{maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}}
+
 \item{X}{matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL}
 
 \item{X_new}{matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL}
@@ -72,7 +77,15 @@ it returns a list with the following fields
       \item \code{resBootstrap} {list of length \code{B}. Each field contains a tangent point estimate (at iteration \code{b}) for each new location, obtained 
                             as the intrinsic mean of the data within the tile it belongs to}
       \item \code{resAggregated} {field of tangent points computed, for each location (both those where data are measured and where they must be predicted), aggregating the corresponding \code{resBootstrap}}
-      \item \code{model_pred} {Predictions, for each new location, obtained fitting a global model on the common Hilbert space and parallely transporting the results back on the manifold}
+      \item \code{model_pred} {list with the details of the global model fitted on the common Hibert space and the resulting kriging predictions. Namely it contains the following fields:
+              \item{\code{beta}}{ vector of the beta matrices of the fitted model}
+              \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
+              \item{\code{residuals}}{ vector of the \code{N} residual matrices}
+              \item{\code{emp_vario_values}}{ vector of empircal variogram values in correspondence of \code{h_vec}}
+              \item{\code{h_vec}}{ vector of positions at which the empirical variogram is computed}
+              \item{\code{fitted_par_vario}}{ estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range}}
+              \item{\code{iterations}}{ number of iterations of the main loop}
+              \item{\code{prediction}}{ vector of matrices predicted at the new locations}}
 }
 }
 \description{

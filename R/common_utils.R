@@ -1,6 +1,26 @@
 
 ################################ RDD #####################################
-
+#' Divide the domain in K subregions
+#' @param K number of regions the domain is divided in
+#' @param method.rdd method used to define the subregions. So far only "Voronoi" has been implemented
+#' @param data_coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates of the locations where data has been measured
+#' @param graph.distance \code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)
+#' @param nk_min minimum number of observations within a cell
+#' @param grid prediction grid, i.e. \code{M*2} or \code{M*3} matrix of coordinates where to predict
+#' @param data.grid.distance \code{N*M} distance matrix between locations where the datum has been observed and locations where
+#' the datum has to be predicted
+#' @param suppressMes \{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given
+#' @return it returns a list with the following fields
+#' \itemize{
+#'       \item \code{assign} {vector of length N that indicates, for every known location, the cell it has been assigned to}
+#'       \item \code{centers} {\code{K*3} matrix reporting the coordinates and the index of the locations drawn as centers of the K cells }
+#'       \item \code{assigng} {vector of length M that indicates, for every new location, the cell it has been assigned to}
+#'       \item \code{gridk} {list of K elements. The i-th element contains the coordinates of the grid points assigned to the i-th cell}
+#'       \item \code{graph.distance.grid.centers} {\code{K*M} matrix containing the distances between each grid points and the K centers}
+#' }
+#' @details ...
+#' @description ...
+#' @useDynLib Manifoldgstat
 create.rdd = function(K, method.rdd='Voronoi', data_coords,
                       # border.length, spdist,
                       graph.distance,
@@ -174,6 +194,13 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
 #   return(output)
 # }
 
+
+#' Assign a point to the cell with the closest center
+#' @param distance.vector vector of length K containing the distances between the point and the centers
+#' @return it returns the index(es) of the cell(s) with the closest center(s). Returns 0 it the minimum does not exists
+#' @details ...
+#' @description ...
+#' @useDynLib Manifoldgstat
 assign2center=function(distance.vector)
 {
   # INPUT :
@@ -305,6 +332,16 @@ assign2center=function(distance.vector)
 #   return(d)
 # }
 
+
+#' Evaluate a gaussian kernel
+#' @param newdata coordinates of the locations where we want to compute the kernel values
+#' @param center coordinates of the reference center for the kernel
+#' @param ker.type type of kernel. So far only "Gau" (i.e gaussian kernel) has been implemented
+#' @param param parameters that define the kernel. For the gaussian kernel it is the sigma parameter
+#' @return the values of the kernel function corresponding to the vector of Euclidean distances between \code{newdata} and the \code{center}
+#' @details ...
+#' @description ...
+#' @useDynLib Manifoldgstat
 kerfn= function(newdata,center,ker.type='Gau',param) # dist, distance.matrix = NULL
 {
   # This function compute the value of the kernel for a point given a reference center
@@ -343,6 +380,15 @@ kerfn= function(newdata,center,ker.type='Gau',param) # dist, distance.matrix = N
   return(exp(-1/(2*eps^2)*(d^2)))
 }
 
+#' Aggregate the results of the bootrap iterations
+#' @param fOKBV list of length \code{B}, containing the results obtained, for each location, at the \code{B} bootstrap iterations  
+#'              (Usually it is the \code{fmean} or \code{fpred} returned by \code{RDD_OOK_boot_man} or \code{RDD_OOK_boot_man_mixed})
+#' @param weights_intrinsic weights to use to aggregate the results
+#' @param ker.width.intrinsic width of the kernel used to compute \code{weights_intrinsic}. 0 if we use equal weights
+#' @return the aggregated result, obtained as the intrinsic_mean of \code{fOKBV}
+#' @details If \code{ker.width.intrinsic!=0} the data are aggregated using the normalized \code{weights_intrinsic}. Otherwise equal weights are used
+#' @description ...
+#' @useDynLib Manifoldgstat
 RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic) # p, num.signif.entries=1
 {
   # This functions aggregates the results of bootstrap in OKBV
@@ -513,7 +559,13 @@ RDD_OOK_aggr_man=function(fOKBV,weights_intrinsic, ker.width.intrinsic) # p, num
 
 ######################## GEOGRAPHICAL DISTANCE ###########################
 
-# Haversine formula
+#' Compute the great-circle distance between two points
+#' @param c1 coordinates [lat, long] of the first point. 
+#' @param c2 coordinates [lat, long] of the second point. 
+#' @return the great-circle distance between \code{c1} and \code{c2}
+#' @details The distance is computed using the Haversine formula
+#' @description ...
+#' @useDynLib Manifoldgstat
 Geodist=function(c1,c2){
   R=6371
   r=(pi/2)/90
@@ -526,6 +578,13 @@ Geodist=function(c1,c2){
 
 }
 
+#' Compute the Euclidean distance between two points
+#' @param c1 coordinates of the first point. 
+#' @param c2 coordinates of the second point. 
+#' @return the Euclidean distance between \code{c1} and \code{c2}
+#' @details ...
+#' @description ...
+#' @useDynLib Manifoldgstat
 Eucldist = function (c1, c2) {
   return (dist(rbind(c1,c2)))
 }

@@ -19,6 +19,8 @@
 #' @param max_it maximum number of iterations for the main loop of \code{model_kriging}
 #' @param n_h number of bins in the empirical variogram
 #' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean
+#' @param max_sill max value allowed for \code{sill} in the fitted variogram. If NULL it is defined as \code{1.15*max(emp_vario_values)}
+#' @param max_a maximum value for \code{a} in the fitted variogram. If NULL it is defined as \code{1.15*h_max}
 #' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
 #' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
 #' @param create_pdf_vario boolean. If \code{TRUE} the empirical and fitted variograms are plotted in a pdf file
@@ -32,7 +34,15 @@
 #'       \item \code{resBootstrap} {list of length \code{B}. Each field contains a tangent point estimate (at iteration \code{b}) for each new location, obtained 
 #'                             as the intrinsic mean of the data within the tile it belongs to}
 #'       \item \code{resAggregated} {field of tangent points computed, for each location (both those where data are measured and where they must be predicted), aggregating the corresponding \code{resBootstrap}}
-#'       \item \code{model_pred} {Predictions, for each new location, obtained fitting a global model on the common Hilbert space and parallely transporting the results back on the manifold}
+#'       \item \code{model_pred} {list with the details of the global model fitted on the common Hibert space and the resulting kriging predictions. Namely it contains the following fields:
+#'               \item{\code{beta}}{ vector of the beta matrices of the fitted model}
+#'               \item{\code{gamma_matrix}}{ \code{N*N} covariogram matrix}
+#'               \item{\code{residuals}}{ vector of the \code{N} residual matrices}
+#'               \item{\code{emp_vario_values}}{ vector of empircal variogram values in correspondence of \code{h_vec}}
+#'               \item{\code{h_vec}}{ vector of positions at which the empirical variogram is computed}
+#'               \item{\code{fitted_par_vario}}{ estimates of \emph{nugget}, \emph{sill-nugget} and \emph{practical range}}
+#'               \item{\code{iterations}}{ number of iterations of the main loop}
+#'               \item{\code{prediction}}{ vector of matrices predicted at the new locations}}
 #' }
 #' @details It employs a \emph{divide} et \emph{impera} strategy to provide an estimate of a "fictional" field of tangent 
 #' points, used to encode the information regarding the drift of the field. To this end in the \emph{divide} step, the domain is randomly 
@@ -57,6 +67,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                        N_samples, #p,
                        aggregation_mean, metric_ts,
                        tol=1e-12, max_it=100, n_h=15, tolerance_intrinsic =10^(-6),
+                     max_sill =NULL, max_a=NULL,
                        X=NULL, X_new=NULL, create_pdf_vario=FALSE, pdf_parameters=NULL,
   # ker.width.vario = 1.5, aggregation_kriging, method.analysis = 'Local mean',
                        metric_manifold, model_ts, vario_model, distance)
@@ -115,12 +126,15 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
 
   fmean = resAggregated
 
-  model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = NULL, Sigma_data = fmean[1:N_samples], metric_manifold = metric_manifold,
+  model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = X, Sigma_data = fmean[1:N_samples], 
+                                    metric_manifold = metric_manifold,
                               model_ts = model_ts, vario_model = vario_model, # metric_ts = "Frobenius",
-                              n_h=15, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=data.grid.distance, max_it = 100, tolerance = 1e-6, # weight_vario = NULL,
+                              n_h=n_h, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=data.grid.distance, 
+                              max_it = max_it, tolerance = tol, # weight_vario = NULL,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
-                              max_sill = NULL, max_a = NULL,
-                              new_coords=prediction_grid, Sigma_new = fmean, X_new = NULL, create_pdf_vario = create_pdf_vario, pdf_parameters=pdf_parameters, suppressMes = FALSE)
+                              max_sill = max_sill, max_a = max_a,
+                              new_coords=prediction_grid, Sigma_new = fmean, X_new = X_new, create_pdf_vario = create_pdf_vario, 
+                              pdf_parameters=pdf_parameters, suppressMes = suppressMes)
 
   return(list(resBootstrap = resBootstrap,
               resAggregated = resAggregated,

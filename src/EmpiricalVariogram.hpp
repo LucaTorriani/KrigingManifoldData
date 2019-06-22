@@ -39,8 +39,11 @@ class EmpiricalVariogram {
   Vec _weights;
   /*!
     @brief Compute the maximum distance to be considered
+    @details `_hmax` is computed as one third of the diagonal of the bouding box for the data
+    @param coords Data coordinates
+    @param distance Geographical distance
   */
-  void compute_hmax(const Coordinates&, const distances::Distance&);
+  void compute_hmax(const Coordinates& coords, const distances::Distance& distance);
 
 public:
   /*!
@@ -83,9 +86,27 @@ public:
     @brief Return `_hmax`
   */
   double get_hmax() const;
-  void set_distance_and_h_max(const std::shared_ptr<const Eigen::MatrixXd>, const Coordinates&, const distances::Distance&);
-  void set_distance_and_h_max(const std::shared_ptr<const Eigen::MatrixXd>, const double&);
-  void set_weights(unsigned int, const Vec&);
+  /*!
+    @brief Set `_distanceMatrix`, `_d` and `_hmax`
+    @details `_hmax` is computed using `compute_hmax`
+    @param distanceMatrix Matrix of distances among the \f$N\f$ locations
+    @param coords Data coordinates
+    @param distance Geographical distance
+  */
+  void set_distance_and_h_max(const std::shared_ptr<const Eigen::MatrixXd> distanceMatrix, const Coordinates& coords, const distances::Distance& distance);
+  /*!
+    @brief Set `_distanceMatrix`, `_d` and `_hmax`
+    @details `_hmax` is computed as one third of `max_dist`
+    @param distanceMatrix Matrix of distances among the \f$N\f$ locations
+    @param max_dist Maximum distance between data locations
+  */
+  void set_distance_and_h_max(const std::shared_ptr<const Eigen::MatrixXd> distanceMatrix, const double& max_dist);
+  /*!
+    @brief Set `_N` and `_weights`
+    @param N Number \f$N\f$ of locations
+    @param weights Weights for the \f$N\f$ locations used in the computation of the empirical variogram
+  */
+  void set_weights(unsigned int N, const Vec& weights);
 };
 
 }

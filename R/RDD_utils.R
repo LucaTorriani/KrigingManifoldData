@@ -1,5 +1,8 @@
+#' Return a given row of a matrix
+#' @param mat A matrix
+#' @param i The index of the row to extract
+#' @return It returns the i-th row of \code{mat}
 #' @useDynLib Manifoldgstat
-
 return_ith_row = function(mat, i){
   return (mat[i,])
 }
@@ -71,7 +74,53 @@ return_ith_row = function(mat, i){
 # }
 
 
-
+#' Main routine for full_RDD
+#' @param data_coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates.
+#' @param data_val list of \code{N} symmetric positive definite matrices of dimension \code{p*p}
+#' @param K Number of neighborhood (i.e., centers) to sample at each iteration
+#' @param grid \code{M*2} or \code{M*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates of the new locations where to predict
+#' @param nk_min Minimum number of observations within a neighborhood
+#' @param B Number of bootstap iterations
+#' @param suppressMes boolean. If \code{TRUE} warning messagges are not printed
+#' @param tol tolerance for each main loop
+#' @param max_it max number of iterations for each main loop
+#' @param n_h number of bins in the emprical variogram
+#' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean
+#' @param X Additional covariates for the locations used to create the model
+#' @param X_new Additional covariates for the \code{M} locations where to perform kriging
+#' @param ker.width.intrinsic Parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, no kernel is used)
+#' @param ker.width.vario Parameter controlling the width of the Gaussian kernel for the computation of the empirical variogram (if 0, no kernel is used)
+#' @param graph.distance.complete \code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)
+#' @param data.grid.distance \code{N*M} distance matrix between locations where the datum has been observed and locations where
+#' the datum has to be predicted
+#' @param method.analysis "Local mean" to predict just with the mean, "Kriging" to predict via Kriging procedure
+#' @param metric_manifold Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot" and "Correlation"
+#' @param metric_ts Metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
+#' @param model_ts Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
+#' @param vario_model Type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
+#' @param distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+#' @return According to the analysis chosen:
+#' \itemize{
+#'   \item If \code{method.analysis} = "Local mean" it returns a list with the following fields
+#'     \itemize{
+#'           \item \code{fmean} {list of length \code{B}. Each field contains the prediction (at iteration \code{b}) for each new location, obtained
+#'                             as the intrinsic mean of the data within the tile it belongs to}
+#'           \item \code{kervalues_mean} {Weights used for aggregating \code{fmean}}
+#'          }
+#'   \item If \code{method.analysis} = "Kriging" it returns a list with the following fields
+#'     \itemize{
+#'           \item \code{fmean} {list of length \code{B}. Each field contains the prediction (at iteration \code{b}) for each new location, obtained
+#'                             as the intrinsic mean of the data within the tile it belongs to}
+#'           \item \code{fpred} {list of length \code{B}. Each field contains the prediction (at iteration \code{b}) for each new location, obtained
+#'                             through kriging}
+#'           \item \code{kervalues_mean} {Weights used for aggregating \code{fmean}}
+#'           \item \code{kervalues_krig} {Weights used for aggregating \code{fpred}}
+#'           \item \code{variofit} {list of length \code{B}. Each field contains, for each datum, the parameters of the variogram fitted in the tile it belongs to}
+#'          }
+#'   }
+#' @details ...
+#' @description ...
+#' @useDynLib Manifoldgstat
 RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
                             # spdist,
                             suppressMes, tol, max_it,
@@ -251,7 +300,7 @@ RDD_OOK_boot_man = function(data_coords, data_val, K, grid, nk_min, B,
         if(method.analysis == 'Kriging') {
           param_weighted_vario = NULL
           indexes_model = which(assign==k)
-          
+
           if (ker.width.vario > 0) {
 
             weight.vario = kerfn(newdata=data[,1:2], center=center, ker.type = 'Gau', param = ker.width.vario) #  dist=spdist, distance.matrix = graph.distance[,indexes_samples]

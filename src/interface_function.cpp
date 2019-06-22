@@ -37,10 +37,11 @@ extern "C"{
     Authors: D. Pigoli, A. Menafoglio & P. Secchi (2016) \n
     Periodical: Journal of Multivariate Analysis, 145, 117-131.
   @param s_data_manifold list of \f$N\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
-  @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+  @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where data have been measured. [lat,long] are supposed to be provided in signed decimal degrees
   @param s_X matrix Matrix with \f$N\f$ rows and unrestricted number of columns of additional covariates for the tangent space model, possibly `NULL`
   @param s_Sigma Matrix \f$\left(p*p\right)\f$ representing the tangent point. If `NULL` the tangent point is computed as the intrinsic mean of `s_data_manifold`
-  @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+  @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist". If `NULL` `s_data_dist_mat` must be provided
+  @param s_data_dist_mat Matrix \f$N*N\f$ of distances between data points. It is considered only if `s_distance==NULL`
   @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
   @param s_ts_metric Metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
   @param s_ts_model Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
@@ -55,7 +56,6 @@ extern "C"{
   @param s_data_manifold_tot List of \f$N\_tot\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
   @param s_coordinates_tot \f$\left(N\_tot*2\right)\f$ or \f$\left(N\_tot*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees),
   @param s_X_tot Matrix with \f$N\_tot\f$ rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly `NULL`
-  @param s_hmax Maximum value of distance for which the variogram is computed
   @param s_indexes_model Indexes corresponding to `coords` in `coords_tot`. Required only in the case `metric_manifold=="Correlation"`
   @param s_weight_intrinsic Vector of length \f$N\f$ to weight the locations in the computation of the intrinsic mean. If `NULL` a vector of ones is used. Not needed if `Sigma` is provided
   @param s_tolerance_intrinsic Tolerance for the computation of the intrinsic mean. Not needed if `Sigma` is provided
@@ -456,16 +456,17 @@ extern "C"{
   }
 
 /*!
-    @brief  Given the GLS model kriging prediction on new location is performed.
+    @brief  Given the GLS model kriging prediction on new locations is performed.
     @details The model provided is used to perform simple kriging on the tangent space in correspondence of the new locations. The estimates are then mapped to the manifold to produce the actual prediction.
     @note
       Reference: "Kriging prediction for manifold-valued random fields." \n
       Authors: D. Pigoli, A. Menafoglio & P. Secchi (2016) \n
       Periodical: Journal of Multivariate Analysis, 145, 117-131.
-    @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
-    @param s_new_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where data have been measured. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_new_coordinates \f$\left(M*2\right)\f$ or \f$\left(M*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where we want to predict. [lat,long] are supposed to be provided in signed decimal degrees
     @param s_Sigma Matrix \f$\left(p*p\right)\f$ representing the tangent point. If `NULL` the tangent point is computed as the intrinsic mean of `s_data_manifold`
-    @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+    @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist". If `NULL` `s_data_grid_dist_mat` must be provided
+    @param s_data_grid_dist_mat Matrix \f$N*M\f$ of distances between data points and grid points. It is considered only if `s_distance==NULL`
     @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
     @param s_ts_model Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
     @param s_vario_model Type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
@@ -603,10 +604,12 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
       Authors: D. Pigoli, A. Menafoglio & P. Secchi (2016)   \n
       Periodical: Journal of Multivariate Analysis, 145, 117-131.
     @param s_data_manifold list of \f$N\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
-    @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where data have been measured. [lat,long] are supposed to be provided in signed decimal degrees
     @param s_X matrix Matrix with \f$N\f$ rows and unrestricted number of columns of additional covariates for the tangent space model, possibly `NULL`
     @param s_Sigma Matrix \f$\left(p*p\right)\f$ representing the tangent point. If `NULL` the tangent point is computed as the intrinsic mean of `s_data_manifold`
-    @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist"
+    @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist". If `NULL` `s_data_dist_mat` and `s_data_grid_dist_mat` must be provided
+    @param s_data_dist_mat Matrix \f$N*N\f$ of distances between data points. It is considered only if `s_distance==NULL`
+    @param s_data_grid_dist_mat Matrix \f$N*M\f$ of distances between data points and grid points. It is considered only if `s_distance==NULL`
     @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
     @param s_ts_metric Metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
     @param s_ts_model Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
@@ -621,12 +624,11 @@ RcppExport SEXP get_kriging (SEXP s_coordinates, SEXP s_new_coordinates,  SEXP s
     @param s_data_manifold_tot List of \f$N\_tot\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
     @param s_coordinates_tot \f$\left(N\_tot*2\right)\f$ or \f$\left(N\_tot*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees),
     @param s_X_tot Matrix with \f$N\_tot\f$ rows and unrestricted number of columns, of additional covariates for the tangent space model. Possibly `NULL`
-    @param s_hmax Maximum value of distance for which the variogram is computed
     @param s_indexes_model Indexes corresponding to `coords` in `coords_tot`. Required only in the case `metric_manifold=="Correlation"`
     @param s_weight_intrinsic Vector of length \f$N\f$ to weight the locations in the computation of the intrinsic mean. If `NULL` a vector of ones is used. Not needed if `Sigma` is provided
     @param s_tolerance_intrinsic Tolerance for the computation of the intrinsic mean. Not needed if `Sigma` is provided
     @param s_weight_extrinsic Vector of length \f$N\f$ to weight the locations in the computation of the extrinsic mean. If `NULL` `weight_intrinsic` are used. Needed only if `Sigma` is not provided and `metric_manifold=="Correlation"`
-    @param s_new_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_new_coordinates \f$\left(M*2\right)\f$ or \f$\left(M*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where we want to predict. [lat,long] are supposed to be provided in signed decimal degrees
     @param s_X_new Matrix (with the same number of rows of `s_new_coordinates`) of additional covariates for the new locations, possibly `NULL`
     @param s_suppressMes Boolean. If `TRUE` warning messagges are not printed
     @param s_tolerance_map_cor Tolerance to use in the maps. Required only if `metric_manifold=="Correlation"`
@@ -1357,8 +1359,42 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
       END_RCPP
 }
 
-// CREATE MODEL AND KRIGNG
-  RcppExport SEXP get_model_and_kriging_mixed (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma_data,
+/*!
+    @brief  ...
+    @details ...
+    @note ...
+    @param s_data_manifold list of \f$N\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
+    @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where data have been measured. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_X matrix Matrix with \f$N\f$ rows and unrestricted number of columns of additional covariates for the tangent space model, possibly `NULL`
+    @param s_Sigma_data List of the \f$N\f$ fictional tangent points in correspondence with the \f$N\f$ `data_manifold`
+    @param s_distance Type of distance between coordinates. It must be either "Eucldist" or "Geodist". If `NULL` `s_data_dist_mat` and `s_data_grid_dist_mat` must be provided
+    @param s_data_dist_mat Matrix \f$N*N\f$ of distances between data points. It is considered only if `s_distance==NULL`
+    @param s_data_grid_dist_mat Matrix \f$N*M\f$ of distances between data points and grid points. It is considered only if `s_distance==NULL`
+    @param s_manifold_metric Metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot", "Correlation"
+    @param s_ts_model Type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
+    @param s_vario_model Type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
+    @param s_n_h Number of bins in the emprical variogram
+    @param s_max_it Max number of iterations for the main loop
+    @param s_tolerance Tolerance for the main loop
+    @param s_max_sill Maximum value allowed for \e sill in the fitted variogram. If `NULL` it is defined as \f$1.15*\max(\text{emp\_vario\_values})\f$
+    @param s_max_a Maximum value for \e a in the fitted variogram. If `NULL` it is defined as \f$1.15*\text{h\_max}\f$
+    @param s_new_coordinates \f$\left(M*2\right)\f$ or \f$\left(M*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where we want to predict. [lat,long] are supposed to be provided in signed decimal degrees
+    @param s_Sigma_new List of the \f$M\f$ fictional tangent points in correspondence with the \f$M\f$ new locations where we want to predict
+    @param s_X_new Matrix (with the same number of rows of `s_new_coordinates`) of additional covariates for the new locations, possibly `NULL`
+    @param s_suppressMes Boolean. If `TRUE` warning messagges are not printed
+    @return A list with the following fields:
+     - `beta` Vector of the beta matrices of the fitted model
+     - `fit_vario_values` Vector of fitted variogram values in correspondence of `hh`
+     - `hh` Dense vector of positions at which `fit_vario_values` is computed
+     - `gamma_matrix` Covariogram matrix \f$\left(N*N\right)\f$
+     - `residuals` Vector of the \f$N\f$ residual matrices
+     - `emp_vario_values` Vector of empircal variogram values in correspondence of  `h_vec`
+     - `h_vec` Vector of positions at which the empirical variogram is computed
+     - `fitted_par_vario` Estimates of \e nugget, \e sill-nugget and \e practical \e range
+     - `iterations` Number of iterations of the main loop
+     - `prediction` Vector of matrices predicted at the new locations
+*/
+RcppExport SEXP get_model_and_kriging_mixed (SEXP s_data_manifold, SEXP s_coordinates, SEXP s_X, SEXP s_Sigma_data,
      SEXP s_distance, SEXP s_data_dist_mat, SEXP s_data_grid_dist_mat, SEXP s_manifold_metric,  SEXP s_ts_model, SEXP s_vario_model, SEXP s_n_h, // SEXP s_ts_metric,
      SEXP s_max_it, SEXP s_tolerance, SEXP s_max_sill, SEXP s_max_a, // SEXP s_weight_vario, SEXP s_weight_intrinsic, SEXP s_tolerance_intrinsic,
      SEXP s_new_coordinates, SEXP s_Sigma_new, SEXP s_X_new, SEXP s_suppressMes) {

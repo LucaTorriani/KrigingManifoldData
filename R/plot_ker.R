@@ -1,3 +1,11 @@
+#' Plot kernel  
+#' @param data_coords coordinates of the data
+#' @param id the index of the row of \code{data_coords} that will be used as center
+#' @param xmax the maximum value for the x-coordinate (the minimum is 0)
+#' @param ymax the maximum value for the y-coordinate (the minimum is 0)
+#' @param m number of points on the grid in horizontal direction
+#' @param n number of points on the grid in vertical direction
+#' @param ker.width kernel width
 #' @useDynLib Manifoldgstat
 #' @export
 plot_ker_rect = function(data_coords, id, xmax, ymax, m, n, ker.width) {

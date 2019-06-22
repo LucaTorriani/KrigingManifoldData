@@ -1,5 +1,8 @@
+#' Return a given element of a list
+#' @param lista A list
+#' @param i The index of the element to extract
+#' @return It returns the i-th element of \code{lista}
 #' @useDynLib Manifoldgstat
-
 return_ith_list_element = function(lista,i) {
   return(lista[[i]])
 }
@@ -85,7 +88,41 @@ return_ith_list_element = function(lista,i) {
 # }
 
 
+#' Main routine for mixed_RDD
+#' @param data_coords \code{N*2} or \code{N*3} matrix of [lat,long], [x,y] or [x,y,z] coordinates. [lat,long] are supposed to
+#' be provided in signed decimal degrees
+#' @param data_val array [\code{p,p,N}] of \code{N} symmetric positive definite matrices of dimension \code{p*p}
+#' @param K number of cells the domain is subdivided in
+#' @param grid prediction grid, i.e. \code{M*2} or \code{M*3} matrix of coordinates where to predict
+#' @param nk_min minimum number of observations within a cell
+#' @param B number of \emph{divide} iterations to perform
+#' @param suppressMes \{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given
+#' @param ker.width.intrinsic parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, 
+#' a "step kernel" is used, giving weight 1 to all the data within the cell and 0 to those outside of it)
+#' @param graph.distance.complete \code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)
+#' @param data.grid.distance \code{N*M} distance matrix between locations where the datum has been observed and locations where
+#' the datum has to be predicted
+#' @param metric_ts metric used on the tangent space. It must be chosen among "Frobenius", "FrobeniusScaled", "Correlation"
+#' @param vario_model type of variogram fitted. It must be chosen among "Gaussian", "Spherical", "Exponential"
+#' @param tol tolerance for the main loop of \code{model_kriging}
+#' @param max_it maximum number of iterations for the main loop of \code{model_kriging}
+#' @param n_h number of bins in the empirical variogram
+#' @param tolerance_intrinsic tolerance for the computation of the intrinsic mean
+#' @param X matrix (N rows and unrestricted number of columns) of additional covariates for the tangent space model, possibly NULL
+#' @param X_new matrix (with the same number of rows of \code{new_coords}) of additional covariates for the new locations, possibly NULL
+#' @param metric_manifold metric used on the manifold. It must be chosen among "Frobenius", "LogEuclidean", "SquareRoot"
+#' @param model_ts type of model fitted on the tangent space. It must be chosen among "Intercept", "Coord1", "Coord2", "Additive"
+#' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
 
+#' @return it returns a list with the following fields
+#' \itemize{
+#'       \item \code{fmean} {list of length \code{B}. Each field contains the prediction (at iteration \code{b}) for each location, obtained
+#'                             as the intrinsic mean of the data within the tile it belongs to}
+#'       \item \code{kervalues_mean} {Weights used for aggregating \code{fmean}}
+#'       }
+#' @details ...
+#' @description ...
+#' @useDynLib Manifoldgstat
 RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
                             # spdist,
                             suppressMes,
@@ -97,8 +134,8 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
                             # is.observed, border.length,
                             # num.signif.entries,
                             metric_ts,
-                            vario_model, method.analysis, tol, max_it,
-                            n_h, tolerance_intrinsic, X, X_new, X_tot, # ker.width.vario,
+                            vario_model,  tol, max_it, # method.analysis,
+                            n_h, tolerance_intrinsic, X, X_new, # X_tot, ker.width.vario,
                             metric_manifold, model_ts, distance)
 {
   # This function implements the bootstrap step of Ordinary Kriging with Random Domain
