@@ -1360,9 +1360,9 @@ RcppExport SEXP get_model_and_kriging (SEXP s_data_manifold, SEXP s_coordinates,
 }
 
 /*!
-    @brief  ...
-    @details ...
-    @note ...
+    @brief Perform kriging prediction using parallel transport to connect all the data
+    @details Each datum is parallely trasported from "its" tangent space (i.e the plane tangent to the manifold in the point indicated by the corresponding entry of `s_Sigma_data`) to a common space, tangent to the manifold in the identity.
+    Here a global kriging analysis is performed and the results are then parallely trasported back to their specific tangent spaces (using the tangent points listed in `s_Sigma_new`) to obtain the actual predictions.
     @param s_data_manifold list of \f$N\f$ symmetric positive definite matrices of dimension \f$\left(p*p\right)\f$
     @param s_coordinates \f$\left(N*2\right)\f$ or \f$\left(N*3\right)\f$ matrix of [lat,long], [x,y] or [x,y,z] coordinates, identifying the locations where data have been measured. [lat,long] are supposed to be provided in signed decimal degrees
     @param s_X matrix Matrix with \f$N\f$ rows and unrestricted number of columns of additional covariates for the tangent space model, possibly `NULL`
