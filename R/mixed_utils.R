@@ -97,7 +97,7 @@ return_ith_list_element = function(lista,i) {
 #' @param nk_min minimum number of observations within a cell
 #' @param B number of \emph{divide} iterations to perform
 #' @param suppressMes \{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given
-#' @param ker.width.intrinsic parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, 
+#' @param ker.width.intrinsic parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0,
 #' a "step kernel" is used, giving weight 1 to all the data within the cell and 0 to those outside of it)
 #' @param graph.distance.complete \code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)
 #' @param data.grid.distance \code{N*M} distance matrix between locations where the datum has been observed and locations where
@@ -290,7 +290,9 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
         # veclocmean[[k]] = Sigma
         # --- Assign the local tangent point to each grid point & store results
         # fpred[[b]][which(assigng==k),]=matrix(rep(veclocmean[k,],nk[as.character(k)]), nrow = nk[as.character(k)], ncol=num.signif.entries, byrow = T)
-        fmean[[b]][which(assigng==k)]= lapply(seq_len(nk[as.character(k)]), function(X) Sigma)
+        fmean_grid[[b]][which(assigng==k)]= lapply(seq_len(nk[as.character(k)]), function(X) Sigma)
+        fmean_data[[b]][which(assign==k)]= lapply(seq_len(nk[as.character(k)]), function(X) Sigma)
+
       }
     } # for su K
 
@@ -311,7 +313,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
 
   } # for su B
   # if (method.analysis == 'Local mean')
-  list.ret = list(fmean=fmean, kervalues_mean=kervalues_mean) # ,kervalues_krig=kervalues_krig, variofit=vfit
+  list.ret = list(fmean_data=fmean_data, fmean_grid=fmean_grid,  kervalues_mean=kervalues_mean) # ,kervalues_krig=kervalues_krig, variofit=vfit
 
   if(suppressMes) options(warn = oldw)
 

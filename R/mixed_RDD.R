@@ -119,21 +119,24 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     # metric_manifold = metric_manifold, metric_ts = metric_ts, model_ts = model_ts,
     # vario_model = vario_model, distance = distance
     if (aggregation_mean== "Equal") ker.width.intrinsic=0
-    resAggregated=RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean, weights_intrinsic = resBootstrap$kervalues_mean,
+    resAggregated_grid = RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean_grid, weights_intrinsic = resBootstrap$kervalues_mean,
                                    ker.width.intrinsic=  ker.width.intrinsic) # p=p,  num.signif.entries = num.signif.entries
 
+    resAggregated_data = RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean_grid, weights_intrinsic = resBootstrap$kervalues_mean,
+                                          ker.width.intrinsic=  ker.width.intrinsic)
   }
+  
+  fmean_data = resAggregated_data
+  fmean_grid = resAggregated_grid
 
-  fmean = resAggregated
-
-  model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = X, Sigma_data = fmean[1:N_samples],
+  model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = X, Sigma_data = fmean_data,
                                     metric_manifold = metric_manifold,
                               model_ts = model_ts, vario_model = vario_model, # metric_ts = "Frobenius",
                               n_h=n_h, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=data.grid.distance,
                               max_it = max_it, tolerance = tol, # weight_vario = NULL,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                               max_sill = max_sill, max_a = max_a,
-                              new_coords=grid, Sigma_new = fmean, X_new = X_new, create_pdf_vario = create_pdf_vario,
+                              new_coords=grid, Sigma_new = fmean_grid, X_new = X_new, create_pdf_vario = create_pdf_vario,
                               pdf_parameters=pdf_parameters, suppressMes = suppressMes)
 
   return(list(resBootstrap = resBootstrap,
