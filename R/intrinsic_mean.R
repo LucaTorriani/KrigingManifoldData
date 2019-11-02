@@ -26,7 +26,11 @@ intrinsic_mean = function(data, metric_manifold = "Frobenius", metric_ts = "Frob
                      tolerance = 1e-6, weight_intrinsic= NULL, weight_extrinsic= weight_intrinsic,
                       tolerance_map_cor=1e-6){
   if( is.array(data)){
+    print('Prima alply')
+    
     data = alply(data,3)
+    print('Dopo alply')
+    
   }
 
   if(is.null(weight_intrinsic)) {
