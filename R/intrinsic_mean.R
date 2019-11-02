@@ -25,21 +25,23 @@
 intrinsic_mean = function(data, metric_manifold = "Frobenius", metric_ts = "Frobenius",
                      tolerance = 1e-6, weight_intrinsic= NULL, weight_extrinsic= weight_intrinsic,
                       tolerance_map_cor=1e-6){
-  if( is.array(data)){
-    print('Prima alply')
+  if(length(dim(data))<3){
+    return(data)
+  }
+  else{
+    if( is.array(data)){
+      data = alply(data,3)
+
+    }
     
-    print(dim(data))
-    data = alply(data,3)
-    print('Dopo alply')
+    if(is.null(weight_intrinsic)) {
+      weight_intrinsic = rep(1, length(data))
+      weight_extrinsic = weight_intrinsic
+    }
+    
+    result =.Call("intrinsic_mean",data, N=length(data), metric_manifold, metric_ts, tolerance, weight_intrinsic, weight_extrinsic, tolerance_map_cor)
+    return (result)
     
   }
-
-  if(is.null(weight_intrinsic)) {
-    weight_intrinsic = rep(1, length(data))
-    weight_extrinsic = weight_intrinsic
-  }
-
-  result =.Call("intrinsic_mean",data, N=length(data), metric_manifold, metric_ts, tolerance, weight_intrinsic, weight_extrinsic, tolerance_map_cor)
-
-  return (result)
+ 
 }
