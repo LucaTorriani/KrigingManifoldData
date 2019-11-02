@@ -190,7 +190,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
   if(suppressMes)  oldw <- getOption("warn");  options(warn = -1)
   # Set parameters and initialize lists
   #*lists and parameters
-  fmean=kervalues_mean=list() # kervalues_krig=fmean=vfit
+  kervalues_mean=fmean_grid=fmean_data = list() # kervalues_krig=fmean=vfit
   # nk=rep(0,K)
   #*data
   colnames(data_coords)=c('x','y')
@@ -234,7 +234,8 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
     # veclocmean = list()
 
     # fpred[[b]]=matrix(NA,ngrid,num.signif.entries); colnames(fpred[[b]])=c(paste("Z",1:num.signif.entries))
-    fmean[[b]]= list() # Lista di ngrid matrici p*p
+    fmean_grid[[b]]= list() 
+    fmean_data[[b]]= list() # Lista di ngrid matrici p*p
 
     if(ker.width.intrinsic>0) {
       kervalues_mean[[b]]=matrix(NA,ngrid,1); colnames(kervalues_mean[[b]])="Ker.val.mean"
@@ -273,7 +274,6 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
       #   }
 
       ##### Dati
-      print(nk)
       if(nk[as.character(k)]>0)  #table(factor(assigng, levels=1:K))[as.character(k)]>0
       {
         # datak=data.frame(data[assign==k,]) # extract data in k-th neighb.
