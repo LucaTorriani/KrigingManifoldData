@@ -25,11 +25,11 @@
 intrinsic_mean = function(data, metric_manifold = "Frobenius", metric_ts = "Frobenius",
                      tolerance = 1e-6, weight_intrinsic= NULL, weight_extrinsic= weight_intrinsic,
                       tolerance_map_cor=1e-6){
-  if(length(dim(data))<3){
+  if((!is.list(data)) & length(dim(data))<3){
     return(data)
   }
   else{
-    if( is.array(data)){
+    if(is.array(data)){
       data = alply(data,3)
 
     }
