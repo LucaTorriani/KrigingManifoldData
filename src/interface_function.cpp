@@ -1409,7 +1409,11 @@ RcppExport SEXP get_model_and_kriging_mixed (SEXP s_data_manifold, SEXP s_coordi
     Rcpp::Nullable<std::string> distance_n(s_distance);
 
     // Coordinates
+    Rcpp::Rcout << "Prima data coordinates"<< std::endl;
+
     std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
+    Rcpp::Rcout << "Dopo data coordinates"<< std::endl;
+
     Coordinates coords(coords_ptr);
     unsigned int N = coords.get_N_station();
 
