@@ -55,7 +55,7 @@
 #' @useDynLib Manifoldgstat
 #' @export
 #'
-mixed_RDD = function(data_coords, data_val, K, grid, nk_min=7, B=100,
+mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                        # spdist='euclidean',
                        suppressMes=F,
                        ker.width.intrinsic = 0,
