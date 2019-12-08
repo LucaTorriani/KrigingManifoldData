@@ -279,7 +279,6 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
       if(nk[as.character(k)]>0)  #table(factor(assigng, levels=1:K))[as.character(k)]>0
       {
         # datak=data.frame(data[assign==k,]) # extract data in k-th neighb.
-        print(sum(assign==k))
         datak=data_val[,,assign==k] # extract data in k-th neighb.
         # # coordinates.datak=datak[,1:2]      # extract coordinates
         # datamat = matrix_to_matrixArray(datak[,-c(1,2)],p = p)
