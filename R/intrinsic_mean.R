@@ -28,7 +28,6 @@ intrinsic_mean = function(data, metric_manifold = "Frobenius", metric_ts = "Frob
   if( is.array(data)){
     print('Prima alply')
     
-    print(dim(data))
     data = alply(data,3)
     print('Dopo alply')
     
