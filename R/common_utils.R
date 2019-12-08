@@ -58,6 +58,37 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
     }
     first=F
     card_min=ifelse(dim(table(assign))== K, min(table(assign)), 0)
+    
+    if(card_min >= nk_min){
+      if(is.null(grid))
+      {
+        list.ret = list(assign=assign, centers=centers)
+        return(list.ret)
+      }
+      ngrid=dim(grid)[1]
+      assigng = rep(0, ngrid)  # *NEW*
+      
+      # graph.distance.grid.centers : K*ngrid matrix (the element (k,i) is the distance on the graph between the k-th center and the i-th grid point)
+      # (This matrix will be used to compute the kernel value if ker.width.intrinsic > 0)
+      
+      # graph.distance.grid.centers = matrix(NA, K, ngrid) # kx411
+      graph.distance.grid.centers = data.grid.distance[ind,]
+      # triangles = mesh$T
+      
+      for(i in 1:ngrid){
+        # d = gridpoints2centers.distance(x=grid.new[i,], centers = centers,
+        #                                 method = spdist,
+        #                                 graph.distance = graph.distance.complete,
+        #                                 assign.matrix = assign.matrix,
+        #                                 data.grid.distance = data.grid.distance,
+        #                                 triangles = triangles)
+        # graph.distance.grid.centers[,i]=d
+        d = data.grid.distance[ind,i]
+        assigng[i]=assign2center(d)
+      }
+      
+    }
+    card_min=ifelse(dim(table(assigng))== K, card_min, 0)
   }
 
   
@@ -89,34 +120,6 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
   # nk.assigng = rep(0, K)
   # for(k in 1:K)
   #   nk.assigng[k] = length(which(assigng==k))
-  if(is.null(grid))
-  {
-    list.ret = list(assign=assign, centers=centers)
-    return(list.ret)
-  }
-  ngrid=dim(grid)[1]
-  assigng = rep(0, ngrid)  # *NEW*
-  
-  # graph.distance.grid.centers : K*ngrid matrix (the element (k,i) is the distance on the graph between the k-th center and the i-th grid point)
-  # (This matrix will be used to compute the kernel value if ker.width.intrinsic > 0)
-  
-  # graph.distance.grid.centers = matrix(NA, K, ngrid) # kx411
-  graph.distance.grid.centers = data.grid.distance[ind,]
-  # triangles = mesh$T
-  
-  for(i in 1:ngrid){
-    # d = gridpoints2centers.distance(x=grid.new[i,], centers = centers,
-    #                                 method = spdist,
-    #                                 graph.distance = graph.distance.complete,
-    #                                 assign.matrix = assign.matrix,
-    #                                 data.grid.distance = data.grid.distance,
-    #                                 triangles = triangles)
-    # graph.distance.grid.centers[,i]=d
-    d = data.grid.distance[ind,i]
-    assigng[i]=assign2center(d)
-    }
-    
-  
 
   gridk = list()
   for(k in 1:K)

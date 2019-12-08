@@ -225,7 +225,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
     assign = rdd$assign
     centers = rdd$centers
     assigng = rdd$assigng
-    nk = table(assign)
+    nk = table(assigng)
     gridk = rdd$gridk
     graph.distance.grid.centers = rdd$graph.distance.grid.centers
 
