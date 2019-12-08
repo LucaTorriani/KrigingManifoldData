@@ -125,6 +125,8 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
   }
 
   fmean = resAggregated
+  
+  prediction_grid = grid # Added 8.12.2019
 
   model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = X, Sigma_data = fmean[1:N_samples], 
                                     metric_manifold = metric_manifold,
