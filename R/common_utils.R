@@ -57,7 +57,7 @@ create.rdd = function(K, method.rdd='Voronoi', data_coords,
       assign[i] = assign2center(d)
     }
     first=F
-    card_min=ifelse(dim(table(assign))== K, min(table(assign)), 0)
+    card_min=min(table(assign))
   }
 
   if(is.null(grid))
