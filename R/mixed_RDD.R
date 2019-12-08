@@ -140,7 +140,6 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                               pdf_parameters=pdf_parameters, suppressMes = suppressMes)
 
   return(list(resBootstrap = resBootstrap,
-              resAggregated_data = resAggregated_data,
-              resAggregated_grid = resAggregated_grid,
+              resAggregated = resAggregated,
               model_pred = model_pred))
 }
