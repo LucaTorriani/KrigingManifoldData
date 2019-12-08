@@ -7,7 +7,7 @@
 #' @param nk_min minimum number of observations within a cell
 #' @param B number of \emph{divide} iterations to perform
 #' @param suppressMes \{\code{TRUE}, \code{FALSE}\} controls the level of interaction and warnings given
-#' @param ker.width.intrinsic parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0,
+#' @param ker.width.intrinsic parameter controlling the width of the Gaussian kernel for the computation of the local mean (if 0, 
 #' a "step kernel" is used, giving weight 1 to all the data within the cell and 0 to those outside of it)
 #' @param graph.distance.complete \code{N*N} distance matrix (the [i,j] element is the length of the shortest path between points i and j)
 #' @param data.grid.distance \code{N*M} distance matrix between locations where the datum has been observed and locations where
@@ -31,7 +31,7 @@
 #' @param distance type of distance between coordinates. It must be either "Eucldist" or "Geodist"
 #' @return it returns a list with the following fields
 #' \itemize{
-#'       \item \code{resBootstrap} {list of length \code{B}. Each field contains a tangent point estimate (at iteration \code{b}) for each new location, obtained
+#'       \item \code{resBootstrap} {list of length \code{B}. Each field contains a tangent point estimate (at iteration \code{b}) for each new location, obtained 
 #'                             as the intrinsic mean of the data within the tile it belongs to}
 #'       \item \code{resAggregated} {field of tangent points computed, for each location (both those where data are measured and where they must be predicted), aggregating the corresponding \code{resBootstrap}}
 #'       \item \code{model_pred} {list with the details of the global model fitted on the common Hibert space and the resulting kriging predictions. Namely it contains the following fields:
@@ -44,12 +44,12 @@
 #'               \item{\code{iterations}}{ number of iterations of the main loop}
 #'               \item{\code{prediction}}{ vector of matrices predicted at the new locations}}
 #' }
-#' @details It employs a \emph{divide} et \emph{impera} strategy to provide an estimate of a "fictional" field of tangent
-#' points, used to encode the information regarding the drift of the field. To this end in the \emph{divide} step, the domain is randomly
-#' decomposed and in each subdomain a tangent point (assigned to each location in that subregion) is estimated as the
-#' intrinsic mean of the data belonging to it. This is repeated \code{B} times with different partitions of the domain and the
-#' results are then aggregated in the \emph{impera} stage by means of the intrinsic mean. Eventually,
-#' exploiting this "fictional" field of tangent points and the concept of parallel transport, a kriging analysis over the whole
+#' @details It employs a \emph{divide} et \emph{impera} strategy to provide an estimate of a "fictional" field of tangent 
+#' points, used to encode the information regarding the drift of the field. To this end in the \emph{divide} step, the domain is randomly 
+#' decomposed and in each subdomain a tangent point (assigned to each location in that subregion) is estimated as the 
+#' intrinsic mean of the data belonging to it. This is repeated \code{B} times with different partitions of the domain and the 
+#' results are then aggregated in the \emph{impera} stage by means of the intrinsic mean. Eventually, 
+#' exploiting this "fictional" field of tangent points and the concept of parallel transport, a kriging analysis over the whole 
 #' domain is performed to predict the field values at new locations.
 #' @description Perform kriging prediction using MixedRDD procedure
 #' @useDynLib Manifoldgstat
@@ -126,14 +126,14 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
 
   fmean = resAggregated
 
-  model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = X, Sigma_data = fmean[1:N_samples],
+  model_pred = model_kriging_mixed (data_manifold = data_val, coords = data_coords, X = X, Sigma_data = fmean[1:N_samples], 
                                     metric_manifold = metric_manifold,
                               model_ts = model_ts, vario_model = vario_model, # metric_ts = "Frobenius",
-                              n_h=n_h, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=data.grid.distance,
+                              n_h=n_h, distance = distance, data_dist_mat=graph.distance.complete, data_grid_dist_mat=data.grid.distance, 
                               max_it = max_it, tolerance = tol, # weight_vario = NULL,
                               # weight_intrinsic = NULL, tolerance_intrinsic = 1e-6,
                               max_sill = max_sill, max_a = max_a,
-                              new_coords=grid, Sigma_new = fmean, X_new = X_new, create_pdf_vario = create_pdf_vario,
+                              new_coords=prediction_grid, Sigma_new = fmean, X_new = X_new, create_pdf_vario = create_pdf_vario, 
                               pdf_parameters=pdf_parameters, suppressMes = suppressMes)
 
   return(list(resBootstrap = resBootstrap,
