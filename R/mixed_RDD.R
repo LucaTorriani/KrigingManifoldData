@@ -122,7 +122,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
     resAggregated_grid = RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean_grid, weights_intrinsic = resBootstrap$kervalues_mean,
                                    ker.width.intrinsic=  ker.width.intrinsic) # p=p,  num.signif.entries = num.signif.entries
 
-    resAggregated_data = RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean_data, weights_intrinsic = resBootstrap$kervalues_mean,
+    resAggregated_data = RDD_OOK_aggr_man(fOKBV = resBootstrap$fmean_grid, weights_intrinsic = resBootstrap$kervalues_mean,
                                           ker.width.intrinsic=  ker.width.intrinsic)
   }
   
