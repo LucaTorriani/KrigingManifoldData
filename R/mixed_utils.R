@@ -215,7 +215,6 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
 
     # Step 1: Extract centers
     ### ------------- 1. Create RDD
-    print('Prima create rdd')
     rdd = create.rdd(K=K, method.rdd = 'Voronoi', data_coords = data_coords,
                      # border.length = border.length, spdist = spdist,
                      graph.distance = graph.distance,
@@ -223,7 +222,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
                      nk_min = nk_min, grid = grid,
                      # is.observed = is.observed, graph.distance.complete = graph.distance.complete, assign.matrix = assign.matrix,
                      data.grid.distance = data.grid.distance, suppressMes = suppressMes)
-    print('Dopo create rdd')
+
     assign = rdd$assign
     centers = rdd$centers
     assigng = rdd$assigng
@@ -244,8 +243,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
     # if(ker.width.vario>0) {
     #   kervalues_krig[[b]]=matrix(NA,ngrid,1); colnames(kervalues_krig[[b]])="Ker.val.krig"
     # }
-    print('Prima for')
-    
+
     for(k in 1:K)
     {
       ##### Centro
@@ -287,14 +285,11 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
         # Sigma = intrinsic_mean(data = datamat, metric_manifold = metric_manifold,
         #                        metric_ts = metric_ts, weight_intrinsic = weight.intrinsic)
         # veclocmean[k,] = matrix_to_vec(Sigma)
-        print('Prima intrinsic')
         Sigma = intrinsic_mean(data = datak, metric_manifold = metric_manifold,
                                metric_ts = metric_ts, weight_intrinsic = weight.intrinsic)
         # veclocmean[[k]] = Sigma
         # --- Assign the local tangent point to each grid point & store results
         # fpred[[b]][which(assigng==k),]=matrix(rep(veclocmean[k,],nk[as.character(k)]), nrow = nk[as.character(k)], ncol=num.signif.entries, byrow = T)
-        print('Dopo intrinsic')
-        
         fmean_grid[[b]][which(assigng==k)]= lapply(seq_len(nk[as.character(k)]), function(X) Sigma)
         fmean_data[[b]][which(assign==k)]= lapply(seq_len(nk[as.character(k)]), function(X) Sigma)
 
@@ -318,8 +313,6 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
 
   } # for su B
   # if (method.analysis == 'Local mean')
-  print('Dopo for')
-  
   list.ret = list(fmean_data=fmean_data, fmean_grid=fmean_grid,  kervalues_mean=kervalues_mean) # ,kervalues_krig=kervalues_krig, variofit=vfit
 
   if(suppressMes) options(warn = oldw)
