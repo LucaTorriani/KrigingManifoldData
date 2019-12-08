@@ -1409,16 +1409,21 @@ RcppExport SEXP get_model_and_kriging_mixed (SEXP s_data_manifold, SEXP s_coordi
     Rcpp::Nullable<std::string> distance_n(s_distance);
 
     // Coordinates
+    Rcpp::Rcout << "Prima data coordinates"<< std::endl;
+
     std::shared_ptr<const Eigen::MatrixXd> coords_ptr = std::make_shared<const Eigen::MatrixXd> (Rcpp::as<Eigen::MatrixXd> (s_coordinates));
+    Rcpp::Rcout << "Dopo data coordinates"<< std::endl;
 
     Coordinates coords(coords_ptr);
     unsigned int N = coords.get_N_station();
 
     // Data manifold
+    Rcpp::Rcout << "Prima data Manifold"<< std::endl;
     std::vector<Eigen::MatrixXd> data_manifold(N);
     for(size_t i=0; i<N; i++){
       data_manifold[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(s_data_manifold,i));
     }
+    Rcpp::Rcout << "Dopo data Manifold"<< std::endl;
 
     unsigned int p = data_manifold[0].rows();
 
@@ -1434,9 +1439,12 @@ RcppExport SEXP get_model_and_kriging_mixed (SEXP s_data_manifold, SEXP s_coordi
     std::unique_ptr<map_functions::logarithmicMap> theLogMap = logmap_fac.create(distance_Manifold_name);
 
     // Tangent points
+    Rcpp::Rcout << "Prima sigma data"<< std::endl;
+
     Rcpp::List Sigma_data(s_Sigma_data);
     std::vector<Eigen::MatrixXd> Sigma_data_vec(N);
     for(size_t i=0; i<N; i++) Sigma_data_vec[i] = Rcpp::as<Eigen::MatrixXd>(VECTOR_ELT(Sigma_data,i));
+    Rcpp::Rcout << "Dopo data Manifold"<< std::endl;
 
     // Data tangent space
     std::vector<Eigen::MatrixXd> data_tspace(N);
