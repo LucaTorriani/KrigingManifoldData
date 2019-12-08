@@ -98,9 +98,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
 
 
     # resAggregated=simplify2array(resBootstrap$fpred)[,,1]
-    resAggregated_grid = resBootstrap$fmean_grid[[1]]
-    resAggregated_data = resBootstrap$fmean_data[[1]]
-    
+    resAggregated = resBootstrap$fmean[[1]]
   }
   if(K>1)
   {
@@ -142,7 +140,7 @@ mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
                               pdf_parameters=pdf_parameters, suppressMes = suppressMes)
 
   return(list(resBootstrap = resBootstrap,
-              resAggregated_data = fmean_data,
-              resAggregated_grid = fmean_grid,
+              resAggregated_data = resAggregated_data,
+              resAggregated_grid = resAggregated_grid,
               model_pred = model_pred))
 }
