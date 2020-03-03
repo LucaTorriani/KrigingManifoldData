@@ -119,16 +119,18 @@ full_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
   }
   if(K>1)
   {
-    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, K=K, grid=grid, nk_min=nk_min, B=B,
+    resBootstrap=RDD_OOK_boot_man(data_coords=data_coords, data_val=data_val, grid=grid,  # ILA 03/03/2020: reordered arguments
+                                  graph.distance.complete= graph.distance.complete,
+                                  # assign.matrix=assign.matrix, no.assg.grid=no.assg.grid,
+                                  data.grid.distance = data.grid.distance,
+                                  
+                                  K=K, nk_min=nk_min, B=B,
                                   # spdist=spdist,
                                   suppressMes=suppressMes, tol=tol, max_it = max_it,
                                   n_h=n_h, tolerance_intrinsic =tolerance_intrinsic, X=X, X_new=X_new,  # plot=plot,
                                   ker.width.intrinsic = ker.width.intrinsic,
                                   ker.width.vario = ker.width.vario,
                                   # mesh=mesh,
-                                  graph.distance.complete= graph.distance.complete,
-                                  # assign.matrix=assign.matrix, no.assg.grid=no.assg.grid,
-                                  data.grid.distance = data.grid.distance,
                                   # is.observed=is.observed, border.length= border.length, p=p,
                                   method.analysis = method.analysis,
                                   metric_manifold = metric_manifold, metric_ts = metric_ts, model_ts = model_ts,
