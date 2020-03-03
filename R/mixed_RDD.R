@@ -55,20 +55,25 @@
 #' @useDynLib Manifoldgstat
 #' @export
 #'
-mixed_RDD = function(data_coords, data_val, K, grid, nk_min=1, B=100,
+mixed_RDD = function(data_coords, data_val, grid, 
+                     N_samples, 
+                     graph.distance.complete,
+                     # assign.matrix, no.assg.grid,
+                     data.grid.distance,
+                     pdf_parameters=NULL,
+                     
+                     K,nk_min=1, B=100,
                        # spdist='euclidean',
                        suppressMes=F,
                        ker.width.intrinsic = 0,
                        # mesh,
-                       graph.distance.complete,
-                       # assign.matrix, no.assg.grid,
-                       data.grid.distance,
+                       
                        # is.observed, border.length,
-                       N_samples, #p,
+                       #p,
                        aggregation_mean, metric_ts,
                        tol=1e-12, max_it=100, n_h=15, tolerance_intrinsic =10^(-6),
                      max_sill =NULL, max_a=NULL,
-                       X=NULL, X_new=NULL, create_pdf_vario=FALSE, pdf_parameters=NULL,
+                       X=NULL, X_new=NULL, create_pdf_vario=FALSE, 
   # ker.width.vario = 1.5, aggregation_kriging, method.analysis = 'Local mean',
                        metric_manifold, model_ts, vario_model, distance)
 
