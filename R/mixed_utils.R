@@ -195,7 +195,7 @@ RDD_OOK_boot_man_mixed = function(data_coords, data_val, K, grid, nk_min, B,
   #*data
   colnames(data_coords)=c('x','y')
   # colnames(data_val)= c(paste0('z',1:num.signif.entries))
-  nsub = dim(data)[1]
+  # nsub = dim(data)[1]  # ILA 03/03/2020
   ngrid = dim(grid)[1]
 
   #*distances
